@@ -1,7 +1,7 @@
 {
   "name": "TARSUS Finder",
   "short_name": "TARSUS",
-  "description": "Pencarian tarif khusus perjalanan kereta api berdasarkan stasiun asal dan tujuan.",
+  "description": "Pencarian tarif khusus perjalanan kereta api.",
   "start_url": "/tarif-khusus/",
   "scope": "/tarif-khusus/",
   "display": "standalone",
