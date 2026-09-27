@@ -3548,8 +3548,19 @@
     ===================================================== -->
 
     <script src="data.js"></script>
-
+<script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/tarif-khusus/sw.js")
+            .then(registration => {
+                console.log("TARSUS Service Worker aktif:", registration.scope);
+            })
+            .catch(error => {
+                console.error("TARSUS Service Worker gagal:", error);
+            });
+    });
+}
+</script>
 
 </body>
-
 </html>
