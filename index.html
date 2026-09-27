@@ -7,20 +7,55 @@
 
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <meta
+        name="theme-color"
+        content="#102536"
+    >
+
+    <meta
+        name="mobile-web-app-capable"
+        content="yes"
+    >
+
+    <meta
+        name="apple-mobile-web-app-capable"
+        content="yes"
+    >
+
+    <meta
+        name="apple-mobile-web-app-status-bar-style"
+        content="black-translucent"
+    >
+
+    <meta
+        name="apple-mobile-web-app-title"
+        content="TARSUS"
     >
 
     <title>TARSUS FINDER — KAI 121</title>
 
+    <link
+        rel="manifest"
+        href="/tarsus-backup/manifest.json"
+    >
 
-    <!-- FONT -->
+    <link
+        rel="icon"
+        href="/tarsus-backup/icon-192.png"
+    >
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <!-- FONT — TETAP -->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
 
     <link
         rel="preconnect"
         href="https://fonts.gstatic.com"
-        crossorigin
     >
 
     <link
@@ -29,3413 +64,3032 @@
     >
 
 
-    <style>
+<style>
 
-        /* =====================================================
-           COLOR SYSTEM
-           HANYA WARNA YANG DIUBAH
-        ===================================================== */
+/* =========================================================
+   TARSUS FINDER
+   FINAL APP INTERFACE
+   ========================================================= */
 
-        :root {
+:root {
 
-            --navy-deep: #102536;
-            --navy: #17384b;
-            --navy-light: #21536a;
-            --navy-card: #1b4053;
+    --navy-deep: #102536;
+    --navy: #17384b;
+    --navy-light: #21536a;
+    --navy-card: #1b4053;
 
-            --orange: #d98282;
-            --gold: #e4c783;
-            --amber: #d8b66a;
+    --orange: #d98282;
+    --gold: #e4c783;
+    --amber: #d8b66a;
 
-            --kai-red: #c76568;
-            --kai-red-light: #d98282;
+    --kai-red: #c76568;
+    --kai-red-light: #d98282;
 
-            --kai-white: #f5f8f8;
+    --kai-white: #f5f8f8;
 
-            --kai-green: #6fa783;
-            --kai-green-light: #8bba9a;
+    --kai-green: #6fa783;
+    --kai-green-light: #8bba9a;
 
-            --white: #f4f8f8;
-            --soft: #cbd9dc;
-            --muted: #8fa9b1;
+    --white: #f4f8f8;
+    --soft: #cbd9dc;
+    --muted: #8fa9b1;
 
-            --border:
-                rgba(213,236,236,.13);
+    --border: rgba(213,236,236,.13);
+    --orange-border: rgba(216,182,106,.22);
 
-            --orange-border:
-                rgba(216,182,106,.22);
-        }
+    --shadow:
+        0 20px 50px rgba(0,0,0,.18);
 
+    --drawer-width: min(330px, 86vw);
 
-        /* =====================================================
-           RESET
-        ===================================================== */
+    --transition:
+        .28s cubic-bezier(.22,.61,.36,1);
+}
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
 
+/* =========================================================
+   LIGHT MODE
+   ========================================================= */
 
-        html {
-            scroll-behavior: smooth;
-        }
+body.light-mode {
 
+    --navy-deep: #f5f7f7;
+    --navy: #ffffff;
+    --navy-light: #eef3f4;
+    --navy-card: #ffffff;
 
-        body {
+    --white: #172a35;
+    --kai-white: #172a35;
 
-            min-height: 100vh;
+    --soft: #536770;
+    --muted: #71848c;
 
-            color: var(--white);
+    --border: rgba(23,42,53,.10);
+    --orange-border: rgba(180,145,65,.22);
 
-            font-family:
-                "DM Sans",
-                sans-serif;
+    --shadow:
+        0 16px 40px rgba(26,48,58,.10);
+}
 
-            overflow-x: hidden;
 
-            background:
+/* =========================================================
+   RESET
+   ========================================================= */
 
-                radial-gradient(
-                    circle at 50% -15%,
-                    rgba(111,175,193,.26),
-                    transparent 31%
-                ),
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
 
-                radial-gradient(
-                    circle at 0% 50%,
-                    rgba(79,159,150,.20),
-                    transparent 32%
-                ),
+html {
+    scroll-behavior: smooth;
+}
 
-                radial-gradient(
-                    circle at 100% 75%,
-                    rgba(111,167,131,.13),
-                    transparent 30%
-                ),
+body {
 
-                linear-gradient(
-                    145deg,
-                    var(--navy-deep),
-                    var(--navy) 48%,
-                    #102b3c
-                );
-        }
+    margin: 0;
 
+    min-height: 100vh;
 
-        /* =====================================================
-           BACKGROUND GRID
-        ===================================================== */
+    font-family:
+        "DM Sans",
+        sans-serif;
 
-        body::before {
+    color: var(--white);
 
-            content: "";
+    background:
+        radial-gradient(
+            circle at 85% 0%,
+            rgba(33,83,106,.30),
+            transparent 35%
+        ),
+        var(--navy-deep);
 
-            position: fixed;
+    transition:
+        background .35s ease,
+        color .35s ease;
 
-            inset: 0;
+    overflow-x: hidden;
+}
 
-            pointer-events: none;
+body.light-mode {
+    background:
+        radial-gradient(
+            circle at 85% 0%,
+            rgba(216,182,106,.12),
+            transparent 35%
+        ),
+        var(--navy-deep);
+}
 
-            opacity: .45;
+button,
+input {
+    font-family: inherit;
+}
 
-            background-image:
+button {
+    cursor: pointer;
+}
 
-                linear-gradient(
-                    rgba(220,242,242,.025) 1px,
-                    transparent 1px
-                ),
+button:focus-visible,
+input:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+}
 
-                linear-gradient(
-                    90deg,
-                    rgba(220,242,242,.025) 1px,
-                    transparent 1px
-                );
 
-            background-size:
-                48px 48px;
+/* =========================================================
+   APP
+   ========================================================= */
 
-            mask-image:
-                linear-gradient(
-                    to bottom,
-                    black,
-                    transparent 88%
-                );
+#app {
 
-            z-index: -10;
-        }
+    min-height: 100vh;
 
+    position: relative;
+}
 
-        /* =====================================================
-           FLOATING ORNAMENT
-        ===================================================== */
 
-        .bg-orbit {
+/* =========================================================
+   SPLASH
+   ========================================================= */
 
-            position: fixed;
+#splashScreen {
 
-            width: 470px;
-            height: 470px;
+    position: fixed;
 
-            top: -260px;
-            right: -220px;
+    inset: 0;
 
-            border:
-                1px solid
-                rgba(228,199,131,.10);
+    z-index: 9999;
 
-            border-radius: 50%;
+    display: flex;
 
-            pointer-events: none;
+    align-items: center;
 
-            z-index: -3;
+    justify-content: center;
 
-            animation:
-                orbitSpin
-                22s
-                linear
-                infinite;
-        }
+    background:
+        radial-gradient(
+            circle at center,
+            #21536a 0%,
+            #17384b 35%,
+            #102536 75%
+        );
 
+    transition:
+        opacity .55s ease,
+        visibility .55s ease;
+}
 
-        .bg-orbit::before {
+#splashScreen.hide {
 
-            content: "";
+    opacity: 0;
 
-            position: absolute;
+    visibility: hidden;
 
-            inset: 50px;
+    pointer-events: none;
+}
 
-            border:
-                1px solid
-                rgba(228,199,131,.065);
+.splash-inner {
 
-            border-radius: 50%;
-        }
+    width: min(90%, 360px);
 
+    text-align: center;
 
-        .bg-orbit::after {
+    animation:
+        splashIn .8s ease both;
+}
 
-            content: "";
+.splash-logo {
 
-            position: absolute;
+    width: 84px;
+    height: 84px;
 
-            inset: 105px;
+    margin: 0 auto 20px;
 
-            border:
-                1px solid
-                rgba(139,186,154,.055);
+    border-radius: 25px;
 
-            border-radius: 50%;
-        }
+    display: grid;
 
+    place-items: center;
 
-        /* =====================================================
-           SPLASH SCREEN
-        ===================================================== */
+    color: var(--navy-deep);
 
-        .splash {
+    background:
+        linear-gradient(
+            145deg,
+            #f0d99d,
+            #d8b66a
+        );
 
-            position: fixed;
+    box-shadow:
+        0 20px 50px rgba(0,0,0,.25);
 
-            inset: 0;
+    font-family: "Manrope", sans-serif;
 
-            z-index: 9999;
+    font-size: 30px;
 
-            overflow: hidden;
+    font-weight: 800;
 
-            display: flex;
+    letter-spacing: -2px;
+}
 
-            align-items: center;
+.splash-title {
 
-            justify-content: center;
+    margin: 0;
 
-            background:
+    font-family: "Manrope", sans-serif;
 
-                radial-gradient(
-                    ellipse at 50% 25%,
-                    rgba(111,175,193,.32),
-                    transparent 40%
-                ),
+    font-size: 27px;
 
-                radial-gradient(
-                    ellipse at 15% 80%,
-                    rgba(111,167,131,.20),
-                    transparent 35%
-                ),
+    font-weight: 800;
 
-                radial-gradient(
-                    ellipse at 85% 70%,
-                    rgba(199,101,104,.13),
-                    transparent 30%
-                ),
+    letter-spacing: -.7px;
+}
 
-                linear-gradient(
-                    135deg,
-                    #123247 0%,
-                    #1b5063 45%,
-                    #1d5960 70%,
-                    #143749 100%
-                );
+.splash-subtitle {
 
-            animation:
-                splashExit
-                4s
-                cubic-bezier(.65,0,.35,1)
-                forwards;
-        }
+    margin: 8px 0 0;
 
+    color: rgba(245,248,248,.68);
 
-        /* =====================================================
-           SPLASH GRID
-        ===================================================== */
+    font-size: 12px;
 
-        .splash::before {
+    letter-spacing: .5px;
+}
 
-            content: "";
+.splash-line {
 
-            position: absolute;
+    width: 100px;
 
-            inset: 0;
+    height: 2px;
 
-            opacity: .22;
+    margin: 25px auto 0;
 
-            background-image:
+    overflow: hidden;
 
-                linear-gradient(
-                    rgba(255,255,255,.045) 1px,
-                    transparent 1px
-                ),
+    border-radius: 10px;
 
-                linear-gradient(
-                    90deg,
-                    rgba(255,255,255,.045) 1px,
-                    transparent 1px
-                );
+    background: rgba(255,255,255,.10);
+}
 
-            background-size:
-                55px 55px;
+.splash-line span {
 
-            mask-image:
-                radial-gradient(
-                    ellipse at center,
-                    black 15%,
-                    transparent 78%
-                );
-        }
+    display: block;
 
+    width: 45%;
 
-        /* =====================================================
-           SPLASH LIGHT
-        ===================================================== */
+    height: 100%;
 
-        .splash-light {
+    background: var(--gold);
 
-            position: absolute;
+    animation:
+        splashLoading 1.4s ease-in-out infinite;
+}
 
-            width: 470px;
-            height: 470px;
+@keyframes splashIn {
 
-            left: 50%;
-            top: 40%;
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(.97);
+    }
 
-            transform:
-                translate(-50%, -50%);
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
 
-            border-radius: 50%;
+@keyframes splashLoading {
 
-            background:
+    0% {
+        transform: translateX(-120%);
+    }
 
-                radial-gradient(
-                    circle,
-                    rgba(228,199,131,.13),
-                    rgba(111,183,167,.09) 35%,
-                    transparent 68%
-                );
+    50% {
+        transform: translateX(220%);
+    }
 
-            filter:
-                blur(8px);
+    100% {
+        transform: translateX(220%);
+    }
+}
 
-            animation:
-                splashPulse
-                3.4s
-                ease-in-out
-                infinite;
-        }
 
+/* =========================================================
+   APP HEADER
+   ========================================================= */
 
-        /* =====================================================
-           SPLASH CONTENT
-        ===================================================== */
+.app-header {
 
-        .splash-content {
+    position: sticky;
 
-            position: relative;
+    top: 0;
 
-            z-index: 10;
+    z-index: 500;
 
-            width: 100%;
+    height: 68px;
 
-            text-align: center;
+    display: flex;
 
-            transform:
-                translateY(-45px);
-        }
+    align-items: center;
 
+    padding:
+        0 18px;
 
-        /* =====================================================
-           SPLASH KAI
-        ===================================================== */
+    background:
+        rgba(16,37,54,.90);
 
-        .splash-kai {
+    border-bottom:
+        1px solid var(--border);
 
-            display: inline-flex;
+    backdrop-filter:
+        blur(18px);
 
-            align-items: center;
+    -webkit-backdrop-filter:
+        blur(18px);
+}
 
-            gap: 12px;
+body.light-mode .app-header {
 
-            margin-bottom: 15px;
+    background:
+        rgba(255,255,255,.90);
+}
 
-            color: #edf6f5;
+.header-left {
 
-            font-family:
-                Manrope,
-                sans-serif;
+    display: flex;
 
-            font-size: 11px;
+    align-items: center;
 
-            font-weight: 800;
+    gap: 12px;
 
-            letter-spacing: .32em;
+    min-width: 0;
+}
 
-            opacity: 0;
+.menu-button {
 
-            animation:
-                splashKai
-                .7s
-                .15s
-                ease-out
-                forwards;
-        }
+    width: 42px;
+    height: 42px;
 
+    flex: 0 0 42px;
 
-        .splash-kai::before,
-        .splash-kai::after {
+    display: grid;
 
-            content: "";
+    place-items: center;
 
-            width: 35px;
+    border: 1px solid var(--border);
 
-            height: 1px;
+    border-radius: 13px;
 
-            background:
+    color: var(--white);
 
-                linear-gradient(
-                    90deg,
-                    transparent,
-                    rgba(228,199,131,.85)
-                );
-        }
+    background:
+        rgba(255,255,255,.04);
 
+    transition:
+        transform .2s ease,
+        background .2s ease;
+}
 
-        .splash-kai::after {
+.menu-button:hover {
 
-            background:
+    background:
+        rgba(255,255,255,.08);
+}
 
-                linear-gradient(
-                    90deg,
-                    rgba(228,199,131,.85),
-                    transparent
-                );
-        }
+.menu-button:active {
 
+    transform: scale(.94);
+}
 
-        /* =====================================================
-           SPLASH TITLE
-           TIDAK LAGI MENGULANG TARSUS FINDER
-        ===================================================== */
+.menu-lines {
 
-        .splash-title {
+    width: 18px;
 
-            position: relative;
+    display: flex;
 
-            font-family:
-                Manrope,
-                sans-serif;
+    flex-direction: column;
 
-            font-size:
-                clamp(
-                    28px,
-                    6vw,
-                    48px
-                );
+    gap: 4px;
+}
 
-            line-height: 1;
+.menu-lines span {
 
-            font-weight: 800;
+    display: block;
 
-            letter-spacing: .09em;
+    height: 2px;
 
-            color: #f4f8f7;
+    border-radius: 4px;
 
-            opacity: 0;
+    background: currentColor;
+}
 
-            transform:
-                translateY(12px)
-                scale(.97);
+.brand-wrap {
 
-            animation:
+    min-width: 0;
+}
 
-                splashTitle
-                .9s
-                .4s
-                cubic-bezier(.2,.8,.2,1)
-                forwards;
-        }
+.brand-name {
 
+    font-family:
+        "Manrope",
+        sans-serif;
 
-        .splash-title::after {
+    font-size: 15px;
 
-            content: "";
+    font-weight: 800;
 
-            position: absolute;
+    letter-spacing: .3px;
 
-            left: 28%;
+    white-space: nowrap;
+}
 
-            right: 28%;
+.brand-sub {
 
-            bottom: -12px;
+    margin-top: 2px;
 
-            height: 1px;
+    color: var(--muted);
 
-            background:
+    font-size: 8px;
 
-                linear-gradient(
-                    90deg,
-                    transparent,
-                    rgba(228,199,131,.75),
-                    rgba(139,186,154,.7),
-                    transparent
-                );
+    font-weight: 600;
 
-            opacity: .8;
-        }
+    letter-spacing: .8px;
 
+    white-space: nowrap;
+}
 
-        /* =====================================================
-           SPLASH SUBTITLE
-        ===================================================== */
 
-        .splash-subtitle {
+/* =========================================================
+   DRAWER
+   ========================================================= */
 
-            margin-top: 27px;
+.drawer-overlay {
 
-            color:
-                rgba(235,246,245,.78);
+    position: fixed;
 
-            font-size: 10px;
+    inset: 0;
 
-            letter-spacing: .16em;
+    z-index: 800;
 
-            text-transform: uppercase;
+    background:
+        rgba(0,0,0,.48);
 
-            opacity: 0;
+    opacity: 0;
 
-            animation:
+    visibility: hidden;
 
-                splashSubtitle
-                .8s
-                .8s
-                ease-out
-                forwards;
-        }
+    transition:
+        opacity var(--transition),
+        visibility var(--transition);
 
+    backdrop-filter:
+        blur(2px);
+}
 
-        /* =====================================================
-           SPLASH STATUS
-        ===================================================== */
+.drawer-overlay.open {
 
-        .splash-status {
+    opacity: 1;
 
-            margin-top: 12px;
+    visibility: visible;
+}
 
-            color:
-                rgba(228,199,131,.80);
+.drawer {
 
-            font-size: 8px;
+    position: fixed;
 
-            font-weight: 700;
+    top: 0;
+    left: 0;
+    bottom: 0;
 
-            letter-spacing: .22em;
+    z-index: 900;
 
-            text-transform: uppercase;
+    width: var(--drawer-width);
 
-            opacity: 0;
+    padding:
+        18px 14px 24px;
 
-            animation:
-                splashStatus
-                .7s
-                1.1s
-                ease-out
-                forwards;
-        }
+    overflow-y: auto;
 
+    background:
+        linear-gradient(
+            180deg,
+            var(--navy) 0%,
+            var(--navy-deep) 100%
+        );
 
-        /* =====================================================
-           SPEED LINES
-           DIPERHALUS
-        ===================================================== */
+    border-right:
+        1px solid var(--border);
 
-        .speed-lines {
+    box-shadow:
+        20px 0 50px rgba(0,0,0,.20);
 
-            position: absolute;
+    transform:
+        translateX(-105%);
 
-            left: 0;
-            right: 0;
+    transition:
+        transform var(--transition);
+}
 
-            bottom: 16%;
+.drawer.open {
 
-            height: 60px;
+    transform:
+        translateX(0);
+}
 
-            overflow: hidden;
+.drawer-top {
 
-            opacity: .25;
-        }
+    display: flex;
 
+    align-items: center;
 
-        .speed-lines span {
+    justify-content: space-between;
 
-            position: absolute;
+    padding:
+        4px 4px 18px;
 
-            height: 1px;
+    border-bottom:
+        1px solid var(--border);
+}
 
-            border-radius: 50%;
+.drawer-brand {
 
-            background:
+    display: flex;
 
-                linear-gradient(
-                    90deg,
-                    transparent,
-                    rgba(222,240,240,.45),
-                    transparent
-                );
+    align-items: center;
 
-            animation:
-                speedLine
-                3.4s
-                linear
-                infinite;
-        }
+    gap: 10px;
+}
 
+.drawer-logo {
 
-        .speed-lines span:nth-child(1) {
-            width: 100px;
-            top: 12px;
-            animation-delay: -.3s;
-        }
+    width: 42px;
+    height: 42px;
 
-        .speed-lines span:nth-child(2) {
-            width: 150px;
-            top: 25px;
-            animation-delay: -1.2s;
-        }
+    display: grid;
 
-        .speed-lines span:nth-child(3) {
-            width: 80px;
-            top: 39px;
-            animation-delay: -2s;
-        }
+    place-items: center;
 
-        .speed-lines span:nth-child(4) {
-            width: 120px;
-            top: 51px;
-            animation-delay: -.8s;
-        }
+    border-radius: 13px;
 
-        .speed-lines span:nth-child(5) {
-            width: 70px;
-            top: 57px;
-            animation-delay: -1.8s;
-        }
+    color: var(--navy-deep);
 
+    background:
+        linear-gradient(
+            145deg,
+            #efd99f,
+            #d8b66a
+        );
 
-        /* =====================================================
-           SPLASH TRAIN AREA
-           TRAIN KECIL DAN RENDAH
-        ===================================================== */
+    font-family:
+        "Manrope",
+        sans-serif;
 
-        .splash-track {
+    font-size: 14px;
 
-            position: absolute;
+    font-weight: 800;
+}
 
-            left: 0;
-            right: 0;
+.drawer-title {
 
-            bottom: 10%;
+    font-family:
+        "Manrope",
+        sans-serif;
 
-            height: 70px;
+    font-size: 13px;
 
-            overflow: hidden;
-        }
+    font-weight: 800;
+}
 
+.drawer-subtitle {
 
-        /* rail */
+    margin-top: 2px;
 
-        .splash-track::before {
+    color: var(--muted);
 
-            content: "";
+    font-size: 8px;
 
-            position: absolute;
+    letter-spacing: .5px;
+}
 
-            left: 0;
-            right: 0;
+.drawer-close {
 
-            bottom: 8px;
+    width: 36px;
+    height: 36px;
 
-            height: 2px;
+    display: grid;
 
-            background:
+    place-items: center;
 
-                linear-gradient(
-                    90deg,
-                    transparent,
-                    rgba(235,246,245,.18) 15%,
-                    rgba(228,199,131,.48) 50%,
-                    rgba(235,246,245,.18) 85%,
-                    transparent
-                );
+    border: 0;
 
-            box-shadow:
-                0 4px 0
-                rgba(235,246,245,.035);
-        }
+    border-radius: 11px;
 
+    color: var(--muted);
 
-        .splash-track::after {
+    background:
+        rgba(255,255,255,.04);
 
-            content: "";
+    font-size: 20px;
+}
 
-            position: absolute;
+.drawer-section {
 
-            left: 0;
-            right: 0;
+    margin-top: 22px;
+}
 
-            bottom: 0;
+.drawer-section-title {
 
-            height: 22px;
+    padding:
+        0 10px 8px;
 
-            background:
+    color: var(--muted);
 
-                linear-gradient(
-                    to top,
-                    rgba(16,42,58,.65),
-                    transparent
-                );
-        }
+    font-size: 8px;
 
+    font-weight: 800;
 
-        /* =====================================================
-           SPLASH TRAIN
-           LEBIH KECIL
-        ===================================================== */
+    letter-spacing: 1.4px;
+}
 
-        .splash-train {
+.drawer-item {
 
-            position: absolute;
+    width: 100%;
 
-            left: -260px;
+    min-height: 48px;
 
-            bottom: 12px;
+    display: flex;
 
-            width: 230px;
+    align-items: center;
 
-            height: 38px;
+    gap: 12px;
 
-            animation:
+    padding:
+        9px 10px;
 
-                splashTrainMove
-                3.3s
-                .2s
-                cubic-bezier(.42,0,.58,1)
-                forwards;
-        }
+    margin-bottom: 3px;
 
+    border: 0;
 
-        /* =====================================================
-           COACH
-        ===================================================== */
+    border-radius: 13px;
 
-        .splash-coach {
+    color: var(--soft);
 
-            position: absolute;
+    background: transparent;
 
-            bottom: 8px;
+    text-align: left;
 
-            width: 40px;
+    transition:
+        background .2s ease,
+        color .2s ease,
+        transform .2s ease;
+}
 
-            height: 14px;
+.drawer-item:hover {
 
-            border-radius:
-                3px 4px 2px 2px;
+    color: var(--white);
 
-            background:
+    background:
+        rgba(255,255,255,.045);
+}
 
-                linear-gradient(
-                    to bottom,
-                    #f6faf9 0%,
-                    #edf4f3 34%,
-                    #c76568 35%,
-                    #c76568 47%,
-                    #e6edec 48%,
-                    #c8d5d6 100%
-                );
+.drawer-item:active {
 
-            border:
-                1px solid
-                rgba(255,255,255,.48);
+    transform: scale(.985);
+}
 
-            box-shadow:
+.drawer-item.active {
 
-                0 3px 8px
-                rgba(0,0,0,.28);
-        }
+    color: var(--gold);
 
+    background:
+        rgba(228,199,131,.09);
+}
 
-        .splash-coach::before {
+.drawer-item-icon {
 
-            content: "";
+    width: 34px;
+    height: 34px;
 
-            position: absolute;
+    flex: 0 0 34px;
 
-            left: 4px;
+    display: grid;
 
-            top: 3px;
+    place-items: center;
 
-            width: 6px;
+    border-radius: 10px;
 
-            height: 4px;
+    color: currentColor;
 
-            border-radius: 1px;
+    background:
+        rgba(255,255,255,.045);
+}
 
-            background:
-                #23485b;
+.drawer-item.active
+.drawer-item-icon {
 
-            box-shadow:
+    background:
+        rgba(228,199,131,.10);
+}
 
-                9px 0 0 #23485b,
-                18px 0 0 #23485b,
-                27px 0 0 #23485b;
-        }
+.drawer-item-text {
 
+    flex: 1;
 
-        .splash-coach::after {
+    font-size: 11px;
 
-            content: "";
+    font-weight: 700;
+}
 
-            position: absolute;
+.external-arrow {
 
-            left: 3px;
-            right: 3px;
+    color: var(--muted);
 
-            bottom: 2px;
+    font-size: 12px;
+}
 
-            height: 1px;
 
-            border-radius: 3px;
+/* =========================================================
+   MAIN
+   ========================================================= */
 
-            background:
-                rgba(111,167,131,.9);
-        }
+main {
 
+    width: 100%;
 
-        .splash-coach.one {
-            left: 0;
-        }
+    min-height:
+        calc(100vh - 68px);
+}
 
-        .splash-coach.two {
-            left: 43px;
-        }
+.page {
 
-        .splash-coach.three {
-            left: 86px;
-        }
+    display: none;
 
-        .splash-coach.four {
-            left: 129px;
-        }
+    width: min(
+        100%,
+        920px
+    );
 
+    margin:
+        0 auto;
 
-        /* =====================================================
-           COUPLER
-        ===================================================== */
+    padding:
+        30px 18px 60px;
 
-        .splash-coupler {
+    animation:
+        pageIn .32s ease both;
+}
 
-            position: absolute;
+.page.active {
 
-            bottom: 11px;
+    display: block;
+}
 
-            width: 4px;
+@keyframes pageIn {
 
-            height: 2px;
+    from {
+        opacity: 0;
+        transform: translateY(7px);
+    }
 
-            border-radius: 2px;
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
-            background:
-                #71868b;
-        }
 
+/* =========================================================
+   HOME
+   ========================================================= */
 
-        .splash-coupler.one {
-            left: 39px;
-        }
+.home-hero {
 
-        .splash-coupler.two {
-            left: 82px;
-        }
+    position: relative;
 
-        .splash-coupler.three {
-            left: 125px;
-        }
+    overflow: hidden;
 
-        .splash-coupler.four {
-            left: 168px;
-        }
+    padding:
+        34px 24px 28px;
 
+    border:
+        1px solid var(--border);
 
-        /* =====================================================
-           LOCOMOTIVE
-        ===================================================== */
+    border-radius: 25px;
 
-        .splash-loco {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(33,83,106,.72),
+            rgba(23,56,75,.70)
+        );
 
-            position: absolute;
+    box-shadow:
+        var(--shadow);
+}
 
-            left: 173px;
+body.light-mode .home-hero {
 
-            bottom: 8px;
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #edf3f4
+        );
+}
 
-            width: 57px;
+.home-hero::after {
 
-            height: 22px;
-        }
+    content: "";
 
+    position: absolute;
 
-        /* body */
+    width: 180px;
+    height: 180px;
 
-        .splash-loco-body {
+    right: -70px;
+    top: -70px;
 
-            position: absolute;
+    border-radius: 50%;
 
-            left: 0;
+    background:
+        rgba(228,199,131,.08);
 
-            bottom: 0;
+    pointer-events: none;
+}
 
-            width: 51px;
+.home-kicker {
 
-            height: 14px;
+    position: relative;
 
-            border-radius:
-                3px 4px 2px 2px;
+    color: var(--gold);
 
-            background:
+    font-size: 9px;
 
-                linear-gradient(
-                    to bottom,
-                    #f7faf9 0%,
-                    #edf4f3 27%,
-                    #c76568 28%,
-                    #c76568 43%,
-                    #dce6e5 44%,
-                    #c3d0d1 100%
-                );
+    font-weight: 800;
 
-            border:
-                1px solid
-                rgba(255,255,255,.52);
+    letter-spacing: 1.8px;
+}
 
-            box-shadow:
-                0 3px 9px
-                rgba(0,0,0,.32);
-        }
+.home-title {
 
+    position: relative;
 
-        /* green lower accent */
+    margin:
+        9px 0 9px;
 
-        .splash-loco-body::after {
+    max-width: 620px;
 
-            content: "";
+    font-family:
+        "Manrope",
+        sans-serif;
 
-            position: absolute;
+    font-size:
+        clamp(27px, 6vw, 43px);
 
-            left: 3px;
+    line-height: 1.08;
 
-            right: 5px;
+    letter-spacing: -1.2px;
+}
 
-            bottom: 2px;
+.home-description {
 
-            height: 1px;
+    position: relative;
 
-            border-radius: 3px;
+    max-width: 600px;
 
-            background:
-                var(--kai-green);
-        }
+    margin: 0;
 
+    color: var(--soft);
 
-        /* cabin */
+    font-size: 12px;
 
-        .splash-loco-cabin {
+    line-height: 1.7;
+}
 
-            position: absolute;
+.home-search-button {
 
-            left: 11px;
+    width: 100%;
 
-            bottom: 13px;
+    min-height: 66px;
 
-            width: 23px;
+    display: flex;
 
-            height: 11px;
+    align-items: center;
 
-            border-radius:
-                3px 3px 0 0;
+    justify-content: space-between;
 
-            background:
+    gap: 15px;
 
-                linear-gradient(
-                    135deg,
-                    #f7faf9,
-                    #e2ebea
-                );
+    margin-top: 25px;
 
-            border:
-                1px solid
-                rgba(255,255,255,.55);
+    padding:
+        11px 14px;
 
-            z-index: 3;
-        }
+    border: 1px solid
+        rgba(228,199,131,.25);
 
+    border-radius: 17px;
 
-        /* windows */
+    color: var(--navy-deep);
 
-        .splash-loco-cabin::before {
+    background:
+        linear-gradient(
+            135deg,
+            #efd99e,
+            #d8b66a
+        );
 
-            content: "";
+    box-shadow:
+        0 12px 28px rgba(0,0,0,.15);
 
-            position: absolute;
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+}
 
-            left: 3px;
+.home-search-button:hover {
 
-            top: 3px;
+    transform: translateY(-1px);
 
-            width: 6px;
+    box-shadow:
+        0 15px 32px rgba(0,0,0,.20);
+}
 
-            height: 4px;
+.home-search-button:active {
 
-            border-radius: 1px;
+    transform: scale(.985);
+}
 
-            background:
-                #23485b;
+.home-search-button .left {
 
-            box-shadow:
-                9px 0 0 #23485b;
+    display: flex;
 
-            border:
-                1px solid
-                rgba(111,167,131,.5);
-        }
+    align-items: center;
 
+    gap: 12px;
 
-        /* roof */
+    text-align: left;
+}
 
-        .splash-loco-roof {
+.search-icon {
 
-            position: absolute;
+    width: 40px;
+    height: 40px;
 
-            left: 9px;
+    display: grid;
 
-            bottom: 23px;
+    place-items: center;
 
-            width: 27px;
+    border-radius: 12px;
 
-            height: 2px;
+    background:
+        rgba(16,37,54,.10);
 
-            border-radius: 5px;
+    font-size: 17px;
+}
 
-            background:
-                #c8d6d6;
+.home-search-button strong {
 
-            z-index: 4;
-        }
+    display: block;
 
+    font-family:
+        "Manrope",
+        sans-serif;
 
-        /* nose */
+    font-size: 12px;
+}
 
-        .splash-loco-nose {
+.home-search-button small {
 
-            position: absolute;
+    display: block;
 
-            right: 0;
+    margin-top: 3px;
 
-            bottom: 0;
+    font-size: 9px;
 
-            width: 17px;
+    opacity: .72;
+}
 
-            height: 15px;
+.home-arrow {
 
-            border-radius:
-                0 4px 3px 0;
+    font-size: 20px;
 
-            background:
+    font-weight: 700;
+}
 
-                linear-gradient(
-                    to bottom,
-                    #f7faf9 0%,
-                    #edf4f3 30%,
-                    #c76568 31%,
-                    #c76568 47%,
-                    #d1dcdd 48%,
-                    #bac9ca 100%
-                );
 
-            clip-path:
-                polygon(
-                    0 0,
-                    62% 8%,
-                    100% 50%,
-                    62% 92%,
-                    0 100%
-                );
+/* =========================================================
+   QUICK CARDS
+   ========================================================= */
 
-            z-index: 5;
-        }
+.quick-grid {
 
+    display: grid;
 
-        /* front light */
+    grid-template-columns:
+        repeat(3, 1fr);
 
-        .splash-loco-light {
+    gap: 10px;
 
-            position: absolute;
+    margin-top: 14px;
+}
 
-            right: 1px;
+.quick-card {
 
-            bottom: 7px;
+    padding:
+        15px 13px;
 
-            width: 4px;
+    border:
+        1px solid var(--border);
 
-            height: 4px;
+    border-radius: 17px;
 
-            border-radius: 50%;
+    background:
+        rgba(255,255,255,.025);
 
-            background:
-                #fff9d8;
+    transition:
+        transform .2s ease,
+        background .2s ease;
+}
 
-            box-shadow:
-                0 0 5px
-                rgba(255,232,151,.9),
+body.light-mode .quick-card {
 
-                0 0 10px
-                rgba(228,199,131,.45);
+    background:
+        rgba(255,255,255,.70);
+}
 
-            z-index: 8;
-        }
+.quick-card:hover {
 
+    transform:
+        translateY(-2px);
 
-        /* chimney */
+    background:
+        rgba(255,255,255,.05);
+}
 
-        .splash-chimney {
+.quick-icon {
 
-            position: absolute;
+    width: 32px;
+    height: 32px;
 
-            left: 38px;
+    display: grid;
 
-            bottom: 22px;
+    place-items: center;
 
-            width: 4px;
+    margin-bottom: 11px;
 
-            height: 8px;
+    border-radius: 10px;
 
-            border-radius:
-                2px 2px 1px 1px;
+    color: var(--gold);
 
-            background:
-                #75878a;
+    background:
+        rgba(228,199,131,.08);
+}
 
-            z-index: 4;
-        }
+.quick-card strong {
 
+    display: block;
 
-        .splash-chimney::before {
+    font-size: 10px;
 
-            content: "";
+    font-weight: 800;
+}
 
-            position: absolute;
+.quick-card span {
 
-            left: -2px;
+    display: block;
 
-            top: -2px;
+    margin-top: 4px;
 
-            width: 8px;
+    color: var(--muted);
 
-            height: 2px;
+    font-size: 8px;
 
-            border-radius: 5px;
+    line-height: 1.4;
+}
 
-            background:
-                #687b7f;
-        }
 
+/* =========================================================
+   RECENT / FAVORITES
+   ========================================================= */
 
-        /* =====================================================
-           TRAIN WHEELS
-        ===================================================== */
+.home-section {
 
-        .splash-wheel {
+    margin-top: 28px;
+}
 
-            position: absolute;
+.section-heading {
 
-            bottom: -3px;
+    display: flex;
 
-            width: 8px;
+    align-items: center;
 
-            height: 8px;
+    justify-content: space-between;
 
-            border-radius: 50%;
+    margin-bottom: 10px;
+}
 
-            background:
+.section-heading h2 {
 
-                radial-gradient(
-                    circle,
-                    #e8eeee 0 15%,
-                    #6d7f83 16% 35%,
-                    #273b45 36% 65%,
-                    #152630 66%
-                );
+    margin: 0;
 
-            border:
-                1px solid
-                rgba(255,255,255,.42);
+    font-family:
+        "Manrope",
+        sans-serif;
 
-            z-index: 10;
+    font-size: 13px;
+}
 
-            animation:
-                splashWheel
-                .65s
-                linear
-                infinite;
-        }
+.section-heading button {
 
+    border: 0;
 
-        .splash-wheel.w1 {
-            left: 7px;
-        }
+    color: var(--gold);
 
-        .splash-wheel.w2 {
-            left: 28px;
-        }
+    background: transparent;
 
-        .splash-wheel.w3 {
-            left: 50px;
-        }
+    font-size: 9px;
 
-        .splash-wheel.w4 {
-            left: 71px;
-        }
+    font-weight: 700;
+}
 
-        .splash-wheel.w5 {
-            left: 92px;
-        }
+.history-list {
 
-        .splash-wheel.w6 {
-            left: 113px;
-        }
+    display: flex;
 
-        .splash-wheel.w7 {
-            left: 134px;
-        }
+    flex-direction: column;
 
-        .splash-wheel.w8 {
-            left: 155px;
-        }
+    gap: 7px;
+}
 
-        .splash-wheel.w9 {
-            left: 181px;
-        }
+.history-empty {
 
-        .splash-wheel.w10 {
-            left: 201px;
-        }
+    padding:
+        18px;
 
+    border:
+        1px dashed var(--border);
 
-        /* =====================================================
-           SMOKE
-        ===================================================== */
+    border-radius: 15px;
 
-        .splash-smoke {
+    color: var(--muted);
 
-            position: absolute;
+    font-size: 9px;
 
-            left: 39px;
+    text-align: center;
+}
 
-            bottom: 30px;
+.history-item {
 
-            width: 7px;
+    width: 100%;
 
-            height: 7px;
+    display: flex;
 
-            border-radius: 50%;
+    align-items: center;
 
-            background:
-                rgba(236,245,244,.15);
+    gap: 10px;
 
-            filter:
-                blur(1px);
+    padding:
+        10px;
 
-            opacity: 0;
+    border:
+        1px solid var(--border);
 
-            animation:
-                splashSmoke
-                2.5s
-                .7s
-                ease-out
-                infinite;
-        }
+    border-radius: 15px;
 
+    color: var(--white);
 
-        .splash-smoke::before {
+    background:
+        rgba(255,255,255,.025);
 
-            content: "";
+    text-align: left;
+}
 
-            position: absolute;
+.history-route {
 
-            left: 6px;
+    flex: 1;
 
-            top: -5px;
+    min-width: 0;
+}
 
-            width: 8px;
+.history-route strong {
 
-            height: 8px;
+    display: block;
 
-            border-radius: 50%;
+    overflow: hidden;
 
-            background:
-                rgba(236,245,244,.11);
-        }
+    text-overflow: ellipsis;
 
+    white-space: nowrap;
 
-        .splash-smoke::after {
+    font-size: 10px;
+}
 
-            content: "";
+.history-route span {
 
-            position: absolute;
+    display: block;
 
-            left: -3px;
+    margin-top: 3px;
 
-            top: -10px;
+    color: var(--muted);
 
-            width: 6px;
+    font-size: 8px;
+}
 
-            height: 6px;
+.history-arrow {
 
-            border-radius: 50%;
+    color: var(--gold);
 
-            background:
-                rgba(236,245,244,.08);
-        }
+    font-size: 14px;
+}
 
 
-        /* =====================================================
-           TRAIN GLOW
-        ===================================================== */
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
 
-        .splash-train-glow {
+.page-header {
 
-            position: absolute;
+    margin-bottom: 22px;
+}
 
-            left: 0;
+.page-kicker {
 
-            bottom: 2px;
+    color: var(--gold);
 
-            width: 226px;
+    font-size: 8px;
 
-            height: 4px;
+    font-weight: 800;
 
-            border-radius: 50%;
+    letter-spacing: 1.7px;
+}
 
-            background:
+.page-title {
 
-                linear-gradient(
-                    90deg,
-                    rgba(111,167,131,.04),
-                    rgba(228,199,131,.22),
-                    rgba(199,101,104,.07)
-                );
+    margin:
+        7px 0 7px;
 
-            filter:
-                blur(4px);
-        }
+    font-family:
+        "Manrope",
+        sans-serif;
 
+    font-size:
+        clamp(25px, 6vw, 36px);
 
-        /* =====================================================
-           SPLASH FOOTER
-        ===================================================== */
+    line-height: 1.1;
 
-        .splash-footer {
+    letter-spacing: -.8px;
+}
 
-            position: absolute;
+.page-subtitle {
 
-            left: 0;
-            right: 0;
+    max-width: 600px;
 
-            bottom: 24px;
+    margin: 0;
 
-            text-align: center;
+    color: var(--muted);
 
-            color:
-                rgba(205,224,224,.50);
+    font-size: 11px;
 
-            font-size: 8px;
+    line-height: 1.6;
+}
 
-            letter-spacing: .22em;
 
-            text-transform: uppercase;
+/* =========================================================
+   CONTENT CARD
+   ========================================================= */
 
-            opacity: 0;
+.content-card {
 
-            animation:
-                splashFooter
-                .7s
-                1.3s
-                ease-out
-                forwards;
-        }
+    padding:
+        20px;
 
+    margin-bottom: 12px;
 
-        /* =====================================================
-           SPLASH ANIMATIONS
-        ===================================================== */
+    border:
+        1px solid var(--border);
 
-        @keyframes splashKai {
+    border-radius: 19px;
 
-            from {
-                opacity: 0;
-                transform:
-                    translateY(10px);
-            }
+    background:
+        rgba(255,255,255,.025);
+}
 
-            to {
-                opacity: 1;
-                transform:
-                    translateY(0);
-            }
-        }
+body.light-mode .content-card {
 
+    background:
+        rgba(255,255,255,.72);
+}
 
-        @keyframes splashTitle {
+.content-card h3 {
 
-            from {
-                opacity: 0;
-                transform:
-                    translateY(12px)
-                    scale(.97);
-            }
+    margin:
+        0 0 8px;
 
-            to {
-                opacity: 1;
-                transform:
-                    translateY(0)
-                    scale(1);
-            }
-        }
+    font-family:
+        "Manrope",
+        sans-serif;
 
+    font-size: 14px;
+}
 
-        @keyframes splashSubtitle {
+.content-card p {
 
-            from {
-                opacity: 0;
-                transform:
-                    translateY(8px);
-            }
+    margin:
+        0;
 
-            to {
-                opacity: 1;
-                transform:
-                    translateY(0);
-            }
-        }
+    color: var(--soft);
 
+    font-size: 10px;
 
-        @keyframes splashStatus {
+    line-height: 1.75;
+}
 
-            from {
-                opacity: 0;
-            }
+.content-card + .content-card {
 
-            to {
-                opacity: 1;
-            }
-        }
+    margin-top: 12px;
+}
 
 
-        @keyframes splashFooter {
+/* =========================================================
+   SEARCH PAGE
+   ========================================================= */
 
-            from {
-                opacity: 0;
-            }
+.search-shell {
 
-            to {
-                opacity: 1;
-            }
-        }
+    padding:
+        20px;
 
+    border:
+        1px solid var(--border);
 
-        @keyframes splashPulse {
+    border-radius: 23px;
 
-            0%,
-            100% {
-                opacity: .55;
-                transform:
-                    translate(-50%, -50%)
-                    scale(.94);
-            }
+    background:
+        linear-gradient(
+            145deg,
+            rgba(33,83,106,.30),
+            rgba(23,56,75,.25)
+        );
 
-            50% {
-                opacity: 1;
-                transform:
-                    translate(-50%, -50%)
-                    scale(1.06);
-            }
-        }
+    box-shadow:
+        var(--shadow);
+}
 
+.search-fields {
 
-        @keyframes speedLine {
+    display: grid;
 
-            0% {
-                left: -180px;
-                opacity: 0;
-            }
+    grid-template-columns:
+        1fr 46px 1fr;
 
-            20% {
-                opacity: .35;
-            }
+    align-items: end;
 
-            80% {
-                opacity: .12;
-            }
+    gap: 10px;
+}
 
-            100% {
-                left: calc(100% + 180px);
-                opacity: 0;
-            }
-        }
+.field-group {
 
+    position: relative;
+}
 
-        @keyframes splashTrainMove {
+.field-label {
 
-            0% {
-                left: -270px;
-                opacity: 0;
-            }
+    display: block;
 
-            12% {
-                opacity: 1;
-            }
+    margin:
+        0 0 7px 3px;
 
-            25% {
-                opacity: 1;
-            }
+    color: var(--muted);
 
-            82% {
-                opacity: 1;
-            }
+    font-size: 8px;
 
-            100% {
-                left: calc(100% + 270px);
-                opacity: 0;
-            }
-        }
+    font-weight: 800;
 
+    letter-spacing: 1px;
+}
 
-        @keyframes splashWheel {
+.station-input {
 
-            from {
-                transform:
-                    rotate(0deg);
-            }
+    width: 100%;
 
-            to {
-                transform:
-                    rotate(360deg);
-            }
-        }
+    height: 48px;
 
+    padding:
+        0 13px;
 
-        @keyframes splashSmoke {
+    border:
+        1px solid var(--border);
 
-            0% {
-                opacity: 0;
-                transform:
-                    translate(0, 2px)
-                    scale(.6);
-            }
+    border-radius: 13px;
 
-            20% {
-                opacity: .32;
-            }
+    color: var(--white);
 
-            60% {
-                opacity: .12;
-                transform:
-                    translate(-5px, -13px)
-                    scale(1);
-            }
+    background:
+        rgba(0,0,0,.12);
 
-            100% {
-                opacity: 0;
-                transform:
-                    translate(-9px, -25px)
-                    scale(1.2);
-            }
-        }
+    font-size: 11px;
 
+    font-weight: 600;
 
-        @keyframes splashExit {
+    transition:
+        border .2s ease,
+        box-shadow .2s ease;
+}
 
-            0%,
-            82% {
-                opacity: 1;
-                visibility: visible;
-            }
+body.light-mode .station-input {
 
-            100% {
-                opacity: 0;
-                visibility: hidden;
-            }
-        }
+    background:
+        rgba(255,255,255,.85);
+}
 
+.station-input::placeholder {
 
-        /* =====================================================
-           APP
-        ===================================================== */
+    color: var(--muted);
+}
 
-        .app {
+.station-input:focus {
 
-            width:
-                min(
-                    920px,
-                    calc(100% - 28px)
-                );
+    border-color:
+        rgba(228,199,131,.48);
 
-            margin:
-                0 auto;
+    box-shadow:
+        0 0 0 3px rgba(228,199,131,.07);
 
-            padding:
-                25px 0 35px;
+    outline: none;
+}
 
-            opacity: 0;
+.swap-button {
 
-            animation:
-                appReveal
-                .9s
-                3.15s
-                cubic-bezier(.2,.8,.2,1)
-                forwards;
-        }
+    width: 42px;
+    height: 42px;
 
+    margin-bottom: 3px;
 
-        /* =====================================================
-           HEADER
-        ===================================================== */
+    display: grid;
 
-        .header {
+    place-items: center;
 
-            position: relative;
+    border:
+        1px solid var(--border);
 
-            text-align: center;
+    border-radius: 13px;
 
-            padding:
-                25px 10px 42px;
+    color: var(--gold);
 
-            overflow: hidden;
-        }
+    background:
+        rgba(255,255,255,.04);
 
+    font-size: 18px;
 
-        .header::before {
+    transition:
+        transform .25s ease;
+}
 
-            content: "";
+.swap-button:active {
 
-            position: absolute;
+    transform:
+        rotate(180deg) scale(.92);
+}
 
-            width: 360px;
-            height: 170px;
+.search-button {
 
-            left: 50%;
-            top: 0;
+    width: 100%;
 
-            transform:
-                translateX(-50%);
+    height: 48px;
 
-            background:
-                radial-gradient(
-                    ellipse,
-                    rgba(111,175,193,.22),
-                    transparent 68%
-                );
+    margin-top: 12px;
 
-            filter:
-                blur(15px);
+    border: 0;
 
-            animation:
-                headerGlow
-                4.5s
-                ease-in-out
-                infinite;
+    border-radius: 14px;
 
-            pointer-events: none;
-        }
+    color: var(--navy-deep);
 
+    background:
+        linear-gradient(
+            135deg,
+            #efd99e,
+            #d8b66a
+        );
 
-        .header::after {
+    font-size: 11px;
 
-            content: "";
+    font-weight: 800;
 
-            position: absolute;
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+}
 
-            left: 50%;
-            bottom: 20px;
+.search-button:hover {
 
-            width: 240px;
-            height: 1px;
+    box-shadow:
+        0 12px 25px rgba(0,0,0,.14);
+}
 
-            transform:
-                translateX(-50%);
+.search-button:active {
 
-            background:
+    transform: scale(.985);
+}
 
-                linear-gradient(
-                    90deg,
-                    transparent,
-                    rgba(228,199,131,.55),
-                    transparent
-                );
-        }
+.status {
 
+    min-height: 18px;
 
-        .kai-label {
+    margin:
+        13px 3px 0;
 
-            position: relative;
+    color: var(--muted);
 
-            display: inline-flex;
+    font-size: 9px;
+}
 
-            align-items: center;
+.suggestions {
 
-            gap: 9px;
+    position: absolute;
 
-            margin-bottom: 13px;
+    top: calc(100% + 6px);
 
-            color:
-                var(--gold);
+    left: 0;
+    right: 0;
 
-            font-family:
-                Manrope,
-                sans-serif;
+    z-index: 300;
 
-            font-size:
-                10px;
+    max-height: 230px;
 
-            font-weight:
-                800;
+    overflow-y: auto;
 
-            letter-spacing:
-                .27em;
-        }
+    display: none;
 
+    padding: 5px;
 
-        .kai-label::before,
-        .kai-label::after {
+    border:
+        1px solid var(--border);
 
-            content: "";
+    border-radius: 14px;
 
-            width: 23px;
-            height: 1px;
+    background:
+        var(--navy);
 
-            background:
-                linear-gradient(
-                    90deg,
-                    transparent,
-                    var(--orange)
-                );
-        }
+    box-shadow:
+        0 18px 40px rgba(0,0,0,.25);
+}
 
+.suggestions.show {
 
-        .kai-label::after {
+    display: block;
+}
 
-            background:
-                linear-gradient(
-                    90deg,
-                    var(--orange),
-                    transparent
-                );
-        }
+.suggestion-item {
 
+    padding:
+        10px 11px;
 
-        .header h1 {
+    border-radius: 9px;
 
-            position: relative;
+    color: var(--soft);
 
-            font-family:
-                Manrope,
-                sans-serif;
+    font-size: 10px;
 
-            font-size:
-                clamp(
-                    33px,
-                    7vw,
-                    54px
-                );
+    cursor: pointer;
+}
 
-            font-weight:
-                800;
+.suggestion-item:hover {
 
-            line-height:
-                1;
+    color: var(--white);
 
-            letter-spacing:
-                .075em;
+    background:
+        rgba(255,255,255,.05);
+}
 
-            background:
+#results {
 
-                linear-gradient(
-                    105deg,
-                    #dceef0,
-                    #70afc1,
-                    #e4c783,
-                    #67b7a7,
-                    #eaf5f4
-                );
+    margin-top: 18px;
+}
 
-            background-size:
-                260% auto;
 
-            -webkit-background-clip:
-                text;
+/* =========================================================
+   GUIDE
+   ========================================================= */
 
-            background-clip:
-                text;
+.guide-step {
 
-            color:
-                transparent;
+    display: flex;
 
-            animation:
-                titleGradient
-                5s
-                ease-in-out
-                infinite;
-        }
+    gap: 13px;
 
+    padding:
+        15px 0;
 
-        .subtitle {
+    border-bottom:
+        1px solid var(--border);
+}
 
-            position: relative;
+.guide-step:first-child {
 
-            margin-top:
-                13px;
+    padding-top: 0;
+}
 
-            color:
-                var(--soft);
+.guide-step:last-child {
 
-            font-size:
-                12px;
+    padding-bottom: 0;
 
-            letter-spacing:
-                .06em;
-        }
+    border-bottom: 0;
+}
 
+.guide-number {
 
-        /* =====================================================
-           SEARCH PANEL
-        ===================================================== */
+    width: 32px;
+    height: 32px;
 
-        .search-panel {
+    flex: 0 0 32px;
 
-            position: relative;
+    display: grid;
 
-            padding:
-                25px;
+    place-items: center;
 
-            border:
-                1px solid
-                var(--border);
+    border-radius: 10px;
 
-            border-radius:
-                25px;
+    color: var(--navy-deep);
 
-            background:
+    background:
+        var(--gold);
 
-                linear-gradient(
-                    145deg,
-                    rgba(31,76,95,.88),
-                    rgba(18,48,64,.88)
-                );
+    font-size: 10px;
 
-            backdrop-filter:
-                blur(18px);
+    font-weight: 800;
+}
 
-            -webkit-backdrop-filter:
-                blur(18px);
+.guide-content strong {
 
-            box-shadow:
+    display: block;
 
-                0 25px 70px
-                rgba(4,22,31,.30),
+    margin-bottom: 4px;
 
-                inset 0 1px 0
-                rgba(255,255,255,.055);
+    font-family:
+        "Manrope",
+        sans-serif;
 
-            animation:
-                panelReveal
-                .8s
-                .08s
-                cubic-bezier(.2,.8,.2,1)
-                both;
-        }
+    font-size: 11px;
+}
 
+.guide-content span {
 
-        .search-panel::before {
+    color: var(--muted);
 
-            content: "";
+    font-size: 9px;
 
-            position: absolute;
+    line-height: 1.6;
+}
 
-            top: 0;
-            left: 14%;
-            right: 14%;
 
-            height: 1px;
+/* =========================================================
+   INFO ICON
+   ========================================================= */
 
-            background:
+.info-icon {
 
-                linear-gradient(
-                    90deg,
-                    transparent,
-                    rgba(228,199,131,.70),
-                    transparent
-                );
-        }
+    width: 54px;
+    height: 54px;
 
+    display: grid;
 
-        /* =====================================================
-           INPUT AREA
-        ===================================================== */
+    place-items: center;
 
-        .route-grid {
+    margin-bottom: 15px;
 
-            display: grid;
+    border-radius: 17px;
 
-            grid-template-columns:
-                1fr 58px 1fr;
+    color: var(--gold);
 
-            align-items:
-                end;
+    background:
+        rgba(228,199,131,.08);
 
-            gap:
-                14px;
-        }
+    border:
+        1px solid rgba(228,199,131,.14);
+}
 
+.info-icon svg {
 
-        .field {
-            position: relative;
-        }
+    width: 25px;
+    height: 25px;
+}
 
 
-        .field-label {
+/* =========================================================
+   CONTACT
+   ========================================================= */
 
-            display: flex;
+.contact-item {
 
-            align-items:
-                center;
+    display: flex;
 
-            gap:
-                8px;
+    align-items: center;
 
-            margin-bottom:
-                9px;
+    gap: 13px;
 
-            color:
-                var(--muted);
+    padding:
+        13px 0;
 
-            font-size:
-                9px;
+    border-bottom:
+        1px solid var(--border);
+}
 
-            font-weight:
-                800;
+.contact-item:last-child {
 
-            letter-spacing:
-                .16em;
+    border-bottom: 0;
+}
 
-            text-transform:
-                uppercase;
-        }
+.contact-icon {
 
+    width: 42px;
+    height: 42px;
 
-        .field-label .dot {
+    flex: 0 0 42px;
 
-            width: 5px;
-            height: 5px;
+    display: grid;
 
-            border-radius:
-                50%;
+    place-items: center;
 
-            background:
-                var(--orange);
+    border-radius: 13px;
 
-            box-shadow:
-                0 0 10px
-                rgba(217,130,130,.55);
-        }
+    color: var(--gold);
 
+    background:
+        rgba(228,199,131,.08);
+}
 
-        .input-wrap {
-            position: relative;
-        }
+.contact-icon svg {
 
+    width: 20px;
+    height: 20px;
+}
 
-        .input-wrap input {
+.contact-text {
 
-            width: 100%;
-            height: 58px;
+    min-width: 0;
+}
 
-            padding:
-                0 16px;
+.contact-text strong {
 
-            outline: none;
+    display: block;
 
-            border:
-                1px solid
-                rgba(220,240,240,.13);
+    font-size: 10px;
+}
 
-            border-radius:
-                15px;
+.contact-text span {
 
-            color:
-                var(--white);
+    display: block;
 
-            background:
-                rgba(11,35,48,.70);
+    margin-top: 3px;
 
-            font-family:
-                "DM Sans",
-                sans-serif;
+    color: var(--muted);
 
-            font-size:
-                14px;
+    font-size: 8px;
 
-            font-weight:
-                600;
+    overflow-wrap: anywhere;
+}
 
-            transition:
-                .25s ease;
-        }
+.contact-action {
 
+    margin-left: auto;
 
-        .input-wrap input::placeholder {
+    padding:
+        7px 10px;
 
-            color:
-                #86a0a9;
+    border:
+        1px solid var(--border);
 
-            font-weight:
-                400;
-        }
+    border-radius: 9px;
 
+    color: var(--gold);
 
-        .input-wrap input:focus {
+    background:
+        transparent;
 
-            border-color:
-                rgba(111,183,167,.55);
+    font-size: 8px;
 
-            box-shadow:
+    font-weight: 700;
+}
 
-                0 0 0 4px
-                rgba(111,183,167,.08),
 
-                0 12px 35px
-                rgba(5,25,35,.20);
-        }
+/* =========================================================
+   COMMUNITY
+   ========================================================= */
 
+.community-icon {
 
-        /* =====================================================
-           SUGGESTIONS
-        ===================================================== */
+    width: 58px;
+    height: 58px;
 
-        .suggestions {
+    display: grid;
 
-            position: absolute;
+    place-items: center;
 
-            top:
-                calc(100% + 8px);
+    margin-bottom: 15px;
 
-            left: 0;
-            right: 0;
+    border-radius: 18px;
 
-            z-index: 50;
+    color: var(--gold);
 
-            overflow: hidden;
+    background:
+        rgba(228,199,131,.08);
 
-            border:
-                1px solid
-                rgba(220,240,240,.13);
+    border:
+        1px solid rgba(228,199,131,.15);
+}
 
-            border-radius:
-                14px;
+.community-icon svg {
 
-            background:
-                rgba(18,48,64,.98);
+    width: 27px;
+    height: 27px;
+}
 
-            backdrop-filter:
-                blur(18px);
 
-            box-shadow:
-                0 20px 55px
-                rgba(3,20,29,.42);
+/* =========================================================
+   SETTINGS
+   ========================================================= */
 
-            animation:
-                suggestionReveal
-                .18s
-                ease
-                both;
-        }
+.setting-group {
 
+    margin-bottom: 23px;
+}
 
-        .suggestion-item {
+.setting-title {
 
-            padding:
-                13px 15px;
+    margin:
+        0 0 8px 4px;
 
-            border-bottom:
-                1px solid
-                rgba(220,240,240,.06);
+    color: var(--muted);
 
-            color:
-                #dfeceb;
+    font-size: 8px;
 
-            font-size:
-                13px;
+    font-weight: 800;
 
-            cursor:
-                pointer;
+    letter-spacing: 1.2px;
+}
 
-            transition:
-                .2s ease;
-        }
+.setting-card {
 
+    overflow: hidden;
 
-        .suggestion-item:last-child {
-            border-bottom: none;
-        }
+    border:
+        1px solid var(--border);
 
+    border-radius: 17px;
 
-        .suggestion-item:hover {
+    background:
+        rgba(255,255,255,.025);
+}
 
-            padding-left:
-                19px;
+.setting-row {
 
-            color:
-                var(--gold);
+    width: 100%;
 
-            background:
-                rgba(111,183,167,.09);
-        }
+    min-height: 57px;
 
+    display: flex;
 
-        /* =====================================================
-           SWAP
-        ===================================================== */
+    align-items: center;
 
-        .swap-wrap {
+    gap: 12px;
 
-            display:
-                flex;
+    padding:
+        10px 13px;
 
-            justify-content:
-                center;
-        }
+    border: 0;
 
+    border-bottom:
+        1px solid var(--border);
 
-        #swapBtn {
+    color: var(--white);
 
-            width: 45px;
-            height: 45px;
+    background:
+        transparent;
 
-            border:
-                1px solid
-                rgba(111,183,167,.28);
+    text-align: left;
+}
 
-            border-radius:
-                14px;
+.setting-row:last-child {
 
-            color:
-                var(--gold);
+    border-bottom: 0;
+}
 
-            background:
-                rgba(111,183,167,.08);
+.setting-icon {
 
-            font-size:
-                20px;
+    width: 34px;
+    height: 34px;
 
-            cursor:
-                pointer;
+    flex: 0 0 34px;
 
-            transition:
-                .3s
-                cubic-bezier(.2,.8,.2,1);
-        }
+    display: grid;
 
+    place-items: center;
 
-        #swapBtn:hover {
+    border-radius: 10px;
 
-            transform:
-                rotate(180deg);
+    color: var(--gold);
 
-            border-color:
-                rgba(111,183,167,.55);
+    background:
+        rgba(228,199,131,.07);
+}
 
-            background:
-                rgba(111,183,167,.14);
+.setting-icon svg {
 
-            box-shadow:
-                0 10px 30px
-                rgba(111,183,167,.10);
-        }
+    width: 17px;
+    height: 17px;
+}
 
+.setting-info {
 
-        /* =====================================================
-           SEARCH BUTTON
-        ===================================================== */
+    flex: 1;
+}
 
-        .search-button {
+.setting-info strong {
 
-            width: 100%;
-            height: 56px;
+    display: block;
 
-            margin-top:
-                21px;
+    font-size: 10px;
+}
 
-            border: none;
+.setting-info span {
 
-            border-radius:
-                15px;
+    display: block;
 
-            color:
-                #18313b;
+    margin-top: 3px;
 
-            background:
+    color: var(--muted);
 
-                linear-gradient(
-                    105deg,
-                    #8bba9a,
-                    #e4c783,
-                    #70afc1,
-                    #8bc4b5
-                );
+    font-size: 8px;
+}
 
-            background-size:
-                250% auto;
+.theme-switch {
 
-            font-family:
-                Manrope,
-                sans-serif;
+    width: 44px;
+    height: 25px;
 
-            font-size:
-                11px;
+    position: relative;
 
-            font-weight:
-                800;
+    border-radius: 20px;
 
-            letter-spacing:
-                .12em;
+    background:
+        rgba(255,255,255,.10);
 
-            text-transform:
-                uppercase;
+    transition:
+        background .25s ease;
+}
 
-            cursor:
-                pointer;
+.theme-switch::after {
 
-            box-shadow:
-                0 14px 36px
-                rgba(111,183,167,.15);
+    content: "";
 
-            transition:
-                .25s ease;
+    position: absolute;
 
-            animation:
-                buttonGradient
-                5s
-                ease
-                infinite;
-        }
+    width: 19px;
+    height: 19px;
 
+    top: 3px;
+    left: 3px;
 
-        .search-button:hover {
+    border-radius: 50%;
 
-            transform:
-                translateY(-2px);
+    background:
+        var(--white);
 
-            box-shadow:
-                0 18px 42px
-                rgba(111,183,167,.22);
-        }
+    transition:
+        transform .25s ease;
+}
 
+body.light-mode
+.theme-switch {
 
-        .search-button:active {
+    background:
+        var(--gold);
+}
 
-            transform:
-                translateY(0)
-                scale(.99);
-        }
+body.light-mode
+.theme-switch::after {
 
+    transform:
+        translateX(19px);
 
-        /* =====================================================
-           STATUS
-        ===================================================== */
+    background:
+        #ffffff;
+}
 
-        #status {
+.version-text {
 
-            min-height:
-                18px;
+    margin-top: 35px;
 
-            margin:
-                17px 2px 0;
+    color: var(--muted);
 
-            color:
-                var(--muted);
+    font-size: 8px;
 
-            font-size:
-                10px;
+    text-align: center;
 
-            text-align:
-                center;
-        }
+    letter-spacing: .5px;
+}
 
 
-        /* =====================================================
-           RESULTS
-        ===================================================== */
+/* =========================================================
+   TOAST
+   ========================================================= */
 
-        #results {
-            margin-top: 27px;
-        }
+#toast {
 
+    position: fixed;
 
-        .results-heading {
+    left: 50%;
 
-            display:
-                flex;
+    bottom: 24px;
 
-            justify-content:
-                space-between;
+    z-index: 3000;
 
-            align-items:
-                center;
+    max-width:
+        calc(100vw - 40px);
 
-            margin:
-                0 4px 12px;
-        }
+    padding:
+        11px 15px;
 
+    border:
+        1px solid var(--border);
 
-        .results-heading span:first-child {
+    border-radius: 13px;
 
-            color:
-                var(--soft);
+    color: var(--white);
 
-            font-size:
-                9px;
+    background:
+        rgba(16,37,54,.94);
 
-            font-weight:
-                800;
+    box-shadow:
+        0 15px 35px rgba(0,0,0,.25);
 
-            letter-spacing:
-                .16em;
+    font-size: 9px;
 
-            text-transform:
-                uppercase;
-        }
+    font-weight: 600;
 
+    opacity: 0;
 
-        .results-heading span:last-child {
+    visibility: hidden;
 
-            color:
-                var(--muted);
+    transform:
+        translate(-50%, 15px);
 
-            font-size:
-                9px;
-        }
+    transition:
+        opacity .25s ease,
+        visibility .25s ease,
+        transform .25s ease;
+}
 
+#toast.show {
 
-        /* =====================================================
-           RESULT CARD
-        ===================================================== */
+    opacity: 1;
 
-        .result-card {
+    visibility: visible;
 
-            position:
-                relative;
+    transform:
+        translate(-50%, 0);
+}
 
-            margin-bottom:
-                13px;
 
-            padding:
-                21px;
+/* =========================================================
+   FOOTER
+   ========================================================= */
 
-            overflow:
-                hidden;
+.app-footer {
 
-            border:
-                1px solid
-                var(--border);
+    padding:
+        15px 18px 30px;
 
-            border-radius:
-                21px;
+    color: var(--muted);
 
-            background:
+    font-size: 8px;
 
-                linear-gradient(
-                    145deg,
-                    rgba(29,69,88,.90),
-                    rgba(16,43,57,.90)
-                );
+    text-align: center;
+}
 
-            box-shadow:
+.app-footer a {
 
-                0 16px 40px
-                rgba(3,20,29,.22),
+    color: var(--gold);
 
-                inset 0 1px 0
-                rgba(255,255,255,.035);
+    text-decoration: none;
+}
 
-            animation:
-                resultReveal
-                .5s
-                cubic-bezier(.2,.8,.2,1)
-                both;
 
-            transition:
-                .25s ease;
-        }
+/* =========================================================
+   MOBILE
+   ========================================================= */
 
+@media (max-width: 680px) {
 
-        .result-card::before {
+    .app-header {
+        height: 62px;
+    }
 
-            content: "";
+    main {
+        min-height:
+            calc(100vh - 62px);
+    }
 
-            position:
-                absolute;
+    .page {
+        padding:
+            20px 14px 45px;
+    }
 
-            left: 0;
+    .home-hero {
+        padding:
+            27px 18px 20px;
+        border-radius: 21px;
+    }
 
-            top: 18px;
-            bottom: 18px;
+    .home-title {
+        font-size: 28px;
+    }
 
-            width: 2px;
+    .quick-grid {
+        gap: 7px;
+    }
 
-            border-radius:
-                2px;
+    .quick-card {
+        padding:
+            12px 10px;
+        border-radius: 14px;
+    }
 
-            background:
+    .quick-icon {
+        width: 29px;
+        height: 29px;
+    }
 
-                linear-gradient(
-                    to bottom,
-                    transparent,
-                    var(--kai-green),
-                    var(--gold),
-                    transparent
-                );
+    .quick-card strong {
+        font-size: 9px;
+    }
 
-            box-shadow:
-                0 0 13px
-                rgba(111,167,131,.22);
-        }
+    .quick-card span {
+        font-size: 7px;
+    }
 
+    .search-shell {
+        padding: 15px;
+        border-radius: 19px;
+    }
 
-        .result-card:hover {
+    .search-fields {
+        grid-template-columns:
+            1fr 40px 1fr;
+        gap: 6px;
+    }
 
-            transform:
-                translateY(-3px);
+    .swap-button {
+        width: 38px;
+        height: 38px;
+    }
 
-            border-color:
-                rgba(111,183,167,.20);
-        }
+    .station-input {
+        padding:
+            0 10px;
+        font-size: 10px;
+    }
 
+    .content-card {
+        padding: 17px;
+    }
+}
 
-        /* =====================================================
-           TRAIN NAME
-        ===================================================== */
 
-        .result-name {
+/* =========================================================
+   SMALL PHONE
+   ========================================================= */
 
-            font-family:
-                Manrope,
-                sans-serif;
+@media (max-width: 380px) {
 
-            font-size:
-                18px;
+    .brand-sub {
+        display: none;
+    }
 
-            font-weight:
-                800;
+    .home-title {
+        font-size: 25px;
+    }
 
-            color:
-                #f5f9f8;
-        }
+    .quick-grid {
+        grid-template-columns:
+            1fr;
+    }
 
+    .quick-card {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
 
-        /* =====================================================
-           ACTUAL JOURNEY
-        ===================================================== */
+    .quick-icon {
+        margin: 0;
+    }
 
-        .journey {
+    .search-fields {
+        grid-template-columns:
+            1fr;
+    }
 
-            display:
-                flex;
+    .swap-button {
+        width: 100%;
+        height: 36px;
+        margin: 0;
+    }
+}
 
-            align-items:
-                center;
 
-            flex-wrap:
-                wrap;
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
 
-            gap:
-                8px;
+@media (prefers-reduced-motion: reduce) {
 
-            margin-top:
-                7px;
+    *,
+    *::before,
+    *::after {
 
-            color:
-                var(--soft);
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
 
-            font-size:
-                12px;
-
-            font-weight:
-                500;
-        }
-
-
-        .journey-arrow {
-
-            color:
-                var(--orange);
-
-            font-weight:
-                800;
-        }
-
-
-        /* =====================================================
-           ACUAN TARIF
-        ===================================================== */
-
-        .reference-box {
-
-            margin-top:
-                17px;
-
-            padding:
-                14px 15px;
-
-            border:
-                1px solid
-                var(--orange-border);
-
-            border-radius:
-                14px;
-
-            background:
-
-                linear-gradient(
-                    110deg,
-                    rgba(228,199,131,.075),
-                    rgba(111,183,167,.035)
-                );
-        }
-
-
-        .reference-label {
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            gap:
-                7px;
-
-            margin-bottom:
-                8px;
-
-            color:
-                var(--gold);
-
-            font-size:
-                8px;
-
-            font-weight:
-                800;
-
-            letter-spacing:
-                .16em;
-
-            text-transform:
-                uppercase;
-        }
-
-
-        .reference-label::before {
-
-            content: "";
-
-            width: 5px;
-            height: 5px;
-
-            border-radius:
-                50%;
-
-            background:
-                var(--orange);
-
-            box-shadow:
-                0 0 8px
-                rgba(217,130,130,.55);
-        }
-
-
-        .reference-route {
-
-            color:
-                #e5efee;
-
-            font-size:
-                12px;
-
-            font-weight:
-                700;
-
-            line-height:
-                1.7;
-        }
-
-
-        .relation-arrow {
-
-            margin:
-                0 5px;
-
-            color:
-                var(--orange);
-        }
-
-
-        /* =====================================================
-           FARE
-        ===================================================== */
-
-        .fare-list {
-
-            display:
-                flex;
-
-            flex-wrap:
-                wrap;
-
-            gap:
-                7px;
-
-            margin-top:
-                14px;
-        }
-
-
-        .fare-item {
-
-            min-width:
-                105px;
-
-            padding:
-                10px 13px;
-
-            border:
-                1px solid
-                rgba(220,240,240,.065);
-
-            border-radius:
-                12px;
-
-            background:
-                rgba(220,240,240,.035);
-        }
-
-
-        .fare-class {
-
-            display:
-                block;
-
-            margin-bottom:
-                3px;
-
-            color:
-                var(--muted);
-
-            font-size:
-                8px;
-
-            font-weight:
-                800;
-
-            letter-spacing:
-                .13em;
-        }
-
-
-        .fare-price {
-
-            display:
-                block;
-
-            color:
-                var(--gold);
-
-            font-family:
-                Manrope,
-                sans-serif;
-
-            font-size:
-                13px;
-
-            font-weight:
-                800;
-        }
-
-
-        .fare-unavailable {
-
-            color:
-                #78919a;
-        }
-
-
-        /* =====================================================
-           EMPTY STATE
-        ===================================================== */
-
-        .empty-state {
-
-            padding:
-                48px 25px;
-
-            border:
-                1px dashed
-                rgba(220,240,240,.10);
-
-            border-radius:
-                20px;
-
-            text-align:
-                center;
-
-            background:
-                rgba(220,240,240,.015);
-
-            animation:
-                resultReveal
-                .4s
-                ease
-                both;
-        }
-
-
-        .empty-symbol {
-
-            width: 50px;
-            height: 50px;
-
-            display:
-                grid;
-
-            place-items:
-                center;
-
-            margin:
-                0 auto 15px;
-
-            border:
-                1px solid
-                rgba(111,183,167,.22);
-
-            border-radius:
-                15px;
-
-            color:
-                var(--orange);
-
-            font-size:
-                18px;
-        }
-
-
-        .empty-state h3 {
-
-            font-family:
-                Manrope,
-                sans-serif;
-
-            font-size:
-                15px;
-        }
-
-
-        .empty-state p {
-
-            max-width:
-                400px;
-
-            margin:
-                7px auto 0;
-
-            color:
-                var(--muted);
-
-            font-size:
-                11px;
-
-            line-height:
-                1.7;
-        }
-
-
-        /* =====================================================
-           FOOTER
-        ===================================================== */
-
-        .footer {
-
-            padding:
-                35px 0 5px;
-
-            text-align:
-                center;
-
-            color:
-                #789099;
-
-            font-size:
-                9px;
-
-            letter-spacing:
-                .14em;
-
-            text-transform:
-                uppercase;
-        }
-
-
-        .footer strong {
-
-            color:
-                rgba(228,199,131,.78);
-
-            font-weight:
-                700;
-        }
-
-
-        /* =====================================================
-           MAIN ANIMATION
-        ===================================================== */
-
-        @keyframes appReveal {
-
-            0% {
-
-                opacity: 0;
-
-                transform:
-                    translateY(22px)
-                    scale(.985);
-            }
-
-            100% {
-
-                opacity: 1;
-
-                transform:
-                    translateY(0)
-                    scale(1);
-            }
-
-        }
-
-
-        @keyframes panelReveal {
-
-            from {
-                opacity: 0;
-                transform:
-                    translateY(18px);
-            }
-
-            to {
-                opacity: 1;
-                transform:
-                    translateY(0);
-            }
-
-        }
-
-
-        @keyframes resultReveal {
-
-            from {
-                opacity: 0;
-                transform:
-                    translateY(12px)
-                    scale(.985);
-            }
-
-            to {
-                opacity: 1;
-                transform:
-                    translateY(0)
-                    scale(1);
-            }
-
-        }
-
-
-        @keyframes suggestionReveal {
-
-            from {
-                opacity: 0;
-                transform:
-                    translateY(-5px);
-            }
-
-            to {
-                opacity: 1;
-                transform:
-                    translateY(0);
-            }
-
-        }
-
-
-        @keyframes headerGlow {
-
-            0%,
-            100% {
-
-                opacity:
-                    .55;
-
-                transform:
-                    translateX(-50%)
-                    scale(.92);
-            }
-
-            50% {
-
-                opacity:
-                    1;
-
-                transform:
-                    translateX(-50%)
-                    scale(1.08);
-            }
-
-        }
-
-
-        @keyframes titleGradient {
-
-            0% {
-                background-position:
-                    0% center;
-            }
-
-            50% {
-                background-position:
-                    100% center;
-            }
-
-            100% {
-                background-position:
-                    0% center;
-            }
-
-        }
-
-
-        @keyframes buttonGradient {
-
-            0% {
-                background-position:
-                    0% center;
-            }
-
-            50% {
-                background-position:
-                    100% center;
-            }
-
-            100% {
-                background-position:
-                    0% center;
-            }
-
-        }
-
-
-        @keyframes orbitSpin {
-
-            from {
-                transform:
-                    rotate(0deg);
-            }
-
-            to {
-                transform:
-                    rotate(360deg);
-            }
-
-        }
-
-
-        /* =====================================================
-           MOBILE
-        ===================================================== */
-
-        @media (max-width: 680px) {
-
-            .app {
-
-                width:
-                    calc(100% - 20px);
-
-                padding-top:
-                    14px;
-            }
-
-
-            .header {
-
-                padding:
-                    23px 5px 36px;
-            }
-
-
-            .header h1 {
-
-                font-size:
-                    31px;
-            }
-
-
-            .subtitle {
-
-                font-size:
-                    10px;
-
-                letter-spacing:
-                    .035em;
-            }
-
-
-            .search-panel {
-
-                padding:
-                    18px;
-
-                border-radius:
-                    21px;
-            }
-
-
-            .route-grid {
-
-                grid-template-columns:
-                    1fr;
-
-                gap:
-                    10px;
-            }
-
-
-            .swap-wrap {
-
-                position:
-                    absolute;
-
-                top:
-                    85px;
-
-                right:
-                    26px;
-
-                z-index:
-                    10;
-            }
-
-
-            #swapBtn {
-
-                width:
-                    40px;
-
-                height:
-                    40px;
-
-                border-radius:
-                    12px;
-            }
-
-
-            .input-wrap input {
-
-                height:
-                    54px;
-            }
-
-
-            .result-card {
-
-                padding:
-                    18px;
-            }
-
-
-            .fare-item {
-
-                min-width:
-                    88px;
-            }
-
-
-            /* SPLASH MOBILE */
-
-            .splash-title {
-
-                font-size:
-                    clamp(
-                        25px,
-                        8vw,
-                        40px
-                    );
-
-                letter-spacing:
-                    .06em;
-            }
-
-
-            .splash-subtitle {
-
-                font-size:
-                    8px;
-
-                letter-spacing:
-                    .10em;
-
-                padding:
-                    0 20px;
-            }
-
-
-            .splash-kai {
-
-                font-size:
-                    9px;
-
-                letter-spacing:
-                    .25em;
-            }
-
-
-            .splash-track {
-
-                bottom:
-                    12%;
-            }
-
-
-            .splash-train {
-
-                transform:
-                    scale(.78);
-
-                transform-origin:
-                    left bottom;
-            }
-
-
-            .speed-lines {
-
-                bottom:
-                    15%;
-            }
-
-        }
-
-
-        /* =====================================================
-           REDUCE MOTION
-        ===================================================== */
-
-        @media (
-            prefers-reduced-motion: reduce
-        ) {
-
-            .splash {
-
-                animation:
-                    splashExit
-                    .01ms
-                    forwards;
-            }
-
-
-            .app {
-
-                opacity: 1;
-
-                animation:
-                    none;
-            }
-
-
-            *,
-            *::before,
-            *::after {
-
-                animation-duration:
-                    .01ms !important;
-
-                animation-iteration-count:
-                    1 !important;
-
-                transition-duration:
-                    .01ms !important;
-            }
-
-        }
-
-    </style>
+</style>
 
 </head>
 
 
 <body>
 
+<!-- =======================================================
+     SPLASH
+     ======================================================= -->
 
-    <!-- =====================================================
-         SPLASH SCREEN
-    ===================================================== -->
+<div id="splashScreen">
 
-    <div class="splash">
+    <div class="splash-inner">
 
-        <div class="splash-light"></div>
-
-
-        <!-- SPEED LINES -->
-
-        <div class="speed-lines">
-
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-
+        <div class="splash-logo">
+            T
         </div>
 
+        <h1 class="splash-title">
+            TARSUS
+        </h1>
 
-        <!-- CONTENT -->
+        <p class="splash-subtitle">
+            Tarif Khusus Perjalanan Kereta Api
+        </p>
 
-        <div class="splash-content">
-
-            <div class="splash-kai">
-                KERETA API INDONESIA
-            </div>
-
-
-            <div class="splash-title">
-                TARSUS FINDER
-            </div>
-
-
-            <div class="splash-subtitle">
-                Sistem Pencarian Tarif Khusus
-            </div>
-
-
-            <div class="splash-status">
-                C O N T A C T  C E N T E R  1 2 1
-            </div>
-
-        </div>
-
-
-        <!-- =================================================
-             SPLASH TRAIN
-        ================================================== -->
-
-        <div class="splash-track">
-
-            <div class="splash-train">
-
-
-                <!-- GLOW -->
-
-                <div class="splash-train-glow"></div>
-
-
-                <!-- SMOKE -->
-
-                <div class="splash-smoke"></div>
-
-
-                <!-- GERBONG -->
-
-                <div class="splash-coach one"></div>
-
-                <div class="splash-coach two"></div>
-
-                <div class="splash-coach three"></div>
-
-                <div class="splash-coach four"></div>
-
-
-                <!-- COUPLER -->
-
-                <div class="splash-coupler one"></div>
-
-                <div class="splash-coupler two"></div>
-
-                <div class="splash-coupler three"></div>
-
-                <div class="splash-coupler four"></div>
-
-
-                <!-- LOKOMOTIF -->
-
-                <div class="splash-loco">
-
-                    <div class="splash-loco-body"></div>
-
-                    <div class="splash-loco-cabin"></div>
-
-                    <div class="splash-loco-roof"></div>
-
-                    <div class="splash-loco-nose"></div>
-
-                    <div class="splash-loco-light"></div>
-
-                    <div class="splash-chimney"></div>
-
-                </div>
-
-
-                <!-- RODA -->
-
-                <div class="splash-wheel w1"></div>
-                <div class="splash-wheel w2"></div>
-                <div class="splash-wheel w3"></div>
-                <div class="splash-wheel w4"></div>
-                <div class="splash-wheel w5"></div>
-                <div class="splash-wheel w6"></div>
-                <div class="splash-wheel w7"></div>
-                <div class="splash-wheel w8"></div>
-                <div class="splash-wheel w9"></div>
-                <div class="splash-wheel w10"></div>
-
-            </div>
-
-        </div>
-
-
-        <div class="splash-footer">
-            created by prima_adis
+        <div class="splash-line">
+            <span></span>
         </div>
 
     </div>
 
-
-    <!-- =====================================================
-         BACKGROUND
-    ===================================================== -->
-
-    <div class="bg-orbit"></div>
+</div>
 
 
-    <!-- =====================================================
-         MAIN APP
-    ===================================================== -->
+<!-- =======================================================
+     APP
+     ======================================================= -->
 
-    <main class="app">
+<div id="app">
 
 
-        <!-- HEADER -->
+    <!-- ===================================================
+         HEADER
+         =================================================== -->
 
-        <header class="header">
+    <header class="app-header">
 
-            <div class="kai-label">
-                KAI 121
+        <div class="header-left">
+
+            <button
+                class="menu-button"
+                id="menuButton"
+                type="button"
+                aria-label="Buka menu"
+            >
+
+                <span class="menu-lines">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+
+            </button>
+
+
+            <div class="brand-wrap">
+
+                <div class="brand-name">
+                    TARSUS FINDER
+                </div>
+
+                <div class="brand-sub">
+                    KAI 121 · TARIF KHUSUS
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- ===================================================
+         DRAWER OVERLAY
+         =================================================== -->
+
+    <div
+        class="drawer-overlay"
+        id="drawerOverlay"
+    ></div>
+
+
+    <!-- ===================================================
+         DRAWER
+         =================================================== -->
+
+    <aside
+        class="drawer"
+        id="drawer"
+    >
+
+        <div class="drawer-top">
+
+            <div class="drawer-brand">
+
+                <div class="drawer-logo">
+                    T
+                </div>
+
+                <div>
+
+                    <div class="drawer-title">
+                        TARSUS FINDER
+                    </div>
+
+                    <div class="drawer-subtitle">
+                        KAI 121
+                    </div>
+
+                </div>
+
             </div>
 
 
-            <h1>
-                TARSUS FINDER
-            </h1>
+            <button
+                class="drawer-close"
+                id="drawerClose"
+                type="button"
+                aria-label="Tutup menu"
+            >
+                ×
+            </button>
+
+        </div>
 
 
-            <p class="subtitle">
-                Tarif Khusus Perjalanan Kereta Api
-            </p>
+        <!-- MENU UTAMA -->
 
-        </header>
+        <div class="drawer-section">
+
+            <div class="drawer-section-title">
+                MENU UTAMA
+            </div>
+
+
+            <button
+                class="drawer-item active"
+                data-page="home"
+                type="button"
+            >
+
+                <span class="drawer-item-icon">
+
+                    <svg
+                        width="17"
+                        height="17"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                    >
+                        <path d="M3 10.5 12 3l9 7.5"/>
+                        <path d="M5.5 9.5V21h13V9.5"/>
+                        <path d="M9.5 21v-6h5v6"/>
+                    </svg>
+
+                </span>
+
+                <span class="drawer-item-text">
+                    Beranda
+                </span>
+
+            </button>
+
+
+            <button
+                class="drawer-item"
+                data-page="search"
+                type="button"
+            >
+
+                <span class="drawer-item-icon">
+
+                    <svg
+                        width="17"
+                        height="17"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                    >
+                        <circle cx="11" cy="11" r="6.5"/>
+                        <path d="m16 16 5 5"/>
+                    </svg>
+
+                </span>
+
+                <span class="drawer-item-text">
+                    Cari Tarif Khusus
+                </span>
+
+            </button>
+
+
+            <button
+                class="drawer-item"
+                data-page="guide"
+                type="button"
+            >
+
+                <span class="drawer-item-icon">
+
+                    <svg
+                        width="17"
+                        height="17"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                    >
+                        <path d="M5 4.5h11a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3V4.5Z"/>
+                        <path d="M8 20V7.5a3 3 0 0 1 3-3"/>
+                        <path d="M9 9h7"/>
+                        <path d="M9 12h7"/>
+                    </svg>
+
+                </span>
+
+                <span class="drawer-item-text">
+                    Panduan
+                </span>
+
+            </button>
+
+        </div>
+
+
+        <!-- INFORMASI -->
+
+        <div class="drawer-section">
+
+            <div class="drawer-section-title">
+                INFORMASI
+            </div>
+
+
+            <button
+                class="drawer-item"
+                data-page="about"
+                type="button"
+            >
+
+                <span class="drawer-item-icon">
+
+                    <svg
+                        width="17"
+                        height="17"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                    >
+                        <circle cx="12" cy="12" r="9"/>
+                        <path d="M12 10v6"/>
+                        <path d="M12 7.5h.01"/>
+                    </svg>
+
+                </span>
+
+                <span class="drawer-item-text">
+                    Tentang TARSUS
+                </span>
+
+            </button>
+
+
+            <button
+                class="drawer-item"
+                data-page="contact"
+                type="button"
+            >
+
+                <span class="drawer-item-icon">
+
+                    <svg
+                        width="17"
+                        height="17"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                    >
+                        <rect x="3" y="5" width="18" height="14" rx="2"/>
+                        <path d="m4 7 8 6 8-6"/>
+                    </svg>
+
+                </span>
+
+                <span class="drawer-item-text">
+                    Bantuan & Saran
+                </span>
+
+            </button>
+
+
+            <button
+                class="drawer-item"
+                data-page="terms"
+                type="button"
+            >
+
+                <span class="drawer-item-icon">
+
+                    <svg
+                        width="17"
+                        height="17"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                    >
+                        <path d="M6 3h9l4 4v14H6z"/>
+                        <path d="M14 3v5h5"/>
+                        <path d="M9 13h6"/>
+                        <path d="M9 16h6"/>
+                    </svg>
+
+                </span>
+
+                <span class="drawer-item-text">
+                    Syarat & Ketentuan
+                </span>
+
+            </button>
+
+        </div>
+
+
+        <!-- KOMUNITAS -->
+
+        <div class="drawer-section">
+
+            <div class="drawer-section-title">
+                KOMUNITAS
+            </div>
+
+
+            <button
+                class="drawer-item"
+                id="instagramMenu"
+                type="button"
+            >
+
+                <span class="drawer-item-icon">
+
+                    <svg
+                        width="17"
+                        height="17"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                    >
+                        <rect
+                            x="3"
+                            y="3"
+                            width="18"
+                            height="18"
+                            rx="5"
+                        />
+                        <circle
+                            cx="12"
+                            cy="12"
+                            r="4"
+                        />
+                        <path d="M17.5 6.5h.01"/>
+                    </svg>
+
+                </span>
+
+                <span class="drawer-item-text">
+                    Instagram
+                </span>
+
+                <span class="external-arrow">
+                    ↗
+                </span>
+
+            </button>
+
+
+            <button
+                class="drawer-item"
+                data-page="rating"
+                type="button"
+            >
+
+                <span class="drawer-item-icon">
+
+                    <svg
+                        width="17"
+                        height="17"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                    >
+                        <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"/>
+                    </svg>
+
+                </span>
+
+                <span class="drawer-item-text">
+                    Beri Rating
+                </span>
+
+            </button>
+
+
+            <button
+                class="drawer-item"
+                data-page="donate"
+                type="button"
+            >
+
+                <span class="drawer-item-icon">
+
+                    <svg
+                        width="17"
+                        height="17"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                    >
+                        <path d="M20.8 8.7c0 5.2-8.8 11-8.8 11S3.2 13.9 3.2 8.7A4.7 4.7 0 0 1 12 6.2a4.7 4.7 0 0 1 8.8 2.5Z"/>
+                    </svg>
+
+                </span>
+
+                <span class="drawer-item-text">
+                    Dukung Pengembang
+                </span>
+
+            </button>
+
+        </div>
+
+
+        <!-- APLIKASI -->
+
+        <div class="drawer-section">
+
+            <div class="drawer-section-title">
+                APLIKASI
+            </div>
+
+
+            <button
+                class="drawer-item"
+                data-page="settings"
+                type="button"
+            >
+
+                <span class="drawer-item-icon">
+
+                    <svg
+                        width="17"
+                        height="17"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                    >
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.8 1.8 0 0 0 .3 2l.1.1-1.7 1.7-.1-.1a1.8 1.8 0 0 0-2-.3 1.8 1.8 0 0 0-1 1.6v.1h-2.4V20a1.8 1.8 0 0 0-1-1.6 1.8 1.8 0 0 0-2 .3l-.1.1-1.7-1.7.1-.1a1.8 1.8 0 0 0 .3-2 1.8 1.8 0 0 0-1.6-1H6v-2.4h.1a1.8 1.8 0 0 0 1.6-1 1.8 1.8 0 0 0-.3-2l-.1-.1 1.7-1.7.1.1a1.8 1.8 0 0 0 2 .3 1.8 1.8 0 0 0 1-1.6V3h2.4v.1a1.8 1.8 0 0 0 1 1.6 1.8 1.8 0 0 0 2-.3l.1-.1 1.7 1.7-.1.1a1.8 1.8 0 0 0-.3 2 1.8 1.8 0 0 0 1.6 1h.1v2.4h-.1a1.8 1.8 0 0 0-1.6 1.5Z"/>
+                    </svg>
+
+                </span>
+
+                <span class="drawer-item-text">
+                    Pengaturan
+                </span>
+
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ===================================================
+         MAIN
+         =================================================== -->
+
+    <main>
+
+
+        <!-- =================================================
+             BERANDA
+             ================================================= -->
+
+        <section
+            class="page active"
+            id="page-home"
+        >
+
+            <div class="home-hero">
+
+                <div class="home-kicker">
+                    TARSUS FINDER
+                </div>
+
+                <h1 class="home-title">
+                    Cari tarif khusus
+                    jadi lebih cepat.
+                </h1>
+
+                <p class="home-description">
+                    Temukan informasi tarif khusus perjalanan
+                    kereta api berdasarkan relasi dan stasiun
+                    dengan lebih praktis.
+                </p>
+
+
+                <button
+                    class="home-search-button"
+                    id="homeSearchButton"
+                    type="button"
+                >
+
+                    <span class="left">
+
+                        <span class="search-icon">
+
+                            <svg
+                                width="19"
+                                height="19"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <circle
+                                    cx="11"
+                                    cy="11"
+                                    r="6.5"
+                                />
+                                <path d="m16 16 5 5"/>
+                            </svg>
+
+                        </span>
+
+                        <span>
+
+                            <strong>
+                                Cari Tarif Khusus
+                            </strong>
+
+                            <small>
+                                Mulai pencarian perjalanan
+                            </small>
+
+                        </span>
+
+                    </span>
+
+                    <span class="home-arrow">
+                        →
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <!-- QUICK FEATURES -->
+
+            <div class="quick-grid">
+
+                <div class="quick-card">
+
+                    <div class="quick-icon">
+
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                        >
+                            <circle cx="11" cy="11" r="6.5"/>
+                            <path d="m16 16 5 5"/>
+                        </svg>
+
+                    </div>
+
+                    <strong>
+                        Pencarian
+                    </strong>
+
+                    <span>
+                        Cari berdasarkan stasiun
+                    </span>
+
+                </div>
+
+
+                <div class="quick-card">
+
+                    <div class="quick-icon">
+
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                        >
+                            <path d="M4 17h16"/>
+                            <path d="M6 17V8l3-3h6l3 3v9"/>
+                            <circle cx="8" cy="18" r="2"/>
+                            <circle cx="16" cy="18" r="2"/>
+                        </svg>
+
+                    </div>
+
+                    <strong>
+                        Data KA
+                    </strong>
+
+                    <span>
+                        Informasi tarif terstruktur
+                    </span>
+
+                </div>
+
+
+                <div class="quick-card">
+
+                    <div class="quick-icon">
+
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                        >
+                            <path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/>
+                        </svg>
+
+                    </div>
+
+                    <strong>
+                        Praktis
+                    </strong>
+
+                    <span>
+                        Dirancang untuk pencarian cepat
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- RIWAYAT -->
+
+            <div class="home-section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Pencarian Terakhir
+                    </h2>
+
+                    <button
+                        id="homeHistoryClear"
+                        type="button"
+                    >
+                        Hapus
+                    </button>
+
+                </div>
+
+                <div
+                    class="history-list"
+                    id="homeHistoryList"
+                ></div>
+
+            </div>
+
+
+            <!-- FAVORIT -->
+
+            <div class="home-section">
+
+                <div class="section-heading">
+
+                    <h2>
+                        Favorit
+                    </h2>
+
+                </div>
+
+                <div
+                    class="history-list"
+                    id="homeFavoriteList"
+                ></div>
+
+            </div>
+
+        </section>
 
 
         <!-- =================================================
              SEARCH
-        ================================================== -->
+             ================================================= -->
 
-        <section class="search-panel">
+        <section
+            class="page"
+            id="page-search"
+        >
+
+            <div class="page-header">
+
+                <div class="page-kicker">
+                    TARIF KHUSUS
+                </div>
+
+                <h1 class="page-title">
+                    Cari Tarif
+                </h1>
+
+                <p class="page-subtitle">
+                    Masukkan stasiun asal dan tujuan untuk
+                    menemukan informasi tarif khusus.
+                </p>
+
+            </div>
 
 
-            <div class="route-grid">
+            <div class="search-shell">
+
+                <div class="search-fields">
 
 
-                <!-- ASAL -->
+                    <!-- ASAL -->
 
-                <div class="field">
+                    <div class="field-group">
 
-                    <div class="field-label">
-
-                        <span class="dot"></span>
-
-                        Stasiun Asal
-
-                    </div>
-
-
-                    <div class="input-wrap">
+                        <label
+                            class="field-label"
+                            for="asal"
+                        >
+                            STASIUN ASAL
+                        </label>
 
                         <input
-                            id="asal"
                             type="text"
+                            id="asal"
+                            class="station-input"
+                            placeholder="Contoh: Gambir"
                             autocomplete="off"
-                            placeholder="Cari stasiun asal..."
                         >
-
 
                         <div
                             id="asal-suggestions"
@@ -3444,46 +3098,37 @@
 
                     </div>
 
-                </div>
 
-
-                <!-- SWAP -->
-
-                <div class="swap-wrap">
+                    <!-- SWAP -->
 
                     <button
                         id="swapBtn"
+                        class="swap-button"
                         type="button"
-                        title="Tukar stasiun"
+                        aria-label="Tukar stasiun"
                     >
                         ⇄
                     </button>
 
-                </div>
 
+                    <!-- TUJUAN -->
 
-                <!-- TUJUAN -->
+                    <div class="field-group">
 
-                <div class="field">
-
-                    <div class="field-label">
-
-                        <span class="dot"></span>
-
-                        Stasiun Tujuan
-
-                    </div>
-
-
-                    <div class="input-wrap">
+                        <label
+                            class="field-label"
+                            for="tujuan"
+                        >
+                            STASIUN TUJUAN
+                        </label>
 
                         <input
-                            id="tujuan"
                             type="text"
+                            id="tujuan"
+                            class="station-input"
+                            placeholder="Contoh: Solo Balapan"
                             autocomplete="off"
-                            placeholder="Cari stasiun tujuan..."
                         >
-
 
                         <div
                             id="tujuan-suggestions"
@@ -3495,53 +3140,1961 @@
                 </div>
 
 
+                <button
+                    id="searchBtn"
+                    class="search-button"
+                    type="button"
+                >
+                    Cari Tarif Khusus
+                </button>
+
+
+                <div
+                    id="status"
+                    class="status"
+                ></div>
+
             </div>
 
 
-            <button
-                id="searchBtn"
-                class="search-button"
-                type="button"
-            >
-                Temukan Tarif Khusus
-            </button>
-
-
-            <div id="status"></div>
-
+            <div id="results"></div>
 
         </section>
 
 
         <!-- =================================================
-             RESULTS
-        ================================================== -->
+             PANDUAN
+             ================================================= -->
 
-        <section id="results"></section>
+        <section
+            class="page"
+            id="page-guide"
+        >
+
+            <div class="page-header">
+
+                <div class="page-kicker">
+                    PANDUAN
+                </div>
+
+                <h1 class="page-title">
+                    Cara Menggunakan
+                </h1>
+
+                <p class="page-subtitle">
+                    Ikuti beberapa langkah sederhana untuk
+                    mencari tarif khusus.
+                </p>
+
+            </div>
+
+
+            <div class="content-card">
+
+                <div class="guide-step">
+
+                    <div class="guide-number">
+                        1
+                    </div>
+
+                    <div class="guide-content">
+
+                        <strong>
+                            Pilih stasiun asal
+                        </strong>
+
+                        <span>
+                            Ketik nama stasiun keberangkatan
+                            pada kolom Stasiun Asal.
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="guide-step">
+
+                    <div class="guide-number">
+                        2
+                    </div>
+
+                    <div class="guide-content">
+
+                        <strong>
+                            Pilih stasiun tujuan
+                        </strong>
+
+                        <span>
+                            Masukkan stasiun tujuan perjalanan.
+                            Gunakan saran otomatis jika tersedia.
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="guide-step">
+
+                    <div class="guide-number">
+                        3
+                    </div>
+
+                    <div class="guide-content">
+
+                        <strong>
+                            Tekan Cari Tarif
+                        </strong>
+
+                        <span>
+                            TARSUS akan menampilkan KA yang
+                            memiliki tarif khusus sesuai relasi.
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="guide-step">
+
+                    <div class="guide-number">
+                        4
+                    </div>
+
+                    <div class="guide-content">
+
+                        <strong>
+                            Periksa hasil
+                        </strong>
+
+                        <span>
+                            Perhatikan nama KA, relasi tarif,
+                            arah perjalanan, dan kelas tarif
+                            yang tersedia.
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="content-card">
+
+                <h3>
+                    Catatan
+                </h3>
+
+                <p>
+                    Informasi tarif khusus dapat berubah sesuai
+                    ketentuan yang berlaku. Gunakan hasil TARSUS
+                    sebagai alat bantu pencarian dan tetap
+                    perhatikan informasi resmi yang berlaku.
+                </p>
+
+            </div>
+
+        </section>
 
 
         <!-- =================================================
-             FOOTER
-        ================================================== -->
+             TENTANG
+             ================================================= -->
 
-        <footer class="footer">
+        <section
+            class="page"
+            id="page-about"
+        >
 
-            any question? ask me 
-            <strong>primaadis46@gmail.com</strong>
+            <div class="page-header">
 
-        </footer>
+                <div class="page-kicker">
+                    ABOUT
+                </div>
 
+                <h1 class="page-title">
+                    Tentang TARSUS
+                </h1>
+
+                <p class="page-subtitle">
+                    Mengenal aplikasi yang sedang kamu gunakan.
+                </p>
+
+            </div>
+
+
+            <div class="content-card">
+
+                <div class="info-icon">
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                    >
+                        <circle cx="12" cy="12" r="9"/>
+                        <path d="M12 10v6"/>
+                        <path d="M12 7.5h.01"/>
+                    </svg>
+
+                </div>
+
+                <h3>
+                    TARSUS FINDER
+                </h3>
+
+                <p>
+                    TARSUS Finder merupakan aplikasi bantu
+                    pencarian informasi tarif khusus perjalanan
+                    kereta api yang dirancang agar proses
+                    pencarian informasi menjadi lebih cepat,
+                    praktis, dan terstruktur.
+                </p>
+
+            </div>
+
+
+            <div class="content-card">
+
+                <h3>
+                    Dibuat untuk penggunaan yang praktis
+                </h3>
+
+                <p>
+                    TARSUS mengutamakan tampilan sederhana,
+                    pencarian cepat, dan informasi yang mudah
+                    dibaca melalui perangkat komputer maupun
+                    smartphone.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CONTACT
+             ================================================= -->
+
+        <section
+            class="page"
+            id="page-contact"
+        >
+
+            <div class="page-header">
+
+                <div class="page-kicker">
+                    CONTACT
+                </div>
+
+                <h1 class="page-title">
+                    Bantuan & Saran
+                </h1>
+
+                <p class="page-subtitle">
+                    Punya pertanyaan, saran, atau menemukan
+                    sesuatu yang perlu diperbaiki?
+                </p>
+
+            </div>
+
+
+            <div class="content-card">
+
+                <div class="contact-item">
+
+                    <div class="contact-icon">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                        >
+                            <rect
+                                x="3"
+                                y="5"
+                                width="18"
+                                height="14"
+                                rx="2"
+                            />
+                            <path d="m4 7 8 6 8-6"/>
+                        </svg>
+
+                    </div>
+
+                    <div class="contact-text">
+
+                        <strong>
+                            Hubungi Pengembang
+                        </strong>
+
+                        <span>
+                            primaadis46@gmail.com
+                        </span>
+
+                    </div>
+
+                    <button
+                        class="contact-action"
+                        id="emailContactButton"
+                        type="button"
+                    >
+                        Email
+                    </button>
+
+                </div>
+
+
+                <div class="contact-item">
+
+                    <div class="contact-icon">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                        >
+                            <path d="M12 3v12"/>
+                            <path d="m7 10 5 5 5-5"/>
+                            <path d="M5 21h14"/>
+                        </svg>
+
+                    </div>
+
+                    <div class="contact-text">
+
+                        <strong>
+                            Berikan Saran
+                        </strong>
+
+                        <span>
+                            Sampaikan ide atau fitur yang kamu inginkan.
+                        </span>
+
+                    </div>
+
+                    <button
+                        class="contact-action"
+                        id="suggestionButton"
+                        type="button"
+                    >
+                        Kirim
+                    </button>
+
+                </div>
+
+
+                <div class="contact-item">
+
+                    <div class="contact-icon">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                        >
+                            <path d="M12 3 4 6v6c0 5 3.4 8 8 9 4.6-1 8-4 8-9V6l-8-3Z"/>
+                            <path d="M12 8v4"/>
+                            <path d="M12 15h.01"/>
+                        </svg>
+
+                    </div>
+
+                    <div class="contact-text">
+
+                        <strong>
+                            Laporkan Masalah
+                        </strong>
+
+                        <span>
+                            Laporkan bug atau masalah pada aplikasi.
+                        </span>
+
+                    </div>
+
+                    <button
+                        class="contact-action"
+                        id="bugButton"
+                        type="button"
+                    >
+                        Laporkan
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             TERMS
+             ================================================= -->
+
+        <section
+            class="page"
+            id="page-terms"
+        >
+
+            <div class="page-header">
+
+                <div class="page-kicker">
+                    INFORMATION
+                </div>
+
+                <h1 class="page-title">
+                    Syarat & Ketentuan
+                </h1>
+
+                <p class="page-subtitle">
+                    Ketentuan umum penggunaan TARSUS Finder.
+                </p>
+
+            </div>
+
+
+            <div class="content-card">
+
+                <h3>
+                    1. Penggunaan aplikasi
+                </h3>
+
+                <p>
+                    TARSUS Finder dibuat sebagai alat bantu
+                    pencarian informasi tarif khusus perjalanan
+                    kereta api.
+                </p>
+
+            </div>
+
+
+            <div class="content-card">
+
+                <h3>
+                    2. Informasi tarif
+                </h3>
+
+                <p>
+                    Informasi tarif yang tersedia pada aplikasi
+                    dapat mengalami perubahan sesuai ketentuan
+                    dan pembaruan data yang berlaku.
+                </p>
+
+            </div>
+
+
+            <div class="content-card">
+
+                <h3>
+                    3. Verifikasi informasi
+                </h3>
+
+                <p>
+                    Pengguna tetap bertanggung jawab untuk
+                    memastikan informasi yang digunakan sesuai
+                    dengan ketentuan dan sumber resmi yang berlaku.
+                </p>
+
+            </div>
+
+
+            <div class="content-card">
+
+                <h3>
+                    4. Pengembangan aplikasi
+                </h3>
+
+                <p>
+                    TARSUS dapat mengalami perubahan, pembaruan,
+                    penambahan fitur, atau perbaikan sewaktu-waktu
+                    untuk meningkatkan pengalaman penggunaan.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             RATING
+             ================================================= -->
+
+        <section
+            class="page"
+            id="page-rating"
+        >
+
+            <div class="page-header">
+
+                <div class="page-kicker">
+                    FEEDBACK
+                </div>
+
+                <h1 class="page-title">
+                    Beri Rating
+                </h1>
+
+                <p class="page-subtitle">
+                    Bantu pengembangan TARSUS dengan memberikan
+                    masukan mengenai pengalaman penggunaanmu.
+                </p>
+
+            </div>
+
+
+            <div class="content-card">
+
+                <div class="community-icon">
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                    >
+                        <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"/>
+                    </svg>
+
+                </div>
+
+                <h3>
+                    Bagaimana pengalamanmu?
+                </h3>
+
+                <p>
+                    Masukan dari pengguna membantu menentukan
+                    pengembangan TARSUS berikutnya.
+                </p>
+
+
+                <button
+                    class="home-search-button"
+                    id="ratingButton"
+                    type="button"
+                >
+
+                    <span class="left">
+
+                        <span class="search-icon">
+                            ★
+                        </span>
+
+                        <span>
+
+                            <strong>
+                                Beri Rating
+                            </strong>
+
+                            <small>
+                                Buka halaman penilaian
+                            </small>
+
+                        </span>
+
+                    </span>
+
+                    <span class="home-arrow">
+                        ↗
+                    </span>
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             DONATE
+             ================================================= -->
+
+        <section
+            class="page"
+            id="page-donate"
+        >
+
+            <div class="page-header">
+
+                <div class="page-kicker">
+                    SUPPORT
+                </div>
+
+                <h1 class="page-title">
+                    Dukung Pengembang
+                </h1>
+
+                <p class="page-subtitle">
+                    Jika TARSUS membantu pekerjaanmu, kamu dapat
+                    mendukung pengembangannya.
+                </p>
+
+            </div>
+
+
+            <div class="content-card">
+
+                <div class="community-icon">
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                    >
+                        <path d="M20.8 8.7c0 5.2-8.8 11-8.8 11S3.2 13.9 3.2 8.7A4.7 4.7 0 0 1 12 6.2a4.7 4.7 0 0 1 8.8 2.5Z"/>
+                    </svg>
+
+                </div>
+
+                <h3>
+                    Bantu TARSUS berkembang
+                </h3>
+
+                <p>
+                    Dukungan dari pengguna dapat membantu
+                    pengembangan fitur, pemeliharaan aplikasi,
+                    dan peningkatan pengalaman penggunaan TARSUS.
+                </p>
+
+
+                <button
+                    class="home-search-button"
+                    id="donateButton"
+                    type="button"
+                >
+
+                    <span class="left">
+
+                        <span class="search-icon">
+                            ♡
+                        </span>
+
+                        <span>
+
+                            <strong>
+                                Dukung Pengembang
+                            </strong>
+
+                            <small>
+                                Terima kasih atas dukungannya
+                            </small>
+
+                        </span>
+
+                    </span>
+
+                    <span class="home-arrow">
+                        →
+                    </span>
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             SETTINGS
+             ================================================= -->
+
+        <section
+            class="page"
+            id="page-settings"
+        >
+
+            <div class="page-header">
+
+                <div class="page-kicker">
+                    APPLICATION
+                </div>
+
+                <h1 class="page-title">
+                    Pengaturan
+                </h1>
+
+                <p class="page-subtitle">
+                    Sesuaikan tampilan dan data lokal TARSUS.
+                </p>
+
+            </div>
+
+
+            <!-- TAMPILAN -->
+
+            <div class="setting-group">
+
+                <div class="setting-title">
+                    TAMPILAN
+                </div>
+
+                <div class="setting-card">
+
+                    <button
+                        class="setting-row"
+                        id="themeToggle"
+                        type="button"
+                    >
+
+                        <span class="setting-icon">
+
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                            >
+                                <path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.7 6.7 0 0 0 21 12.8Z"/>
+                            </svg>
+
+                        </span>
+
+                        <span class="setting-info">
+
+                            <strong>
+                                Mode Tampilan
+                            </strong>
+
+                            <span id="themeLabel">
+                                Mode Gelap
+                            </span>
+
+                        </span>
+
+                        <span
+                            class="theme-switch"
+                            aria-hidden="true"
+                        ></span>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- DATA -->
+
+            <div class="setting-group">
+
+                <div class="setting-title">
+                    DATA LOKAL
+                </div>
+
+                <div class="setting-card">
+
+                    <button
+                        class="setting-row"
+                        id="clearHistoryButton"
+                        type="button"
+                    >
+
+                        <span class="setting-icon">
+
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                            >
+                                <path d="M4 7h16"/>
+                                <path d="M10 11v6"/>
+                                <path d="M14 11v6"/>
+                                <path d="M6 7l1 14h10l1-14"/>
+                                <path d="M9 7V4h6v3"/>
+                            </svg>
+
+                        </span>
+
+                        <span class="setting-info">
+
+                            <strong>
+                                Hapus Riwayat
+                            </strong>
+
+                            <span>
+                                Menghapus pencarian yang tersimpan di perangkat.
+                            </span>
+
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- VERSION -->
+
+            <div class="version-text">
+                TARSUS Finder · v1.0.0
+            </div>
+
+        </section>
 
     </main>
 
 
-    <!-- =====================================================
-         DATA ENGINE
-    ===================================================== -->
+    <!-- ===================================================
+         FOOTER
+         =================================================== -->
 
-    <script src="data.js"></script>
+    <footer class="app-footer">
+
+        TARSUS FINDER · KAI 121
+        <br>
+
+        <a href="mailto:primaadis46@gmail.com">
+            primaadis46@gmail.com
+        </a>
+
+    </footer>
+
+
+</div>
+
+
+<!-- =======================================================
+     TOAST
+     ======================================================= -->
+
+<div id="toast"></div>
+
+
+<!-- =======================================================
+     APP UI SCRIPT
+     ======================================================= -->
+
+<script>
+
+"use strict";
+
+
+/* =========================================================
+   APP CONFIG
+   ========================================================= */
+
+const APP_CONFIG = {
+
+    instagram:
+        "https://www.instagram.com/prima_adis/",
+
+    rating:
+        "",
+
+    donate:
+        "",
+
+    email:
+        "primaadis46@gmail.com",
+
+    version:
+        "1.0.0"
+
+};
+
+
+/* =========================================================
+   ELEMENTS
+   ========================================================= */
+
+const drawer =
+    document.getElementById("drawer");
+
+const drawerOverlay =
+    document.getElementById("drawerOverlay");
+
+const menuButton =
+    document.getElementById("menuButton");
+
+const drawerClose =
+    document.getElementById("drawerClose");
+
+const toast =
+    document.getElementById("toast");
+
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+
+let toastTimer = null;
+
+function showToast(message) {
+
+    if (!toast) return;
+
+    toast.textContent = message;
+
+    toast.classList.add("show");
+
+    clearTimeout(toastTimer);
+
+    toastTimer =
+        setTimeout(() => {
+
+            toast.classList.remove("show");
+
+        }, 2200);
+}
+
+
+/* =========================================================
+   DRAWER
+   ========================================================= */
+
+function openDrawer() {
+
+    drawer.classList.add("open");
+
+    drawerOverlay.classList.add("open");
+
+    document.body.style.overflow = "hidden";
+}
+
+function closeDrawer() {
+
+    drawer.classList.remove("open");
+
+    drawerOverlay.classList.remove("open");
+
+    document.body.style.overflow = "";
+}
+
+menuButton.addEventListener(
+    "click",
+    openDrawer
+);
+
+drawerClose.addEventListener(
+    "click",
+    closeDrawer
+);
+
+drawerOverlay.addEventListener(
+    "click",
+    closeDrawer
+);
+
+
+/* =========================================================
+   PAGE NAVIGATION
+   ========================================================= */
+
+const pages =
+    document.querySelectorAll(".page");
+
+const menuItems =
+    document.querySelectorAll(".drawer-item[data-page]");
+
+
+function openPage(pageName) {
+
+    const target =
+        document.getElementById(
+            "page-" + pageName
+        );
+
+    if (!target) return;
+
+
+    pages.forEach(page => {
+
+        page.classList.remove("active");
+
+    });
+
+
+    target.classList.add("active");
+
+
+    menuItems.forEach(item => {
+
+        item.classList.toggle(
+            "active",
+            item.dataset.page === pageName
+        );
+
+    });
+
+
+    closeDrawer();
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+
+    /*
+     * Ketika membuka halaman search,
+     * fokus tidak otomatis diberikan ke input
+     * supaya keyboard HP tidak langsung muncul.
+     */
+
+}
+
+
+menuItems.forEach(item => {
+
+    item.addEventListener(
+        "click",
+        () => {
+
+            openPage(
+                item.dataset.page
+            );
+
+        }
+    );
+
+});
+
+
+/* =========================================================
+   HOME → SEARCH
+   ========================================================= */
+
+const homeSearchButton =
+    document.getElementById(
+        "homeSearchButton"
+    );
+
+if (homeSearchButton) {
+
+    homeSearchButton.addEventListener(
+        "click",
+        () => {
+
+            openPage("search");
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   INSTAGRAM
+   ========================================================= */
+
+const instagramMenu =
+    document.getElementById(
+        "instagramMenu"
+    );
+
+if (instagramMenu) {
+
+    instagramMenu.addEventListener(
+        "click",
+        () => {
+
+            window.open(
+                APP_CONFIG.instagram,
+                "_blank",
+                "noopener,noreferrer"
+            );
+
+            closeDrawer();
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   EMAIL
+   ========================================================= */
+
+const emailContactButton =
+    document.getElementById(
+        "emailContactButton"
+    );
+
+const suggestionButton =
+    document.getElementById(
+        "suggestionButton"
+    );
+
+const bugButton =
+    document.getElementById(
+        "bugButton"
+    );
+
+
+if (emailContactButton) {
+
+    emailContactButton.addEventListener(
+        "click",
+        () => {
+
+            window.location.href =
+                "mailto:" +
+                APP_CONFIG.email;
+
+        }
+    );
+
+}
+
+
+if (suggestionButton) {
+
+    suggestionButton.addEventListener(
+        "click",
+        () => {
+
+            window.location.href =
+                "mailto:" +
+                APP_CONFIG.email +
+                "?subject=" +
+                encodeURIComponent(
+                    "Saran untuk TARSUS Finder"
+                );
+
+        }
+    );
+
+}
+
+
+if (bugButton) {
+
+    bugButton.addEventListener(
+        "click",
+        () => {
+
+            window.location.href =
+                "mailto:" +
+                APP_CONFIG.email +
+                "?subject=" +
+                encodeURIComponent(
+                    "Laporan Masalah TARSUS Finder"
+                );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   RATING
+   ========================================================= */
+
+const ratingButton =
+    document.getElementById(
+        "ratingButton"
+    );
+
+if (ratingButton) {
+
+    ratingButton.addEventListener(
+        "click",
+        () => {
+
+            if (APP_CONFIG.rating) {
+
+                window.open(
+                    APP_CONFIG.rating,
+                    "_blank",
+                    "noopener,noreferrer"
+                );
+
+            } else {
+
+                showToast(
+                    "Link rating belum diatur."
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   DONATE
+   ========================================================= */
+
+const donateButton =
+    document.getElementById(
+        "donateButton"
+    );
+
+if (donateButton) {
+
+    donateButton.addEventListener(
+        "click",
+        () => {
+
+            if (APP_CONFIG.donate) {
+
+                window.open(
+                    APP_CONFIG.donate,
+                    "_blank",
+                    "noopener,noreferrer"
+                );
+
+            } else {
+
+                showToast(
+                    "Link dukungan belum diatur."
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   THEME
+   ========================================================= */
+
+const themeToggle =
+    document.getElementById(
+        "themeToggle"
+    );
+
+const themeLabel =
+    document.getElementById(
+        "themeLabel"
+    );
+
+
+function applyTheme(theme) {
+
+    const light =
+        theme === "light";
+
+
+    document.body.classList.toggle(
+        "light-mode",
+        light
+    );
+
+
+    if (themeLabel) {
+
+        themeLabel.textContent =
+            light
+                ? "Mode Terang"
+                : "Mode Gelap";
+
+    }
+
+
+    localStorage.setItem(
+        "tarsus-theme",
+        light
+            ? "light"
+            : "dark"
+    );
+
+
+    const metaTheme =
+        document.querySelector(
+            'meta[name="theme-color"]'
+        );
+
+    if (metaTheme) {
+
+        metaTheme.setAttribute(
+            "content",
+            light
+                ? "#f5f7f7"
+                : "#102536"
+        );
+
+    }
+
+}
+
+
+const savedTheme =
+    localStorage.getItem(
+        "tarsus-theme"
+    ) || "dark";
+
+applyTheme(savedTheme);
+
+
+if (themeToggle) {
+
+    themeToggle.addEventListener(
+        "click",
+        () => {
+
+            const isLight =
+                document.body.classList.contains(
+                    "light-mode"
+                );
+
+            applyTheme(
+                isLight
+                    ? "dark"
+                    : "light"
+            );
+
+            showToast(
+                isLight
+                    ? "Mode gelap diaktifkan"
+                    : "Mode terang diaktifkan"
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   HISTORY
+   ========================================================= */
+
+const HISTORY_KEY =
+    "tarsus-search-history";
+
+const FAVORITE_KEY =
+    "tarsus-favorites";
+
+
+function getHistory() {
+
+    try {
+
+        return JSON.parse(
+            localStorage.getItem(
+                HISTORY_KEY
+            ) || "[]"
+        );
+
+    } catch {
+
+        return [];
+
+    }
+
+}
+
+
+function saveHistoryItem(
+    asal,
+    tujuan
+) {
+
+    const cleanAsal =
+        String(asal || "").trim();
+
+    const cleanTujuan =
+        String(tujuan || "").trim();
+
+
+    if (!cleanAsal || !cleanTujuan) {
+        return;
+    }
+
+
+    let history =
+        getHistory();
+
+
+    history =
+        history.filter(item =>
+            !(
+                item.asal === cleanAsal &&
+                item.tujuan === cleanTujuan
+            )
+        );
+
+
+    history.unshift({
+
+        asal:
+            cleanAsal,
+
+        tujuan:
+            cleanTujuan,
+
+        time:
+            Date.now()
+
+    });
+
+
+    history =
+        history.slice(0, 8);
+
+
+    localStorage.setItem(
+        HISTORY_KEY,
+        JSON.stringify(history)
+    );
+
+
+    renderHomeHistory();
+
+}
+
+
+function clearHistory() {
+
+    localStorage.removeItem(
+        HISTORY_KEY
+    );
+
+    renderHomeHistory();
+
+    showToast(
+        "Riwayat pencarian telah dihapus."
+    );
+
+}
+
+
+function renderHomeHistory() {
+
+    const container =
+        document.getElementById(
+            "homeHistoryList"
+        );
+
+    if (!container) return;
+
+
+    const history =
+        getHistory();
+
+
+    if (!history.length) {
+
+        container.innerHTML = `
+            <div class="history-empty">
+                Belum ada pencarian tersimpan.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+        history
+            .slice(0, 5)
+            .map((item, index) => `
+
+                <button
+                    class="history-item"
+                    type="button"
+                    data-history-index="${index}"
+                >
+
+                    <span class="quick-icon">
+                        ↗
+                    </span>
+
+                    <span class="history-route">
+
+                        <strong>
+                            ${escapeHTML(item.asal)}
+                            →
+                            ${escapeHTML(item.tujuan)}
+                        </strong>
+
+                        <span>
+                            Pencarian terakhir
+                        </span>
+
+                    </span>
+
+                    <span class="history-arrow">
+                        ›
+                    </span>
+
+                </button>
+
+            `)
+            .join("");
+
+
+    container
+        .querySelectorAll(
+            "[data-history-index]"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const index =
+                        Number(
+                            button.dataset.historyIndex
+                        );
+
+                    const item =
+                        history[index];
+
+                    if (!item) return;
+
+
+                    const asal =
+                        document.getElementById(
+                            "asal"
+                        );
+
+                    const tujuan =
+                        document.getElementById(
+                            "tujuan"
+                        );
+
+
+                    if (asal) {
+                        asal.value =
+                            item.asal;
+                    }
+
+                    if (tujuan) {
+                        tujuan.value =
+                            item.tujuan;
+                    }
+
+
+                    openPage("search");
+
+
+                    /*
+                     * Jangan memanggil mesin pencarian
+                     * secara otomatis di sini.
+                     *
+                     * Pengguna masih bisa memeriksa
+                     * atau mengubah stasiun terlebih dahulu.
+                     */
+
+                }
+            );
+
+        });
+
+}
+
+
+const homeHistoryClear =
+    document.getElementById(
+        "homeHistoryClear"
+    );
+
+if (homeHistoryClear) {
+
+    homeHistoryClear.addEventListener(
+        "click",
+        clearHistory
+    );
+
+}
+
+
+/* =========================================================
+   FAVORITES
+   ========================================================= */
+
+function getFavorites() {
+
+    try {
+
+        return JSON.parse(
+            localStorage.getItem(
+                FAVORITE_KEY
+            ) || "[]"
+        );
+
+    } catch {
+
+        return [];
+
+    }
+
+}
+
+
+function renderFavorites() {
+
+    const container =
+        document.getElementById(
+            "homeFavoriteList"
+        );
+
+    if (!container) return;
+
+
+    const favorites =
+        getFavorites();
+
+
+    if (!favorites.length) {
+
+        container.innerHTML = `
+            <div class="history-empty">
+                Belum ada rute favorit.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+        favorites
+            .slice(0, 5)
+            .map((item, index) => `
+
+                <button
+                    class="history-item"
+                    type="button"
+                    data-favorite-index="${index}"
+                >
+
+                    <span class="quick-icon">
+                        ★
+                    </span>
+
+                    <span class="history-route">
+
+                        <strong>
+                            ${escapeHTML(item.asal)}
+                            →
+                            ${escapeHTML(item.tujuan)}
+                        </strong>
+
+                        <span>
+                            Rute favorit
+                        </span>
+
+                    </span>
+
+                    <span class="history-arrow">
+                        ›
+                    </span>
+
+                </button>
+
+            `)
+            .join("");
+
+
+    container
+        .querySelectorAll(
+            "[data-favorite-index]"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const index =
+                        Number(
+                            button.dataset.favoriteIndex
+                        );
+
+                    const item =
+                        favorites[index];
+
+                    if (!item) return;
+
+
+                    const asal =
+                        document.getElementById(
+                            "asal"
+                        );
+
+                    const tujuan =
+                        document.getElementById(
+                            "tujuan"
+                        );
+
+
+                    if (asal) {
+                        asal.value =
+                            item.asal;
+                    }
+
+                    if (tujuan) {
+                        tujuan.value =
+                            item.tujuan;
+                    }
+
+
+                    openPage("search");
+
+                }
+            );
+
+        });
+
+}
+
+
+function addFavorite(
+    asal,
+    tujuan
+) {
+
+    if (!asal || !tujuan) {
+        return;
+    }
+
+
+    let favorites =
+        getFavorites();
+
+
+    favorites =
+        favorites.filter(item =>
+            !(
+                item.asal === asal &&
+                item.tujuan === tujuan
+            )
+        );
+
+
+    favorites.unshift({
+
+        asal,
+        tujuan
+
+    });
+
+
+    favorites =
+        favorites.slice(0, 10);
+
+
+    localStorage.setItem(
+        FAVORITE_KEY,
+        JSON.stringify(favorites)
+    );
+
+
+    renderFavorites();
+
+    showToast(
+        "Rute ditambahkan ke favorit."
+    );
+
+}
+
+
+renderHomeHistory();
+renderFavorites();
+
+
+/* =========================================================
+   ESCAPE HTML
+   ========================================================= */
+
+function escapeHTML(value) {
+
+    return String(value ?? "")
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =========================================================
+   DETECT SEARCH
+   ========================================================= */
+
+/*
+ * Kita memantau tombol pencarian yang sudah digunakan
+ * oleh data.js.
+ *
+ * Setelah pencarian dilakukan, rute disimpan ke history.
+ */
+
+const originalSearchButton =
+    document.getElementById(
+        "searchBtn"
+    );
+
+if (originalSearchButton) {
+
+    originalSearchButton.addEventListener(
+        "click",
+        () => {
+
+            const asal =
+                document.getElementById(
+                    "asal"
+                )?.value;
+
+            const tujuan =
+                document.getElementById(
+                    "tujuan"
+                )?.value;
+
+
+            if (
+                asal &&
+                tujuan
+            ) {
+
+                saveHistoryItem(
+                    asal,
+                    tujuan
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   KEYBOARD / ENTER
+   ========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Escape" &&
+            drawer.classList.contains("open")
+        ) {
+
+            closeDrawer();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   SERVICE WORKER
+   ========================================================= */
+
+if (
+    "serviceWorker" in navigator
+) {
+
+    window.addEventListener(
+        "load",
+        () => {
+
+            navigator.serviceWorker
+                .register(
+                    "/tarsus-backup/sw.js"
+                )
+                .catch(
+                    () => {
+                        /*
+                         * Tidak menampilkan error
+                         * ke pengguna.
+                         */
+                    }
+                );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   SPLASH
+   ========================================================= */
+
+window.addEventListener(
+    "load",
+    () => {
+
+        /*
+         * Tetap memberikan sedikit waktu
+         * agar splash terasa smooth,
+         * tetapi tidak dibuat terlalu lama.
+         */
+
+        setTimeout(
+            () => {
+
+                const splash =
+                    document.getElementById(
+                        "splashScreen"
+                    );
+
+                if (splash) {
+
+                    splash.classList.add(
+                        "hide"
+                    );
+
+                }
+
+            },
+            900
+        );
+
+    }
+);
+
+
+/* =========================================================
+   INITIAL PAGE
+   ========================================================= */
+
+openPage("home");
+
+</script>
+
+
+<!-- =======================================================
+     DATA ENGINE
+     PENTING:
+     DATA.JS TIDAK DIUBAH
+     ======================================================= -->
+
+<script src="data.js"></script>
 
 
 </body>
-
 </html>
