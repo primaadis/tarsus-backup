@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.primaadis.tarsusfinder",
+      "sha256_cert_fingerprints": [
+        "9E:04:70:6C:35:16:AF:3C:11:BA:C7:28:D3:35:A1:AD:DC:56:2E:EA:1B:AD:11:8E:36:04:04:F6:AA:94:67:EB"
+      ]
+    }
+  }
+]
