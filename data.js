@@ -1,13 +1,11 @@
 /* =========================================================
    TARSUS FINDER
-   DATA ENGINE v1.0.1
+   DATA ENGINE - FINAL
    ---------------------------------------------------------
    DATABASE:
    1. MASTER_KA
    2. MASTER_TARIF
    3. MASTER_STASIUN
-
-   GOOGLE SHEET
    ========================================================= */
 
 (() => {
@@ -17,3388 +15,1959 @@
        KONFIGURASI
        ===================================================== */
 
-    const TARSUS_SHEET_ID =
-        "1a4Ln_wASazV35F2M3MKZcJHEmiAV8G-0WmkMmU4Csls";
+    const SHEET_ID = "1a4Ln_wASazV35F2M3MKZcJHEmiAV8G-0WmkMmU4Csls";
 
-    const TARSUS_SHEETS = {
+    const SHEETS = {
         ka: "MASTER_KA",
         tarif: "MASTER_TARIF",
         stasiun: "MASTER_STASIUN"
     };
 
+    const VERSION = "1.0.0";
 
     /* =====================================================
-       DATABASE MEMORY
+       STATE
        ===================================================== */
 
-    let TARSUS_MASTER_KA = [];
-    let TARSUS_MASTER_TARIF = [];
-    let TARSUS_MASTER_STASIUN = [];
+    let MASTER_KA = [];
+    let MASTER_TARIF = [];
+    let MASTER_STASIUN = [];
 
-    let TARSUS_DATABASE_READY = false;
-    let TARSUS_DATABASE_LOADING = false;
+    let STATION_INDEX = new Map();
 
+    let isDataLoaded = false;
+    let isSearching = false;
 
     /* =====================================================
-       DOM HELPER
+       DOM
        ===================================================== */
 
-    function tarsusEl(id) {
-        return document.getElementById(id);
-    }
+    const $ = (selector) => document.querySelector(selector);
 
-
-    function tarsusEnsureResults() {
-
-        let results = tarsusEl("results");
-
-        if (results) {
-            return results;
-        }
-
-        results = document.createElement("div");
-        results.id = "results";
-
-        const finderSection = tarsusEl("finderSection");
-
-        if (finderSection && finderSection.parentNode) {
-
-            finderSection.parentNode.insertBefore(
-                results,
-                finderSection.nextSibling
-            );
-
-        } else {
-
-            document.body.appendChild(results);
-
-        }
-
-        return results;
-    }
-
+    const asalInput = $("#asal");
+    const tujuanInput = $("#tujuan");
+    const asalSuggestions = $("#asal-suggestions");
+    const tujuanSuggestions = $("#tujuan-suggestions");
+    const searchBtn = $("#searchBtn");
+    const swapBtn = $("#swapBtn");
+    const results = $("#results");
+    const statusBox = $("#status");
 
     /* =====================================================
-       TEXT UTILITY
+       UTILITAS DASAR
        ===================================================== */
 
-    function tarsusClean(value) {
-
+    function clean(value) {
         if (value === null || value === undefined) {
             return "";
         }
 
-        return String(value).trim();
+        return String(value)
+            .replace(/\u00A0/g, " ")
+            .trim();
     }
 
-
-    function tarsusNormalize(value) {
-
-        return tarsusClean(value)
+    function normalize(value) {
+        return clean(value)
             .toLowerCase()
             .normalize("NFD")
             .replace(/[\u0300-\u036f]/g, "")
             .replace(/\s+/g, " ")
             .trim();
-
     }
 
+    function normalizeKey(value) {
+        return normalize(value)
+            .replace(/[^a-z0-9]+/g, "");
+    }
 
-    function tarsusEscapeHTML(value) {
-
-        return tarsusClean(value)
+    function escapeHTML(value) {
+        return clean(value)
             .replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;")
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
-
     }
 
-
-    function tarsusEscapeAttr(value) {
-
-        return tarsusEscapeHTML(value);
-
+    function escapeAttr(value) {
+        return escapeHTML(value);
     }
 
+    function makeSafeId(value) {
+        return normalizeKey(value)
+            .replace(/^[^a-z]+/, "")
+            .slice(0, 50) || "item";
+    }
+
+    function unique(array) {
+        return [...new Set(array)];
+    }
+
+    /* =====================================================
+       STATUS UI
+       ===================================================== */
+
+    function setStatus(message, type = "normal") {
+        if (!statusBox) {
+            return;
+        }
+
+        statusBox.textContent = message;
+        statusBox.dataset.type = type;
+    }
+
+    function splashStatus(message) {
+        if (
+            window.TARSUS_UI &&
+            typeof window.TARSUS_UI.setSplashStatus === "function"
+        ) {
+            window.TARSUS_UI.setSplashStatus(message);
+        }
+    }
 
     /* =====================================================
        CSV PARSER
        ===================================================== */
 
-    function tarsusParseCSV(text) {
-
+    function parseCSV(text) {
         const rows = [];
         let row = [];
-        let value = "";
+        let cell = "";
         let insideQuotes = false;
 
         for (let i = 0; i < text.length; i++) {
-
             const char = text[i];
             const next = text[i + 1];
 
             if (char === '"') {
-
                 if (insideQuotes && next === '"') {
-
-                    value += '"';
+                    cell += '"';
                     i++;
-
                 } else {
-
                     insideQuotes = !insideQuotes;
-
                 }
-
-                continue;
-            }
-
-
-            if (char === "," && !insideQuotes) {
-
-                row.push(value);
-                value = "";
-                continue;
-
-            }
-
-
-            if (
+            } else if (char === "," && !insideQuotes) {
+                row.push(cell);
+                cell = "";
+            } else if (
                 (char === "\n" || char === "\r") &&
                 !insideQuotes
             ) {
-
                 if (char === "\r" && next === "\n") {
                     i++;
                 }
 
-                row.push(value);
-                value = "";
+                row.push(cell);
+                cell = "";
 
-                if (row.some(cell => tarsusClean(cell) !== "")) {
+                if (row.some(item => clean(item) !== "")) {
                     rows.push(row);
                 }
 
                 row = [];
-
-                continue;
+            } else {
+                cell += char;
             }
-
-
-            value += char;
         }
 
+        row.push(cell);
 
-        row.push(value);
-
-        if (row.some(cell => tarsusClean(cell) !== "")) {
+        if (row.some(item => clean(item) !== "")) {
             rows.push(row);
         }
-
 
         return rows;
     }
 
-
     /* =====================================================
-       GOOGLE SHEET LOADER
+       CSV -> OBJECT
        ===================================================== */
 
-    async function tarsusLoadSheet(sheetName) {
+    function rowsToObjects(rows) {
+        if (!rows || rows.length === 0) {
+            return [];
+        }
 
+        const headers = rows[0].map(header => clean(header));
+
+        return rows
+            .slice(1)
+            .map(row => {
+                const object = {};
+
+                headers.forEach((header, index) => {
+                    object[header] = clean(row[index] ?? "");
+                });
+
+                return object;
+            })
+            .filter(object =>
+                Object.values(object).some(value => clean(value) !== "")
+            );
+    }
+
+    /* =====================================================
+       HEADER HELPER
+       ===================================================== */
+
+    function getField(row, possibleNames) {
+        if (!row || typeof row !== "object") {
+            return "";
+        }
+
+        const keys = Object.keys(row);
+
+        for (const wanted of possibleNames) {
+            const wantedKey = normalizeKey(wanted);
+
+            const actualKey = keys.find(
+                key => normalizeKey(key) === wantedKey
+            );
+
+            if (actualKey !== undefined) {
+                return clean(row[actualKey]);
+            }
+        }
+
+        return "";
+    }
+
+    /* =====================================================
+       LOAD GOOGLE SHEET
+       ===================================================== */
+
+    async function fetchSheet(sheetName) {
         const url =
-            "https://docs.google.com/spreadsheets/d/" +
-            TARSUS_SHEET_ID +
-            "/gviz/tq?tqx=out:csv&sheet=" +
-            encodeURIComponent(sheetName);
-
+            `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq` +
+            `?sheet=${encodeURIComponent(sheetName)}` +
+            `&tqx=out:csv`;
 
         const response = await fetch(url, {
             cache: "no-store"
         });
 
-
         if (!response.ok) {
-
             throw new Error(
-                "Gagal mengambil sheet " +
-                sheetName +
-                " (" +
-                response.status +
-                ")"
+                `Gagal mengambil ${sheetName}: HTTP ${response.status}`
             );
-
         }
 
+        const text = await response.text();
 
-        return await response.text();
-    }
-
-
-    /* =====================================================
-       ROW → OBJECT
-       ===================================================== */
-
-    function tarsusRowsToObjects(rows) {
-
-        if (!rows || rows.length === 0) {
-            return [];
-        }
-
-
-        const headers = rows[0].map(header =>
-            tarsusClean(header)
-        );
-
-
-        const result = [];
-
-
-        for (let i = 1; i < rows.length; i++) {
-
-            const row = rows[i];
-
-            if (!row || row.length === 0) {
-                continue;
-            }
-
-
-            const obj = {};
-
-
-            headers.forEach((header, index) => {
-
-                obj[header] =
-                    row[index] !== undefined
-                        ? tarsusClean(row[index])
-                        : "";
-
-            });
-
-
-            result.push(obj);
-        }
-
-
-        return result;
-    }
-
-
-    /* =====================================================
-       FIELD HELPER
-       ===================================================== */
-
-    function tarsusField(row, names) {
-
-        if (!row) {
-            return "";
-        }
-
-
-        const keys = Object.keys(row);
-
-
-        for (const name of names) {
-
-            const target = tarsusNormalize(name);
-
-            const found = keys.find(key =>
-                tarsusNormalize(key) === target
+        if (!text || !text.trim()) {
+            throw new Error(
+                `${sheetName} kosong atau tidak dapat dibaca.`
             );
-
-
-            if (found !== undefined) {
-
-                const value = tarsusClean(row[found]);
-
-                if (value !== "") {
-                    return value;
-                }
-
-            }
         }
 
-
-        return "";
+        return rowsToObjects(parseCSV(text));
     }
 
-
     /* =====================================================
-       STATUS HELPER
+       ACTIVE STATUS
        ===================================================== */
 
-    function tarsusIsActive(value) {
+    function isExplicitInactive(value) {
+        const n = normalize(value);
 
-        const v = tarsusNormalize(value);
+        return [
+            "tidak",
+            "nonaktif",
+            "non active",
+            "inactive",
+            "no",
+            "0",
+            "false",
+            "off"
+        ].includes(n);
+    }
 
+    function isActive(value) {
+        const n = normalize(value);
 
-        if (
-            v === "" ||
-            v === "aktif" ||
-            v === "active" ||
-            v === "ya" ||
-            v === "yes" ||
-            v === "1" ||
-            v === "true"
-        ) {
-
+        if (!n) {
             return true;
         }
 
-
-        if (
-            v === "tidak" ||
-            v === "nonaktif" ||
-            v === "inactive" ||
-            v === "non active" ||
-            v === "no" ||
-            v === "0" ||
-            v === "false"
-        ) {
-
+        if (isExplicitInactive(n)) {
             return false;
         }
-
 
         return true;
     }
 
+    function isKAActive(row) {
+        if (!row) {
+            return false;
+        }
 
-    /* =====================================================
-       MASTER KA
-       ===================================================== */
+        const status = getField(row, [
+            "STATUS",
+            "STATUS_KA",
+            "AKTIF",
+            "ACTIVE"
+        ]);
 
-    function tarsusParseMasterKA(rows) {
-
-        return rows.map(row => {
-
-            return {
-
-                id_ka: tarsusField(row, [
-                    "ID_KA",
-                    "ID KA",
-                    "ID"
-                ]),
-
-                nama_ka: tarsusField(row, [
-                    "NAMA_KA",
-                    "NAMA KA",
-                    "NAMA",
-                    "KA"
-                ]),
-
-                status: tarsusField(row, [
-                    "STATUS",
-                    "AKTIF",
-                    "ACTIVE"
-                ])
-
-            };
-
-        }).filter(item =>
-            item.id_ka !== "" ||
-            item.nama_ka !== ""
-        );
+        return isActive(status);
     }
 
+    function isTarifActive(row) {
+        if (!row) {
+            return false;
+        }
 
-    /* =====================================================
-       MASTER STASIUN
-       ===================================================== */
+        const status = getField(row, [
+            "STATUS",
+            "STATUS_TARIF",
+            "AKTIF",
+            "ACTIVE"
+        ]);
 
-    function tarsusParseMasterStasiun(rows) {
-
-        return rows.map(row => {
-
-            return {
-
-                id_stasiun: tarsusField(row, [
-                    "ID_STASIUN",
-                    "ID STASIUN",
-                    "ID"
-                ]),
-
-                kode_stasiun: tarsusField(row, [
-                    "KODE_STASIUN",
-                    "KODE STASIUN",
-                    "KODE"
-                ]),
-
-                nama_stasiun: tarsusField(row, [
-                    "NAMA_STASIUN",
-                    "NAMA STASIUN",
-                    "NAMA"
-                ]),
-
-                status: tarsusField(row, [
-                    "STATUS",
-                    "AKTIF",
-                    "ACTIVE"
-                ])
-
-            };
-
-        }).filter(item =>
-            item.nama_stasiun !== "" ||
-            item.kode_stasiun !== ""
-        );
+        return isActive(status);
     }
 
-
     /* =====================================================
-       MASTER TARIF
+       PARSE MASTER KA
        ===================================================== */
 
-    function tarsusParseMasterTarif(rows) {
-
+    function parseMasterKA(rows) {
         return rows.map(row => {
+            const idKA = getField(row, [
+                "ID_KA",
+                "ID KA",
+                "KODE_KA",
+                "KODE KA",
+                "KA_ID"
+            ]);
 
-            const stasiun = [];
+            const namaKA = getField(row, [
+                "NAMA_KA",
+                "NAMA KA",
+                "NAMA",
+                "KA"
+            ]);
 
-            for (let i = 1; i <= 15; i++) {
+            const kelas = getField(row, [
+                "KELAS",
+                "CLASS"
+            ]);
 
-                const station = tarsusField(row, [
-                    "STASIUN_" + i,
-                    "STASIUN " + i
-                ]);
+            const relasi = getField(row, [
+                "RELASI",
+                "RUTE",
+                "ROUTE"
+            ]);
 
-                if (station !== "") {
-                    stasiun.push(station);
-                }
-            }
-
+            const status = getField(row, [
+                "STATUS",
+                "STATUS_KA",
+                "AKTIF",
+                "ACTIVE"
+            ]);
 
             return {
+                ...row,
 
-                id_tarif: tarsusField(row, [
-                    "ID_TARIF",
-                    "ID TARIF",
-                    "ID"
-                ]),
-
-                id_ka: tarsusField(row, [
-                    "ID_KA",
-                    "ID KA"
-                ]),
-
-                arah: tarsusField(row, [
-                    "ARAH"
-                ]),
-
-                pola_relasi: tarsusField(row, [
-                    "POLA_RELASI",
-                    "POLA RELASI"
-                ]),
-
-                stasiun: stasiun,
-
-                eks: tarsusField(row, [
-                    "EKS",
-                    "EKSEKUTIF"
-                ]),
-
-                bis: tarsusField(row, [
-                    "BIS",
-                    "BISNIS"
-                ]),
-
-                eko: tarsusField(row, [
-                    "EKO",
-                    "EKONOMI"
-                ]),
-
-                status: tarsusField(row, [
-                    "STATUS",
-                    "AKTIF",
-                    "ACTIVE"
-                ])
-
+                ID_KA: idKA,
+                NAMA_KA: namaKA,
+                KELAS: kelas,
+                RELASI: relasi,
+                STATUS: status
             };
-
-        }).filter(item =>
-            item.id_tarif !== "" ||
-            item.id_ka !== "" ||
-            item.stasiun.length > 0
-        );
+        }).filter(row => {
+            return row.ID_KA || row.NAMA_KA;
+        });
     }
 
-
     /* =====================================================
-       TARIF PARSER
+       PARSE MASTER STASIUN
        ===================================================== */
 
-    function tarsusParseFare(value) {
+    function parseMasterStasiun(rows) {
+        return rows.map(row => {
+            const id = getField(row, [
+                "ID_STASIUN",
+                "ID STASIUN",
+                "ID",
+                "KODE_STASIUN",
+                "KODE STASIUN",
+                "KODE"
+            ]);
 
-        const raw = tarsusClean(value);
+            const kode = getField(row, [
+                "KODE_STASIUN",
+                "KODE STASIUN",
+                "KODE",
+                "CODE"
+            ]);
+
+            const nama = getField(row, [
+                "NAMA_STASIUN",
+                "NAMA STASIUN",
+                "NAMA",
+                "STASIUN",
+                "STATION"
+            ]);
+
+            const urutan = getField(row, [
+                "URUTAN",
+                "NO_URUT",
+                "NO URUT",
+                "ORDER",
+                "SEQUENCE"
+            ]);
+
+            return {
+                ...row,
+
+                ID_STASIUN: id,
+                KODE_STASIUN: kode,
+                NAMA_STASIUN: nama,
+                URUTAN: urutan
+            };
+        }).filter(row => {
+            return row.ID_STASIUN ||
+                row.KODE_STASIUN ||
+                row.NAMA_STASIUN;
+        });
+    }
+
+    /* =====================================================
+       PARSE MASTER TARIF
+       ===================================================== */
+
+    function parseMasterTarif(rows) {
+        return rows.map(row => {
+            const idKA = getField(row, [
+                "ID_KA",
+                "ID KA",
+                "KODE_KA",
+                "KODE KA",
+                "KA_ID"
+            ]);
+
+            const asal = getField(row, [
+                "ASAL",
+                "STASIUN_ASAL",
+                "STASIUN ASAL",
+                "ORIGIN",
+                "FROM"
+            ]);
+
+            const tujuan = getField(row, [
+                "TUJUAN",
+                "STASIUN_TUJUAN",
+                "STASIUN TUJUAN",
+                "DESTINATION",
+                "TO"
+            ]);
+
+            const tarif = getField(row, [
+                "TARIF",
+                "HARGA",
+                "FARE",
+                "TARIF_KHUSUS",
+                "TARIF KHUSUS"
+            ]);
+
+            const relasi = getField(row, [
+                "RELASI",
+                "RUTE",
+                "ROUTE",
+                "ARAH"
+            ]);
+
+            const status = getField(row, [
+                "STATUS",
+                "STATUS_TARIF",
+                "AKTIF",
+                "ACTIVE"
+            ]);
+
+            const catatan = getField(row, [
+                "CATATAN",
+                "KETERANGAN",
+                "NOTE",
+                "NOTES"
+            ]);
+
+            return {
+                ...row,
+
+                ID_KA: idKA,
+                ASAL: asal,
+                TUJUAN: tujuan,
+                TARIF: tarif,
+                RELASI: relasi,
+                STATUS: status,
+                CATATAN: catatan
+            };
+        }).filter(row => {
+            return row.ID_KA &&
+                (row.ASAL || row.TUJUAN);
+        });
+    }
+
+    /* =====================================================
+       PARSE TARIF
+       ===================================================== */
+
+    function parseFare(value) {
+        const original = clean(value);
 
         if (
-            raw === "" ||
-            raw === "-" ||
-            raw === "—"
+            !original ||
+            original === "-" ||
+            original === "—" ||
+            original === "–"
         ) {
             return null;
         }
 
-
-        const number = raw
+        let number = original
             .replace(/rp/gi, "")
             .replace(/\s/g, "")
             .replace(/\./g, "")
-            .replace(/,/g, "")
-            .replace(/[^\d]/g, "");
+            .replace(/,/g, "");
 
+        number = number.replace(/[^\d]/g, "");
 
         if (!number) {
             return null;
         }
 
-
         const result = Number(number);
 
-
-        return Number.isFinite(result)
-            ? result
-            : null;
-    }
-
-
-    function tarsusFormatRupiah(value) {
-
-        if (
-            value === null ||
-            value === undefined ||
-            !Number.isFinite(Number(value))
-        ) {
-
-            return "-";
-        }
-
-
-        return new Intl.NumberFormat(
-            "id-ID"
-        ).format(Number(value));
-    }
-
-
-    function tarsusGetLowestFare(tarif) {
-
-        const fares = [
-            {
-                kelas: "Eksekutif",
-                harga: tarsusParseFare(tarif.eks)
-            },
-            {
-                kelas: "Bisnis",
-                harga: tarsusParseFare(tarif.bis)
-            },
-            {
-                kelas: "Ekonomi",
-                harga: tarsusParseFare(tarif.eko)
-            }
-        ].filter(item =>
-            item.harga !== null
-        );
-
-
-        if (fares.length === 0) {
+        if (!Number.isFinite(result)) {
             return null;
         }
 
-
-        fares.sort((a, b) =>
-            a.harga - b.harga
-        );
-
-
-        return fares[0];
+        return result;
     }
 
+    function formatRupiah(value) {
+        const number = parseFare(value);
+
+        if (number === null) {
+            return "Tidak tersedia";
+        }
+
+        return new Intl.NumberFormat("id-ID", {
+            style: "currency",
+            currency: "IDR",
+            maximumFractionDigits: 0
+        }).format(number);
+    }
 
     /* =====================================================
-       SELESAI PART 1
+       STATION INDEX
        ===================================================== */
- /* =====================================================
-   STATION MATCHING
-   ===================================================== */
 
-function tarsusFindStation(value) {
+    function addStationAlias(alias, station) {
+        const key = normalize(alias);
 
-    const search = tarsusNormalize(value);
+        if (!key) {
+            return;
+        }
 
-    if (!search) {
+        if (!STATION_INDEX.has(key)) {
+            STATION_INDEX.set(key, station);
+        }
+    }
+
+    function buildStationIndex() {
+        STATION_INDEX = new Map();
+
+        MASTER_STASIUN.forEach(station => {
+            addStationAlias(station.ID_STASIUN, station);
+            addStationAlias(station.KODE_STASIUN, station);
+            addStationAlias(station.NAMA_STASIUN, station);
+
+            const aliases = [
+                getField(station, ["ALIAS"]),
+                getField(station, ["NAMA_ALIAS"]),
+                getField(station, ["NAMA LENGKAP"])
+            ];
+
+            aliases.forEach(alias => {
+                addStationAlias(alias, station);
+            });
+        });
+    }
+
+    function findStation(value) {
+        const key = normalize(value);
+
+        if (!key) {
+            return null;
+        }
+
+        if (STATION_INDEX.has(key)) {
+            return STATION_INDEX.get(key);
+        }
+
+        const stations = MASTER_STASIUN;
+
+        const exactName = stations.find(station =>
+            normalize(station.NAMA_STASIUN) === key
+        );
+
+        if (exactName) {
+            return exactName;
+        }
+
+        const exactCode = stations.find(station =>
+            normalize(station.KODE_STASIUN) === key
+        );
+
+        if (exactCode) {
+            return exactCode;
+        }
+
         return null;
     }
 
-
-    const stations = TARSUS_MASTER_STASIUN.filter(
-        station => tarsusIsActive(station.status)
-    );
-
-
-    /* COCOK NAMA STASIUN */
-
-    let found = stations.find(station =>
-        tarsusNormalize(station.nama_stasiun) === search
-    );
-
-    if (found) {
-        return found;
-    }
-
-
-    /* COCOK KODE STASIUN */
-
-    found = stations.find(station =>
-        tarsusNormalize(station.kode_stasiun) === search
-    );
-
-    if (found) {
-        return found;
-    }
-
-
-    /* COCOK ID STASIUN */
-
-    found = stations.find(station =>
-        tarsusNormalize(station.id_stasiun) === search
-    );
-
-    if (found) {
-        return found;
-    }
-
-
-    return null;
-}
-
-
-/* =====================================================
-   STATION ALIAS MATCHING
-   ===================================================== */
-
-function tarsusStationMatches(
-    stationValue,
-    targetStation
-) {
-
-    if (!stationValue || !targetStation) {
-        return false;
-    }
-
-
-    const source = tarsusNormalize(stationValue);
-
-
-    const possibleValues = [
-        targetStation.id_stasiun,
-        targetStation.kode_stasiun,
-        targetStation.nama_stasiun
-    ];
-
-
-    return possibleValues.some(value =>
-        value &&
-        tarsusNormalize(value) === source
-    );
-}
-
-
-/* =====================================================
-   TARIF STATION MATCHING
-   ===================================================== */
-
-function tarsusFindStationIndex(
-    tarif,
-    targetStation
-) {
-
-    if (!tarif || !targetStation) {
-        return -1;
-    }
-
-
-    for (
-        let i = 0;
-        i < tarif.stasiun.length;
-        i++
-    ) {
-
-        if (
-            tarsusStationMatches(
-                tarif.stasiun[i],
-                targetStation
-            )
-        ) {
-
-            return i;
-        }
-    }
-
-
-    return -1;
-}
-
-
-/* =====================================================
-   ROUTE COVERAGE
-   ===================================================== */
-
-function tarsusRouteIsCovered(
-    tarif,
-    asalStation,
-    tujuanStation
-) {
-
-    if (
-        !tarif ||
-        !asalStation ||
-        !tujuanStation
-    ) {
-
-        return false;
-    }
-
-
-    const asalIndex =
-        tarsusFindStationIndex(
-            tarif,
-            asalStation
-        );
-
-
-    const tujuanIndex =
-        tarsusFindStationIndex(
-            tarif,
-            tujuanStation
-        );
-
-
-    if (
-        asalIndex === -1 ||
-        tujuanIndex === -1
-    ) {
-
-        return false;
-    }
-
-
-    /* RELASI PP BISA DUA ARAH */
-
-    const pola =
-        tarsusNormalize(
-            tarif.pola_relasi
-        );
-
-
-    if (
-        pola === "pp" ||
-        pola === "pulang pergi" ||
-        pola === "pulang-pergi"
-    ) {
-
-        return true;
-    }
-
-
-    /* RELASI BIASA HARUS SESUAI ARAH */
-
-    return asalIndex < tujuanIndex;
-}
-
-
-/* =====================================================
-   GET NAMA KA
-   ===================================================== */
-
-function tarsusGetNamaKA(idKA) {
-
-    const target =
-        tarsusNormalize(idKA);
-
-
-    const ka =
-        TARSUS_MASTER_KA.find(item =>
-            tarsusNormalize(item.id_ka) === target
-        );
-
-
-    if (ka && ka.nama_ka) {
-        return ka.nama_ka;
-    }
-
-
-    return idKA || "Kereta Api";
-}
-
-
-/* =====================================================
-   CHECK KA ACTIVE
-   ===================================================== */
-
-function tarsusIsKAActive(idKA) {
-
-    const target =
-        tarsusNormalize(idKA);
-
-
-    const ka =
-        TARSUS_MASTER_KA.find(item =>
-            tarsusNormalize(item.id_ka) === target
-        );
-
-
-    if (!ka) {
-        return false;
-    }
-
-
-    return tarsusIsActive(
-        ka.status
-    );
-}
-
-
-/* =====================================================
-   CHECK TARIF ACTIVE
-   ===================================================== */
-
-function tarsusIsTarifActive(tarif) {
-
-    if (!tarif) {
-        return false;
-    }
-
-
-    return tarsusIsActive(
-        tarif.status
-    );
-}
-
-
-/* =====================================================
-   GET REFERENCE ROUTE
-   ===================================================== */
-
-function tarsusGetReferenceRoute(tarif) {
-
-    if (
-        !tarif ||
-        !Array.isArray(tarif.stasiun)
-    ) {
-
-        return [];
-    }
-
-
-    return tarif.stasiun.filter(
-        station =>
-            tarsusClean(station) !== ""
-    );
-}
-
-
-/* =====================================================
-   FARE ITEMS
-   ===================================================== */
-
-function tarsusFareItems(tarif) {
-
-    const result = [];
-
-
-    const fares = [
-        {
-            label: "Eksekutif",
-            value: tarsusParseFare(
-                tarif.eks
-            )
-        },
-
-        {
-            label: "Bisnis",
-            value: tarsusParseFare(
-                tarif.bis
-            )
-        },
-
-        {
-            label: "Ekonomi",
-            value: tarsusParseFare(
-                tarif.eko
-            )
-        }
-    ];
-
-
-    fares.forEach(item => {
-
-        if (item.value !== null) {
-
-            result.push(item);
-
+    function stationMatches(value, station) {
+        const a = normalize(value);
+
+        if (!a || !station) {
+            return false;
         }
 
-    });
+        const aliases = [
+            station.ID_STASIUN,
+            station.KODE_STASIUN,
+            station.NAMA_STASIUN,
+            getField(station, ["ALIAS"]),
+            getField(station, ["NAMA_ALIAS"])
+        ];
 
-
-    return result;
-}
-
-
-/* =====================================================
-   ROUTE DISPLAY
-   ===================================================== */
-
-function tarsusRelationHTML(
-    tarif
-) {
-
-    const stations =
-        tarsusGetReferenceRoute(tarif);
-
-
-    if (stations.length === 0) {
-        return "-";
-    }
-
-
-    return stations
-        .map(
-            station =>
-                `<span class="tarsus-route-station">
-                    ${tarsusEscapeHTML(station)}
-                 </span>`
-        )
-        .join(
-            `<span class="tarsus-route-arrow">→</span>`
+        return aliases.some(alias =>
+            normalize(alias) === a
         );
-}
-
-
-/* =====================================================
-   RESULT OBJECT
-   ===================================================== */
-
-function tarsusCreateResult(
-    tarif,
-    asalStation,
-    tujuanStation
-) {
-
-    const lowestFare =
-        tarsusGetLowestFare(tarif);
-
-
-    if (!lowestFare) {
-        return null;
     }
 
+    /* =====================================================
+       KA HELPERS
+       ===================================================== */
 
-    const namaKA =
-        tarsusGetNamaKA(
-            tarif.id_ka
+    function getNamaKA(idKA) {
+        const key = normalize(idKA);
+
+        const ka = MASTER_KA.find(item =>
+            normalize(item.ID_KA) === key
         );
 
-
-    return {
-
-        tarif: tarif,
-
-        id_tarif: tarif.id_tarif,
-
-        id_ka: tarif.id_ka,
-
-        nama_ka: namaKA,
-
-        asal:
-            asalStation.nama_stasiun,
-
-        tujuan:
-            tujuanStation.nama_stasiun,
-
-        harga:
-            lowestFare.harga,
-
-        kelas:
-            lowestFare.kelas,
-
-        fares:
-            tarsusFareItems(tarif),
-
-        route:
-            tarsusGetReferenceRoute(tarif)
-
-    };
-}
-
-
-/* =====================================================
-   SEARCH TARIF
-   ===================================================== */
-
-function tarsusSearchTarif(
-    asalValue,
-    tujuanValue
-) {
-
-    const asalStation =
-        tarsusFindStation(
-            asalValue
-        );
-
-
-    const tujuanStation =
-        tarsusFindStation(
-            tujuanValue
-        );
-
-
-    if (!asalStation) {
-
-        return {
-            success: false,
-            message:
-                "Stasiun asal tidak ditemukan.",
-            results: []
-        };
-
-    }
-
-
-    if (!tujuanStation) {
-
-        return {
-            success: false,
-            message:
-                "Stasiun tujuan tidak ditemukan.",
-            results: []
-        };
-
-    }
-
-
-    if (
-        tarsusNormalize(
-            asalStation.nama_stasiun
-        ) ===
-        tarsusNormalize(
-            tujuanStation.nama_stasiun
-        )
-    ) {
-
-        return {
-            success: false,
-            message:
-                "Stasiun asal dan tujuan tidak boleh sama.",
-            results: []
-        };
-
-    }
-
-
-    const matched = [];
-
-
-    TARSUS_MASTER_TARIF.forEach(tarif => {
-
-        if (
-            !tarsusIsTarifActive(tarif)
-        ) {
-
-            return;
+        if (ka) {
+            return ka.NAMA_KA || ka.ID_KA;
         }
 
-
-        if (
-            !tarsusIsKAActive(
-                tarif.id_ka
-            )
-        ) {
-
-            return;
-        }
-
-
-        if (
-            !tarsusRouteIsCovered(
-                tarif,
-                asalStation,
-                tujuanStation
-            )
-        ) {
-
-            return;
-        }
-
-
-        const result =
-            tarsusCreateResult(
-                tarif,
-                asalStation,
-                tujuanStation
-            );
-
-
-        if (result) {
-            matched.push(result);
-        }
-
-    });
-
-
-    /* SORT BERDASARKAN TARIF TERMURAH */
-
-    matched.sort(
-        (a, b) => {
-
-            if (a.harga !== b.harga) {
-                return a.harga - b.harga;
-            }
-
-
-            return a.nama_ka.localeCompare(
-                b.nama_ka,
-                "id"
-            );
-
-        }
-    );
-
-
-    return {
-
-        success: true,
-
-        message:
-            matched.length > 0
-                ? `${matched.length} tarif ditemukan.`
-                : "Tarif khusus tidak ditemukan.",
-
-        results: matched
-
-    };
-}
-
-
-/* =====================================================
-   GROUP RESULT BY KA
-   ===================================================== */
-
-function tarsusGroupResults(
-    results
-) {
-
-    const groups = {};
-
-
-    results.forEach(result => {
-
-        const key =
-            tarsusNormalize(
-                result.nama_ka
-            );
-
-
-        if (!groups[key]) {
-
-            groups[key] = {
-
-                nama_ka:
-                    result.nama_ka,
-
-                items: []
-
-            };
-
-        }
-
-
-        groups[key].items.push(
-            result
-        );
-
-    });
-
-
-    return Object.values(groups);
-}
-
-
-/* =====================================================
-   SELESAI PART 2
-   ===================================================== */
- /* =====================================================
-   RENDER RESULT
-   ===================================================== */
-
-function tarsusRenderResults(
-    searchResult
-) {
-
-    const resultsEl =
-        tarsusEnsureResults();
-
-
-    if (!resultsEl) {
-        return;
+        return idKA || "KA Tidak Diketahui";
     }
 
+    function getKA(idKA) {
+        const key = normalize(idKA);
 
-    if (
-        !searchResult ||
-        !searchResult.success
-    ) {
-
-        resultsEl.innerHTML = `
-            <div class="tarsus-result-empty">
-                <div class="tarsus-empty-icon">⚠</div>
-                <div class="tarsus-empty-title">
-                    Pencarian tidak dapat diproses
-                </div>
-                <div class="tarsus-empty-text">
-                    ${tarsusEscapeHTML(
-                        searchResult?.message ||
-                        "Terjadi kesalahan."
-                    )}
-                </div>
-            </div>
-        `;
-
-        return;
+        return MASTER_KA.find(item =>
+            normalize(item.ID_KA) === key
+        ) || null;
     }
 
+    /* =====================================================
+       ROUTE
+       ===================================================== */
 
-    if (
-        !searchResult.results ||
-        searchResult.results.length === 0
-    ) {
+    function getReferenceRoute(ka) {
+        if (!ka) {
+            return [];
+        }
 
-        resultsEl.innerHTML = `
-            <div class="tarsus-result-empty">
-                <div class="tarsus-empty-icon">⌕</div>
-                <div class="tarsus-empty-title">
-                    Tarif tidak ditemukan
-                </div>
-                <div class="tarsus-empty-text">
-                    Belum ada tarif khusus yang sesuai
-                    dengan rute tersebut.
-                </div>
-            </div>
-        `;
+        const rawRoute =
+            ka.RELASI ||
+            getField(ka, [
+                "RUTE",
+                "ROUTE",
+                "LINTASAN",
+                "JALUR"
+            ]);
 
-        return;
+        if (!rawRoute) {
+            return [];
+        }
+
+        return rawRoute
+            .split(/\s*(?:-|>|→|↔|\/|;|\|)\s*/)
+            .map(item => clean(item))
+            .filter(Boolean);
     }
 
+    function relationHTML(route) {
+        if (!route || route.length === 0) {
+            return "";
+        }
 
-    const groups =
-        tarsusGroupResults(
-            searchResult.results
-        );
-
-
-    let html = "";
-
-
-    groups.forEach(
-        (group, groupIndex) => {
-
-            const first =
-                group.items[0];
-
-
-            html += `
-                <div class="tarsus-result-card">
-
-                    <div class="tarsus-result-header">
-
-                        <div class="tarsus-ka-icon">
-                            KA
-                        </div>
-
-                        <div class="tarsus-ka-info">
-
-                            <div class="tarsus-ka-name">
-                                ${tarsusEscapeHTML(
-                                    group.nama_ka
-                                )}
-                            </div>
-
-                            <div class="tarsus-ka-route">
-                                ${tarsusEscapeHTML(
-                                    first.asal
-                                )}
-                                <span>→</span>
-                                ${tarsusEscapeHTML(
-                                    first.tujuan
-                                )}
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="tarsus-main-fare">
-
-                        <div class="tarsus-fare-label">
-                            Tarif Khusus
-                        </div>
-
-                        <div class="tarsus-fare-price">
-                            Rp ${tarsusFormatRupiah(
-                                first.harga
-                            )}
-                        </div>
-
-                        <div class="tarsus-fare-class">
-                            ${tarsusEscapeHTML(
-                                first.kelas
-                            )}
-                        </div>
-
-                    </div>
-
-
-                    <div class="tarsus-fare-list">
-
-                        ${first.fares
-                            .map(fare => `
-                                <div class="tarsus-fare-row">
-
-                                    <span>
-                                        ${tarsusEscapeHTML(
-                                            fare.label
-                                        )}
-                                    </span>
-
-                                    <strong>
-                                        Rp ${tarsusFormatRupiah(
-                                            fare.value
-                                        )}
-                                    </strong>
-
-                                </div>
-                            `)
-                            .join("")}
-
-                    </div>
-
-
+        return `
+            <div class="route-line">
+                ${route.map((station, index) => `
+                    <span class="route-station">
+                        ${escapeHTML(station)}
+                    </span>
                     ${
-                        group.items.length > 1
-                            ? `
-                                <details class="tarsus-alternative">
-
-                                    <summary>
-                                        Lihat ${group.items.length - 1}
-                                        alternatif tarif
-                                    </summary>
-
-                                    <div class="tarsus-alternative-list">
-
-                                        ${group.items
-                                            .slice(1)
-                                            .map(item => `
-                                                <div class="tarsus-alternative-item">
-
-                                                    <div class="tarsus-alternative-route">
-
-                                                        ${tarsusEscapeHTML(
-                                                            item.route[0] ||
-                                                            item.asal
-                                                        )}
-
-                                                        <span>→</span>
-
-                                                        ${tarsusEscapeHTML(
-                                                            item.route[
-                                                                item.route.length - 1
-                                                            ] ||
-                                                            item.tujuan
-                                                        )}
-
-                                                    </div>
-
-                                                    <div class="tarsus-alternative-price">
-
-                                                        Rp ${tarsusFormatRupiah(
-                                                            item.harga
-                                                        )}
-
-                                                    </div>
-
-                                                    <div class="tarsus-alternative-class">
-
-                                                        ${tarsusEscapeHTML(
-                                                            item.kelas
-                                                        )}
-
-                                                    </div>
-
-                                                </div>
-                                            `)
-                                            .join("")}
-
-                                    </div>
-
-                                </details>
-                            `
+                        index < route.length - 1
+                            ? `<span class="route-arrow">→</span>`
                             : ""
                     }
-
-                </div>
-            `;
-        }
-    );
-
-
-    resultsEl.innerHTML = `
-        <div class="tarsus-results-title">
-            <div>
-                <strong>
-                    Hasil Pencarian
-                </strong>
-
-                <span>
-                    ${searchResult.results.length}
-                    tarif ditemukan
-                </span>
+                `).join("")}
             </div>
-        </div>
-
-        <div class="tarsus-results-list">
-            ${html}
-        </div>
-    `;
-}
-
-
-/* =====================================================
-   STATUS
-   ===================================================== */
-
-function tarsusSetStatus(
-    message,
-    type = ""
-) {
-
-    const status =
-        tarsusEl("status");
-
-
-    if (!status) {
-        return;
+        `;
     }
 
+    /* =====================================================
+       CEK COVERAGE RUTE
+       ===================================================== */
 
-    status.textContent =
-        message || "";
+    function routeIsCovered(ka, origin, destination, tariffRow = null) {
+        const originStation = findStation(origin);
+        const destinationStation = findStation(destination);
 
+        /*
+         * Jika MASTER_STASIUN tersedia, kedua stasiun harus
+         * dikenali. Ini mencegah pencarian ngawur.
+         */
+        if (MASTER_STASIUN.length > 0) {
+            if (!originStation || !destinationStation) {
+                return false;
+            }
+        }
 
-    status.className =
-        "status" +
-        (
-            type
-                ? " " + type
-                : ""
-        );
-}
+        /*
+         * Tarif khusus yang sudah secara eksplisit memiliki
+         * ASAL dan TUJUAN dianggap sebagai rute utama.
+         */
+        if (tariffRow) {
+            const tariffOrigin = normalize(tariffRow.ASAL);
+            const tariffDestination = normalize(tariffRow.TUJUAN);
 
+            const originKey = normalize(origin);
+            const destinationKey = normalize(destination);
 
-/* =====================================================
-   SEARCH ACTION
-   ===================================================== */
+            const directMatch =
+                tariffOrigin === originKey &&
+                tariffDestination === destinationKey;
 
-async function tarsusPerformSearch() {
+            const reverseMatch =
+                normalize(tariffRow.RELASI) === "pp" &&
+                tariffDestination === originKey &&
+                tariffOrigin === destinationKey;
 
-    const asalInput =
-        tarsusEl("asal");
+            if (directMatch || reverseMatch) {
+                return true;
+            }
+        }
 
-    const tujuanInput =
-        tarsusEl("tujuan");
+        /*
+         * Cari rute KA.
+         */
+        const route = getReferenceRoute(ka);
 
+        if (route.length < 2) {
+            /*
+             * Jika KA tidak memiliki data rute pada MASTER_KA,
+             * jangan menolak tarif yang sudah ditemukan.
+             */
+            return true;
+        }
 
-    if (!asalInput || !tujuanInput) {
-        return;
-    }
+        const normalizedRoute = route.map(normalize);
 
-
-    const asal =
-        tarsusClean(
-            asalInput.value
-        );
-
-    const tujuan =
-        tarsusClean(
-            tujuanInput.value
-        );
-
-
-    if (!asal || !tujuan) {
-
-        tarsusSetStatus(
-            "Silakan isi stasiun asal dan tujuan.",
-            "error"
-        );
-
-        tarsusRenderResults({
-            success: false,
-            message:
-                "Stasiun asal dan tujuan wajib diisi."
-        });
-
-        return;
-    }
-
-
-    if (!TARSUS_DATABASE_READY) {
-
-        tarsusSetStatus(
-            "Database masih dimuat. Tunggu sebentar...",
-            "loading"
+        const originIndex = normalizedRoute.findIndex(
+            station => station === normalize(origin)
         );
 
-        return;
-    }
-
-
-    tarsusSetStatus(
-        "Mencari tarif...",
-        "loading"
-    );
-
-
-    const button =
-        tarsusEl("searchBtn");
-
-
-    if (button) {
-        button.disabled = true;
-    }
-
-
-    try {
-
-        await new Promise(
-            resolve =>
-                setTimeout(
-                    resolve,
-                    100
-                )
+        const destinationIndex = normalizedRoute.findIndex(
+            station => station === normalize(destination)
         );
 
+        /*
+         * Coba berdasarkan kode/nama stasiun.
+         */
+        if (
+            originIndex === -1 &&
+            originStation
+        ) {
+            const aliases = [
+                originStation.ID_STASIUN,
+                originStation.KODE_STASIUN,
+                originStation.NAMA_STASIUN
+            ].map(normalize);
 
-        const result =
-            tarsusSearchTarif(
-                asal,
-                tujuan
+            const idx = normalizedRoute.findIndex(
+                station => aliases.includes(station)
             );
 
+            if (idx !== -1) {
+                return routeIsCoveredByIndex(
+                    idx,
+                    destination,
+                    normalizedRoute,
+                    destinationStation
+                );
+            }
+        }
 
         if (
-            result.results &&
-            result.results.length > 0
+            destinationIndex === -1 &&
+            destinationStation
         ) {
+            const aliases = [
+                destinationStation.ID_STASIUN,
+                destinationStation.KODE_STASIUN,
+                destinationStation.NAMA_STASIUN
+            ].map(normalize);
 
-            tarsusSetStatus(
-                `${result.results.length} tarif ditemukan.`,
-                "success"
+            const idx = normalizedRoute.findIndex(
+                station => aliases.includes(station)
             );
 
-        } else {
+            if (idx !== -1 && originIndex !== -1) {
+                return originIndex < idx;
+            }
+        }
 
-            tarsusSetStatus(
-                "Tarif khusus tidak ditemukan.",
-                "error"
+        if (originIndex === -1 || destinationIndex === -1) {
+            return false;
+        }
+
+        /*
+         * PP = kedua arah diterima.
+         */
+        const relation =
+            normalize(
+                tariffRow?.RELASI ||
+                ka.RELASI ||
+                ""
             );
 
+        if (
+            relation === "pp" ||
+            relation.includes("pp")
+        ) {
+            return true;
         }
 
-
-        tarsusRenderResults(
-            result
-        );
-
-
-        const resultsEl =
-            tarsusEl("results");
-
-
-        if (resultsEl) {
-
-            setTimeout(() => {
-
-                resultsEl.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start"
-                });
-
-            }, 80);
-
-        }
-
-    } catch (error) {
-
-        console.error(
-            "TARSUS SEARCH ERROR:",
-            error
-        );
-
-
-        tarsusSetStatus(
-            "Terjadi kesalahan saat mencari tarif.",
-            "error"
-        );
-
-
-        tarsusRenderResults({
-            success: false,
-            message:
-                "Terjadi kesalahan saat memproses pencarian."
-        });
-
-    } finally {
-
-        if (button) {
-            button.disabled = false;
-        }
-
-    }
-}
-
-
-/* =====================================================
-   SWAP STATION
-   ===================================================== */
-
-function tarsusSwapStations() {
-
-    const asal =
-        tarsusEl("asal");
-
-    const tujuan =
-        tarsusEl("tujuan");
-
-
-    if (!asal || !tujuan) {
-        return;
+        /*
+         * Default = arah perjalanan mengikuti urutan route.
+         */
+        return originIndex < destinationIndex;
     }
 
-
-    const temp =
-        asal.value;
-
-
-    asal.value =
-        tujuan.value;
-
-    tujuan.value =
-        temp;
-
-
-    if (
-        tarsusClean(
-            asal.value
-        ) &&
-        tarsusClean(
-            tujuan.value
-        ) &&
-        TARSUS_DATABASE_READY
+    function routeIsCoveredByIndex(
+        originIndex,
+        destination,
+        normalizedRoute,
+        destinationStation
     ) {
-
-        tarsusPerformSearch();
-
-    }
-
-}
-
-
-/* =====================================================
-   ENTER KEY
-   ===================================================== */
-
-function tarsusHandleEnter(event) {
-
-    if (
-        event.key === "Enter"
-    ) {
-
-        event.preventDefault();
-
-        tarsusPerformSearch();
-
-    }
-
-}
-
-
-/* =====================================================
-   SELESAI PART 3
-   ===================================================== */
- /* =====================================================
-   SUGGESTION SYSTEM
-   ===================================================== */
-
-function tarsusShowSuggestions(
-    input,
-    suggestionBox
-) {
-
-    if (!input || !suggestionBox) {
-        return;
-    }
-
-
-    const keyword =
-        tarsusNormalize(
-            input.value
+        let destinationIndex = normalizedRoute.findIndex(
+            station => station === normalize(destination)
         );
 
+        if (
+            destinationIndex === -1 &&
+            destinationStation
+        ) {
+            const aliases = [
+                destinationStation.ID_STASIUN,
+                destinationStation.KODE_STASIUN,
+                destinationStation.NAMA_STASIUN
+            ].map(normalize);
 
-    if (!keyword) {
+            destinationIndex = normalizedRoute.findIndex(
+                station => aliases.includes(station)
+            );
+        }
 
-        suggestionBox.innerHTML = "";
-        suggestionBox.classList.remove("show");
+        if (destinationIndex === -1) {
+            return false;
+        }
 
-        return;
+        return originIndex < destinationIndex;
     }
 
+    /* =====================================================
+       FARE ITEM
+       ===================================================== */
 
-    const stations =
-        TARSUS_MASTER_STASIUN
-            .filter(station =>
-                tarsusIsActive(
-                    station.status
-                )
-            )
-            .filter(station => {
+    function fareItem(tarifRow) {
+        const fare = parseFare(tarifRow.TARIF);
 
-                const nama =
-                    tarsusNormalize(
-                        station.nama_stasiun
-                    );
+        if (fare === null) {
+            return null;
+        }
 
-                const kode =
-                    tarsusNormalize(
-                        station.kode_stasiun
-                    );
-
-
-                return (
-                    nama.includes(keyword) ||
-                    kode.includes(keyword)
-                );
-
-            })
-            .slice(0, 8);
-
-
-    if (stations.length === 0) {
-
-        suggestionBox.innerHTML = "";
-        suggestionBox.classList.remove("show");
-
-        return;
+        return {
+            ...tarifRow,
+            fare
+        };
     }
 
+    /* =====================================================
+       LOWEST FARE
+       ===================================================== */
 
-    suggestionBox.innerHTML =
-        stations.map(station => {
+    function getLowestFare(rows) {
+        const fares = rows
+            .map(fareItem)
+            .filter(Boolean)
+            .sort((a, b) => a.fare - b.fare);
 
-            const nama =
-                tarsusEscapeHTML(
-                    station.nama_stasiun
-                );
+        return fares[0] || null;
+    }
 
-            const kode =
-                tarsusEscapeHTML(
-                    station.kode_stasiun
-                );
+    /* =====================================================
+       CREATE TARIF DETAIL
+       ===================================================== */
 
+    function createTarifDetail(tarifRow, isMain = false) {
+        const fare = parseFare(tarifRow.TARIF);
 
-            return `
-                <button
-                    type="button"
-                    class="tarsus-suggestion-item"
-                    data-station="${tarsusEscapeAttr(
-                        station.nama_stasiun
-                    )}"
-                >
+        if (fare === null) {
+            return "";
+        }
 
-                    <span class="tarsus-suggestion-icon">
-                        ●
-                    </span>
+        const relation =
+            clean(tarifRow.RELASI) ||
+            "Sekali jalan";
 
-                    <span class="tarsus-suggestion-text">
+        const note =
+            clean(tarifRow.CATATAN);
 
-                        <strong>
-                            ${nama}
-                        </strong>
+        return `
+            <div class="tariff-box ${isMain ? "tariff-main" : ""}">
+                <div class="tariff-label">
+                    ${isMain ? "TARIF KHUSUS" : "ALTERNATIF"}
+                </div>
+
+                <div class="tariff-price">
+                    ${formatRupiah(fare)}
+                </div>
+
+                <div class="tariff-note">
+                    ${escapeHTML(relation)}
+                    ${
+                        note
+                            ? ` · ${escapeHTML(note)}`
+                            : ""
+                    }
+                </div>
+            </div>
+        `;
+    }
+
+    /* =====================================================
+       CREATE KA CARD
+       ===================================================== */
+
+    function createKAGroupCard(group, origin, destination) {
+        const ka = group.ka;
+        const fares = group.fares;
+
+        const sorted = [...fares]
+            .map(fareItem)
+            .filter(Boolean)
+            .sort((a, b) => a.fare - b.fare);
+
+        if (sorted.length === 0) {
+            return "";
+        }
+
+        const mainFare = sorted[0];
+
+        const alternatives = sorted.slice(1);
+
+        const kaName =
+            ka?.NAMA_KA ||
+            getNamaKA(mainFare.ID_KA);
+
+        const kelas =
+            ka?.KELAS ||
+            getField(ka, ["KELAS", "CLASS"]);
+
+        const route =
+            getReferenceRoute(ka);
+
+        const safeId = makeSafeId(
+            `${mainFare.ID_KA}-${origin}-${destination}`
+        );
+
+        return `
+            <article
+                class="result-card"
+                id="result-${safeId}"
+            >
+
+                <div class="result-card-head">
+
+                    <div>
+                        <div class="ka-name">
+                            ${escapeHTML(kaName)}
+                        </div>
 
                         ${
-                            kode
+                            kelas
                                 ? `
-                                    <small>
-                                        ${kode}
-                                    </small>
+                                    <div class="ka-badge">
+                                        ${escapeHTML(kelas)}
+                                    </div>
                                   `
                                 : ""
                         }
-
-                    </span>
-
-                </button>
-            `;
-
-        }).join("");
-
-
-    suggestionBox.classList.add("show");
-}
-
-
-/* =====================================================
-   CLOSE SUGGESTIONS
-   ===================================================== */
-
-function tarsusCloseSuggestions(
-    suggestionBox
-) {
-
-    if (!suggestionBox) {
-        return;
-    }
-
-
-    suggestionBox.innerHTML = "";
-
-    suggestionBox.classList.remove(
-        "show"
-    );
-}
-
-
-/* =====================================================
-   SUGGESTION CLICK
-   ===================================================== */
-
-function tarsusSuggestionClick(
-    event,
-    input,
-    suggestionBox
-) {
-
-    const item =
-        event.target.closest(
-            ".tarsus-suggestion-item"
-        );
-
-
-    if (!item) {
-        return;
-    }
-
-
-    const station =
-        item.getAttribute(
-            "data-station"
-        );
-
-
-    if (input && station) {
-
-        input.value =
-            station;
-
-    }
-
-
-    tarsusCloseSuggestions(
-        suggestionBox
-    );
-
-}
-
-
-/* =====================================================
-   DYNAMIC CSS
-   ===================================================== */
-
-function tarsusInjectStyles() {
-
-    if (
-        document.getElementById(
-            "tarsusDataEngineStyles"
-        )
-    ) {
-
-        return;
-    }
-
-
-    const style =
-        document.createElement(
-            "style"
-        );
-
-
-    style.id =
-        "tarsusDataEngineStyles";
-
-
-    style.textContent = `
-
-        /* =============================================
-           RESULT CONTAINER
-           ============================================= */
-
-        #results {
-            width: 100%;
-            max-width: 900px;
-            margin: 20px auto 0;
-        }
-
-
-        /* =============================================
-           RESULT TITLE
-           ============================================= */
-
-        .tarsus-results-title {
-            margin-bottom: 12px;
-            padding: 0 4px;
-        }
-
-
-        .tarsus-results-title strong {
-            display: block;
-            font-size: 17px;
-            font-weight: 800;
-        }
-
-
-        .tarsus-results-title span {
-            display: block;
-            margin-top: 3px;
-            font-size: 12px;
-            opacity: .65;
-        }
-
-
-        /* =============================================
-           RESULT CARD
-           ============================================= */
-
-        .tarsus-result-card {
-            position: relative;
-            overflow: hidden;
-
-            margin-bottom: 14px;
-            padding: 16px;
-
-            border-radius: 18px;
-
-            background:
-                var(
-                    --card,
-                    rgba(255,255,255,.96)
-                );
-
-            border:
-                1px solid
-                var(
-                    --border,
-                    rgba(0,0,0,.08)
-                );
-
-            box-shadow:
-                0 8px 28px
-                rgba(0,0,0,.06);
-
-            animation:
-                tarsusResultIn .28s ease both;
-        }
-
-
-        @keyframes tarsusResultIn {
-
-            from {
-                opacity: 0;
-                transform:
-                    translateY(8px);
-            }
-
-            to {
-                opacity: 1;
-                transform:
-                    translateY(0);
-            }
-
-        }
-
-
-        /* =============================================
-           KA HEADER
-           ============================================= */
-
-        .tarsus-result-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-
-        .tarsus-ka-icon {
-            width: 42px;
-            height: 42px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            flex-shrink: 0;
-
-            border-radius: 13px;
-
-            font-size: 11px;
-            font-weight: 900;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #172033,
-                    #34425c
-                );
-
-            color: white;
-        }
-
-
-        .tarsus-ka-info {
-            min-width: 0;
-            flex: 1;
-        }
-
-
-        .tarsus-ka-name {
-            font-size: 16px;
-            font-weight: 800;
-
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-
-        .tarsus-ka-route {
-            margin-top: 3px;
-
-            font-size: 12px;
-
-            opacity: .68;
-        }
-
-
-        .tarsus-ka-route span {
-            margin: 0 5px;
-            font-weight: 800;
-        }
-
-
-        /* =============================================
-           MAIN FARE
-           ============================================= */
-
-        .tarsus-main-fare {
-            margin-top: 15px;
-            padding: 14px;
-
-            border-radius: 14px;
-
-            background:
-                rgba(127,127,127,.07);
-        }
-
-
-        .tarsus-fare-label {
-            font-size: 11px;
-            font-weight: 700;
-            opacity: .62;
-
-            text-transform: uppercase;
-            letter-spacing: .04em;
-        }
-
-
-        .tarsus-fare-price {
-            margin-top: 3px;
-
-            font-size: 23px;
-            line-height: 1.15;
-
-            font-weight: 900;
-        }
-
-
-        .tarsus-fare-class {
-            margin-top: 4px;
-
-            font-size: 11px;
-            opacity: .6;
-        }
-
-
-        /* =============================================
-           FARE LIST
-           ============================================= */
-
-        .tarsus-fare-list {
-            margin-top: 10px;
-        }
-
-
-        .tarsus-fare-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            padding: 8px 2px;
-
-            border-bottom:
-                1px solid
-                rgba(127,127,127,.12);
-
-            font-size: 12px;
-        }
-
-
-        .tarsus-fare-row:last-child {
-            border-bottom: none;
-        }
-
-
-        .tarsus-fare-row strong {
-            font-weight: 800;
-        }
-
-
-        /* =============================================
-           ALTERNATIVE
-           ============================================= */
-
-        .tarsus-alternative {
-            margin-top: 10px;
-
-            border-top:
-                1px solid
-                rgba(127,127,127,.12);
-
-            padding-top: 10px;
-        }
-
-
-        .tarsus-alternative summary {
-            cursor: pointer;
-
-            font-size: 12px;
-            font-weight: 700;
-
-            opacity: .72;
-        }
-
-
-        .tarsus-alternative-list {
-            margin-top: 8px;
-        }
-
-
-        .tarsus-alternative-item {
-            padding: 10px;
-
-            border-radius: 12px;
-
-            background:
-                rgba(127,127,127,.06);
-
-            margin-bottom: 7px;
-        }
-
-
-        .tarsus-alternative-route {
-            font-size: 11px;
-            font-weight: 700;
-        }
-
-
-        .tarsus-alternative-route span {
-            margin: 0 4px;
-        }
-
-
-        .tarsus-alternative-price {
-            margin-top: 4px;
-
-            font-size: 14px;
-            font-weight: 900;
-        }
-
-
-        .tarsus-alternative-class {
-            margin-top: 2px;
-
-            font-size: 10px;
-            opacity: .6;
-        }
-
-
-        /* =============================================
-           EMPTY / ERROR
-           ============================================= */
-
-        .tarsus-result-empty {
-            margin-top: 14px;
-            padding: 28px 18px;
-
-            text-align: center;
-
-            border-radius: 18px;
-
-            background:
-                var(
-                    --card,
-                    rgba(255,255,255,.96)
-                );
-
-            border:
-                1px solid
-                var(
-                    --border,
-                    rgba(0,0,0,.08)
-                );
-        }
-
-
-        .tarsus-empty-icon {
-            font-size: 28px;
-            font-weight: 900;
-            opacity: .5;
-        }
-
-
-        .tarsus-empty-title {
-            margin-top: 8px;
-
-            font-size: 15px;
-            font-weight: 800;
-        }
-
-
-        .tarsus-empty-text {
-            margin-top: 5px;
-
-            font-size: 12px;
-            line-height: 1.5;
-
-            opacity: .62;
-        }
-
-
-        /* =============================================
-           SUGGESTION
-           ============================================= */
-
-        .tarsus-suggestion-item {
-            width: 100%;
-
-            display: flex;
-            align-items: center;
-
-            gap: 10px;
-
-            padding: 10px 12px;
-
-            border: none;
-
-            background: transparent;
-
-            text-align: left;
-
-            cursor: pointer;
-        }
-
-
-        .tarsus-suggestion-item:hover {
-            background:
-                rgba(127,127,127,.08);
-        }
-
-
-        .tarsus-suggestion-icon {
-            width: 28px;
-            height: 28px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            border-radius: 50%;
-
-            background:
-                rgba(127,127,127,.10);
-
-            font-size: 9px;
-        }
-
-
-        .tarsus-suggestion-text {
-            display: flex;
-            flex-direction: column;
-
-            min-width: 0;
-        }
-
-
-        .tarsus-suggestion-text strong {
-            font-size: 13px;
-        }
-
-
-        .tarsus-suggestion-text small {
-            margin-top: 2px;
-
-            font-size: 10px;
-            opacity: .55;
-        }
-
-
-        /* =============================================
-           MOBILE
-           ============================================= */
-
-        @media (max-width: 600px) {
-
-            #results {
-                margin-top: 14px;
-            }
-
-
-            .tarsus-result-card {
-                padding: 14px;
-                border-radius: 16px;
-            }
-
-
-            .tarsus-fare-price {
-                font-size: 21px;
-            }
-
-        }
-
-    `;
-
-
-    document.head.appendChild(
-        style
-    );
-}
-
-
-/* =====================================================
-   EVENT BINDING
-   ===================================================== */
-
-function tarsusBindEvents() {
-
-    const asal =
-        tarsusEl("asal");
-
-    const tujuan =
-        tarsusEl("tujuan");
-
-    const asalSuggestions =
-        tarsusEl(
-            "asal-suggestions"
-        );
-
-    const tujuanSuggestions =
-        tarsusEl(
-            "tujuan-suggestions"
-        );
-
-    const searchBtn =
-        tarsusEl("searchBtn");
-
-    const swapBtn =
-        tarsusEl("swapBtn");
-
-
-    /* =============================================
-       ASAL
-       ============================================= */
-
-    if (asal) {
-
-        asal.addEventListener(
-            "input",
-            () => {
-
-                tarsusShowSuggestions(
-                    asal,
-                    asalSuggestions
-                );
-
-            }
-        );
-
-
-        asal.addEventListener(
-            "focus",
-            () => {
-
-                if (
-                    tarsusClean(
-                        asal.value
-                    )
-                ) {
-
-                    tarsusShowSuggestions(
-                        asal,
-                        asalSuggestions
-                    );
-
+                    </div>
+
+                    <div class="ka-code">
+                        ${escapeHTML(mainFare.ID_KA)}
+                    </div>
+
+                </div>
+
+                ${
+                    route.length
+                        ? relationHTML(route)
+                        : `
+                            <div class="route-line route-fallback">
+                                ${escapeHTML(origin)}
+                                <span class="route-arrow">→</span>
+                                ${escapeHTML(destination)}
+                            </div>
+                          `
                 }
 
-            }
-        );
+                ${createTarifDetail(mainFare, true)}
 
+                ${
+                    alternatives.length
+                        ? `
+                            <div class="alternative-title">
+                                Tarif alternatif
+                            </div>
 
-        asal.addEventListener(
-            "keydown",
-            tarsusHandleEnter
-        );
+                            <div class="alternative-list">
 
-    }
+                                ${alternatives.map(item => `
+                                    <div class="alternative-item">
 
+                                        <div>
+                                            <div class="alternative-relation">
+                                                ${
+                                                    escapeHTML(
+                                                        item.RELASI ||
+                                                        "Alternatif"
+                                                    )
+                                                }
+                                            </div>
 
-    /* =============================================
-       TUJUAN
-       ============================================= */
+                                            ${
+                                                item.CATATAN
+                                                    ? `
+                                                        <div class="alternative-note">
+                                                            ${escapeHTML(item.CATATAN)}
+                                                        </div>
+                                                      `
+                                                    : ""
+                                            }
+                                        </div>
 
-    if (tujuan) {
+                                        <div class="alternative-price">
+                                            ${formatRupiah(item.fare)}
+                                        </div>
 
-        tujuan.addEventListener(
-            "input",
-            () => {
+                                    </div>
+                                `).join("")}
 
-                tarsusShowSuggestions(
-                    tujuan,
-                    tujuanSuggestions
-                );
-
-            }
-        );
-
-
-        tujuan.addEventListener(
-            "focus",
-            () => {
-
-                if (
-                    tarsusClean(
-                        tujuan.value
-                    )
-                ) {
-
-                    tarsusShowSuggestions(
-                        tujuan,
-                        tujuanSuggestions
-                    );
-
+                            </div>
+                          `
+                        : ""
                 }
 
+            </article>
+        `;
+    }
+
+    /* =====================================================
+       SEARCH TARIF
+       ===================================================== */
+
+    function searchTarif(origin, destination) {
+        const originClean = clean(origin);
+        const destinationClean = clean(destination);
+
+        if (!originClean || !destinationClean) {
+            return [];
+        }
+
+        const groups = new Map();
+
+        MASTER_TARIF.forEach(tarif => {
+            if (!isTarifActive(tarif)) {
+                return;
             }
-        );
 
+            const fare = parseFare(tarif.TARIF);
 
-        tujuan.addEventListener(
-            "keydown",
-            tarsusHandleEnter
-        );
-
-    }
-
-
-    /* =============================================
-       SUGGESTION CLICK
-       ============================================= */
-
-    if (asalSuggestions) {
-
-        asalSuggestions.addEventListener(
-            "click",
-            event => {
-
-                tarsusSuggestionClick(
-                    event,
-                    asal,
-                    asalSuggestions
-                );
-
+            if (fare === null) {
+                return;
             }
-        );
 
-    }
+            const ka = getKA(tarif.ID_KA);
 
-
-    if (tujuanSuggestions) {
-
-        tujuanSuggestions.addEventListener(
-            "click",
-            event => {
-
-                tarsusSuggestionClick(
-                    event,
-                    tujuan,
-                    tujuanSuggestions
-                );
-
+            /*
+             * Jika ID_KA ada di MASTER_KA dan KA tersebut
+             * secara eksplisit nonaktif, tarif ikut disembunyikan.
+             *
+             * Jika ID_KA tidak ditemukan di MASTER_KA,
+             * tarif tetap diproses.
+             */
+            if (ka && !isKAActive(ka)) {
+                return;
             }
-        );
-
-    }
-
-
-    /* =============================================
-       SEARCH BUTTON
-       ============================================= */
-
-    if (searchBtn) {
-
-        searchBtn.addEventListener(
-            "click",
-            tarsusPerformSearch
-        );
-
-    }
-
-
-    /* =============================================
-       SWAP BUTTON
-       ============================================= */
-
-    if (swapBtn) {
-
-        swapBtn.addEventListener(
-            "click",
-            tarsusSwapStations
-        );
-
-    }
-
-
-    /* =============================================
-       DOCUMENT CLICK
-       ============================================= */
-
-    document.addEventListener(
-        "click",
-        event => {
 
             if (
-                asal &&
-                asalSuggestions &&
-                !asal.contains(event.target) &&
-                !asalSuggestions.contains(event.target)
+                !routeIsCovered(
+                    ka,
+                    originClean,
+                    destinationClean,
+                    tarif
+                )
             ) {
+                return;
+            }
 
-                tarsusCloseSuggestions(
-                    asalSuggestions
+            /*
+             * Prioritaskan kecocokan langsung ASAL-TUJUAN
+             * pada MASTER_TARIF.
+             */
+            const tariffOrigin = normalize(tarif.ASAL);
+            const tariffDestination = normalize(tarif.TUJUAN);
+
+            const originKey = normalize(originClean);
+            const destinationKey = normalize(destinationClean);
+
+            const direct =
+                tariffOrigin === originKey &&
+                tariffDestination === destinationKey;
+
+            const ppReverse =
+                normalize(tarif.RELASI) === "pp" &&
+                tariffOrigin === destinationKey &&
+                tariffDestination === originKey;
+
+            /*
+             * Jika tarif memiliki ASAL/TUJUAN yang jelas,
+             * harus cocok dengan pencarian.
+             *
+             * Jika kosong, biarkan route KA yang menentukan.
+             */
+            const hasExplicitStations =
+                Boolean(tariffOrigin || tariffDestination);
+
+            if (hasExplicitStations) {
+                if (!direct && !ppReverse) {
+                    return;
+                }
+            }
+
+            const id = clean(tarif.ID_KA);
+
+            if (!groups.has(id)) {
+                groups.set(id, {
+                    ka,
+                    fares: []
+                });
+            }
+
+            groups.get(id).fares.push(tarif);
+        });
+
+        return [...groups.values()]
+            .filter(group => group.fares.length > 0)
+            .sort((a, b) => {
+                const fareA = getLowestFare(a.fares);
+                const fareB = getLowestFare(b.fares);
+
+                return (
+                    (fareA?.fare ?? Infinity) -
+                    (fareB?.fare ?? Infinity)
                 );
-
-            }
-
-
-            if (
-                tujuan &&
-                tujuanSuggestions &&
-                !tujuan.contains(event.target) &&
-                !tujuanSuggestions.contains(event.target)
-            ) {
-
-                tarsusCloseSuggestions(
-                    tujuanSuggestions
-                );
-
-            }
-
-        }
-    );
-
-}
-
-
-/* =====================================================
-   SELESAI PART 4
-   ===================================================== */
- /* =====================================================
-   LOAD DATABASE
-   ===================================================== */
-
-async function tarsusLoadDatabase() {
-
-    if (TARSUS_DATABASE_LOADING) {
-        return;
+            });
     }
 
-
-    TARSUS_DATABASE_LOADING = true;
-
-
-    const splashStatus =
-        tarsusEl("splashStatus");
-
-
-    if (splashStatus) {
-        splashStatus.textContent =
-            "Memuat database TARSUS...";
-    }
-
-
-    tarsusSetStatus(
-        "Memuat database...",
-        "loading"
-    );
-
-
-    try {
-
-        console.log(
-            "TARSUS: mulai memuat database..."
-        );
-
-
-        /* =============================================
-           LOAD 3 MASTER SECARA BERSAMAAN
-           ============================================= */
-
-        const [
-            kaCSV,
-            tarifCSV,
-            stasiunCSV
-        ] = await Promise.all([
-
-            tarsusLoadSheet(
-                TARSUS_SHEETS.ka
-            ),
-
-            tarsusLoadSheet(
-                TARSUS_SHEETS.tarif
-            ),
-
-            tarsusLoadSheet(
-                TARSUS_SHEETS.stasiun
-            )
-
-        ]);
-
-
-        console.log(
-            "TARSUS: CSV berhasil diterima."
-        );
-
-
-        /* =============================================
-           PARSE CSV
-           ============================================= */
-
-        const kaRows =
-            tarsusParseCSV(
-                kaCSV
-            );
-
-
-        const tarifRows =
-            tarsusParseCSV(
-                tarifCSV
-            );
-
-
-        const stasiunRows =
-            tarsusParseCSV(
-                stasiunCSV
-            );
-
-
-        console.log(
-            "TARSUS: jumlah baris mentah:",
-            {
-                MASTER_KA:
-                    kaRows.length,
-
-                MASTER_TARIF:
-                    tarifRows.length,
-
-                MASTER_STASIUN:
-                    stasiunRows.length
-            }
-        );
-
-
-        /* =============================================
-           OBJECT
-           ============================================= */
-
-        const kaObjects =
-            tarsusRowsToObjects(
-                kaRows
-            );
-
-
-        const tarifObjects =
-            tarsusRowsToObjects(
-                tarifRows
-            );
-
-
-        const stasiunObjects =
-            tarsusRowsToObjects(
-                stasiunRows
-            );
-
-
-        /* =============================================
-           PARSE MASTER
-           ============================================= */
-
-        TARSUS_MASTER_KA =
-            tarsusParseMasterKA(
-                kaObjects
-            );
-
-
-        TARSUS_MASTER_TARIF =
-            tarsusParseMasterTarif(
-                tarifObjects
-            );
-
-
-        TARSUS_MASTER_STASIUN =
-            tarsusParseMasterStasiun(
-                stasiunObjects
-            );
-
-
-        /* =============================================
-           VALIDASI DATABASE
-           ============================================= */
-
-        console.log(
-            "TARSUS DATABASE:",
-            {
-                KA:
-                    TARSUS_MASTER_KA.length,
-
-                TARIF:
-                    TARSUS_MASTER_TARIF.length,
-
-                STASIUN:
-                    TARSUS_MASTER_STASIUN.length
-            }
-        );
-
-
-        if (
-            TARSUS_MASTER_KA.length === 0
-        ) {
-
-            throw new Error(
-                "MASTER_KA kosong atau header tidak sesuai."
-            );
-
-        }
-
-
-        if (
-            TARSUS_MASTER_TARIF.length === 0
-        ) {
-
-            throw new Error(
-                "MASTER_TARIF kosong atau header tidak sesuai."
-            );
-
-        }
-
-
-        if (
-            TARSUS_MASTER_STASIUN.length === 0
-        ) {
-
-            throw new Error(
-                "MASTER_STASIUN kosong atau header tidak sesuai."
-            );
-
-        }
-
-
-        /* =============================================
-           DATABASE READY
-           ============================================= */
-
-        TARSUS_DATABASE_READY =
-            true;
-
-
-        TARSUS_DATABASE_LOADING =
-            false;
-
-
-        console.log(
-            "TARSUS: database siap digunakan."
-        );
-
-
-        tarsusSetStatus(
-            "Database siap digunakan.",
-            "success"
-        );
-
-
-        if (splashStatus) {
-
-            splashStatus.textContent =
-                "Database siap digunakan";
-
-        }
-
-
-        /* =============================================
-           INFO CONSOLE
-           ============================================= */
-
-        console.log(
-            "TARSUS MASTER_KA:",
-            TARSUS_MASTER_KA
-        );
-
-
-        console.log(
-            "TARSUS MASTER_TARIF:",
-            TARSUS_MASTER_TARIF
-        );
-
-
-        console.log(
-            "TARSUS MASTER_STASIUN:",
-            TARSUS_MASTER_STASIUN
-        );
-
-
-    } catch (error) {
-
-        TARSUS_DATABASE_READY =
-            false;
-
-
-        TARSUS_DATABASE_LOADING =
-            false;
-
-
-        console.error(
-            "TARSUS DATABASE ERROR:",
-            error
-        );
-
-
-        tarsusSetStatus(
-            "Gagal memuat database. Periksa Google Sheet dan koneksi.",
-            "error"
-        );
-
-
-        if (splashStatus) {
-
-            splashStatus.textContent =
-                "Gagal memuat database";
-
-        }
-
-    }
-
-}
-
-
-/* =====================================================
-   INITIALIZATION
-   ===================================================== */
-
-function tarsusInit() {
-
-    console.log(
-        "TARSUS DATA ENGINE: initialization..."
-    );
-
-
-    /* =============================================
-       PASTIKAN CONTAINER HASIL ADA
-       ============================================= */
-
-    tarsusEnsureResults();
-
-
-    /* =============================================
-       INJECT STYLE
-       ============================================= */
-
-    tarsusInjectStyles();
-
-
-    /* =============================================
-       BIND EVENT
-       ============================================= */
-
-    tarsusBindEvents();
-
-
-    /* =============================================
-       LOAD DATABASE
-       ============================================= */
-
-    tarsusLoadDatabase();
-
-}
-
-
-/* =====================================================
-   START
-   ===================================================== */
-
-if (
-    document.readyState === "loading"
-) {
-
-    document.addEventListener(
-        "DOMContentLoaded",
-        tarsusInit
-    );
-
-} else {
-
-    tarsusInit();
-
-}
-
-
-/* =====================================================
-   SELESAI DATA ENGINE
-   ===================================================== */
-
-})();
-/* =====================================================
-   TARSUS RESULT DISPLAY PATCH
-   ===================================================== */
-
-(function () {
-
-    function showTarsusResultsPatch() {
-
-        const results =
-            document.getElementById("results");
-
+    /* =====================================================
+       RENDER RESULTS
+       ===================================================== */
+
+    function renderResults(groups, origin, destination) {
         if (!results) {
-            console.error("TARSUS: #results tidak ditemukan.");
             return;
         }
 
         results.style.display = "block";
-        results.style.visibility = "visible";
-        results.style.opacity = "1";
-        results.style.height = "auto";
-        results.style.maxHeight = "none";
-        results.style.overflow = "visible";
 
-    }
-
-
-    function renderTarsusResultsPatch() {
-
-        const results =
-            document.getElementById("results");
-
-        if (!results) {
-            return;
-        }
-
-
-        if (
-            typeof TARSUS_MASTER_TARIF === "undefined" ||
-            typeof TARSUS_MASTER_KA === "undefined"
-        ) {
-            return;
-        }
-
-
-        const asal =
-            document.getElementById("asal")?.value?.trim();
-
-        const tujuan =
-            document.getElementById("tujuan")?.value?.trim();
-
-
-        if (!asal || !tujuan) {
-            return;
-        }
-
-
-        if (
-            typeof tarsusSearchTarif !== "function"
-        ) {
-            return;
-        }
-
-
-        const data =
-            tarsusSearchTarif(
-                asal,
-                tujuan
-            );
-
-
-        if (
-            !data ||
-            !data.results ||
-            data.results.length === 0
-        ) {
-
+        if (!groups || groups.length === 0) {
             results.innerHTML = `
-                <div style="
-                    margin-top:16px;
-                    padding:20px;
-                    border-radius:16px;
-                    text-align:center;
-                    background:rgba(127,127,127,.08);
-                ">
-                    <strong>Tarif tidak ditemukan</strong>
-                    <div style="
-                        margin-top:6px;
-                        font-size:12px;
-                        opacity:.65;
-                    ">
-                        Tidak ada tarif khusus untuk rute tersebut.
+                <div class="result-empty">
+
+                    <div class="result-empty-icon">
+                        🔎
                     </div>
+
+                    <div class="result-empty-title">
+                        Tarif khusus tidak ditemukan
+                    </div>
+
+                    <div class="result-empty-text">
+                        Belum ada tarif khusus yang sesuai
+                        dengan relasi ${escapeHTML(origin)}
+                        → ${escapeHTML(destination)}.
+                    </div>
+
                 </div>
             `;
 
-            showTarsusResultsPatch();
+            setStatus(
+                "Tarif khusus tidak ditemukan.",
+                "empty"
+            );
 
             return;
         }
 
-
-        const groups =
-            tarsusGroupResults(
-                data.results
-            );
-
-
-        let html = "";
-
-
-        groups.forEach(group => {
-
-            const first =
-                group.items[0];
-
-
-            html += `
-                <div style="
-                    display:block;
-                    margin:14px 0;
-                    padding:18px;
-                    border-radius:18px;
-                    background:var(--card,#ffffff);
-                    border:1px solid var(--border,rgba(0,0,0,.08));
-                    box-shadow:0 6px 20px rgba(0,0,0,.08);
-                ">
-
-                    <div style="
-                        font-size:18px;
-                        font-weight:800;
-                        margin-bottom:5px;
-                    ">
-                        ${tarsusEscapeHTML(
-                            group.nama_ka
-                        )}
-                    </div>
-
-
-                    <div style="
-                        font-size:12px;
-                        opacity:.65;
-                        margin-bottom:14px;
-                    ">
-                        ${tarsusEscapeHTML(
-                            first.asal
-                        )}
-                        →
-                        ${tarsusEscapeHTML(
-                            first.tujuan
-                        )}
-                    </div>
-
-
-                    <div style="
-                        padding:14px;
-                        border-radius:13px;
-                        background:rgba(127,127,127,.08);
-                    ">
-
-                        <div style="
-                            font-size:11px;
-                            opacity:.6;
-                            margin-bottom:3px;
-                        ">
-                            TARIF KHUSUS
-                        </div>
-
-
-                        <div style="
-                            font-size:24px;
-                            font-weight:900;
-                        ">
-                            Rp ${tarsusFormatRupiah(
-                                first.harga
-                            )}
-                        </div>
-
-
-                        <div style="
-                            margin-top:3px;
-                            font-size:11px;
-                            opacity:.6;
-                        ">
-                            ${tarsusEscapeHTML(
-                                first.kelas
-                            )}
-                        </div>
-
-                    </div>
-
-
-                    <div style="
-                        margin-top:12px;
-                    ">
-
-                        ${first.fares.map(fare => `
-
-                            <div style="
-                                display:flex;
-                                justify-content:space-between;
-                                padding:9px 2px;
-                                border-bottom:1px solid rgba(127,127,127,.12);
-                                font-size:12px;
-                            ">
-
-                                <span>
-                                    ${tarsusEscapeHTML(
-                                        fare.label
-                                    )}
-                                </span>
-
-                                <strong>
-                                    Rp ${tarsusFormatRupiah(
-                                        fare.value
-                                    )}
-                                </strong>
-
-                            </div>
-
-                        `).join("")}
-
-                    </div>
-
-
-                    ${
-                        group.items.length > 1
-                        ? `
-
-                            <details style="
-                                margin-top:12px;
-                            ">
-
-                                <summary style="
-                                    cursor:pointer;
-                                    font-size:12px;
-                                    font-weight:700;
-                                ">
-                                    Lihat ${group.items.length - 1}
-                                    alternatif tarif
-                                </summary>
-
-
-                                <div style="
-                                    margin-top:8px;
-                                ">
-
-                                    ${
-                                        group.items
-                                            .slice(1)
-                                            .map(item => `
-
-                                                <div style="
-                                                    margin-top:8px;
-                                                    padding:11px;
-                                                    border-radius:12px;
-                                                    background:rgba(127,127,127,.06);
-                                                ">
-
-                                                    <div style="
-                                                        font-size:11px;
-                                                        font-weight:700;
-                                                    ">
-                                                        ${
-                                                            tarsusEscapeHTML(
-                                                                item.route[0] ||
-                                                                item.asal
-                                                            )
-                                                        }
-
-                                                        →
-
-                                                        ${
-                                                            tarsusEscapeHTML(
-                                                                item.route[
-                                                                    item.route.length - 1
-                                                                ] ||
-                                                                item.tujuan
-                                                            )
-                                                        }
-                                                    </div>
-
-
-                                                    <div style="
-                                                        margin-top:4px;
-                                                        font-size:14px;
-                                                        font-weight:900;
-                                                    ">
-                                                        Rp ${
-                                                            tarsusFormatRupiah(
-                                                                item.harga
-                                                            )
-                                                        }
-                                                    </div>
-
-
-                                                    <div style="
-                                                        margin-top:2px;
-                                                        font-size:10px;
-                                                        opacity:.6;
-                                                    ">
-                                                        ${
-                                                            tarsusEscapeHTML(
-                                                                item.kelas
-                                                            )
-                                                        }
-                                                    </div>
-
-                                                </div>
-
-                                            `)
-                                            .join("")
-                                    }
-
-                                </div>
-
-                            </details>
-
-                        `
-                        : ""
-                    }
-
-                </div>
-            `;
-
-        });
-
+        const cards = groups
+            .map(group =>
+                createKAGroupCard(
+                    group,
+                    origin,
+                    destination
+                )
+            )
+            .filter(Boolean)
+            .join("");
 
         results.innerHTML = `
+            <div class="results-header">
 
-            <div style="
-                margin-bottom:10px;
-                padding:0 4px;
-            ">
-
-                <div style="
-                    font-size:17px;
-                    font-weight:800;
-                ">
-                    Hasil Pencarian
+                <div class="results-heading">
+                    Tarif khusus
                 </div>
 
-                <div style="
-                    margin-top:3px;
-                    font-size:12px;
-                    opacity:.6;
-                ">
-                    ${groups.length} KA dengan tarif khusus
+                <div class="results-count">
+                    ${groups.length} KA
                 </div>
 
             </div>
 
-
-            ${html}
-
+            ${cards}
         `;
 
-
-        showTarsusResultsPatch();
-
-
-        setTimeout(() => {
-
-            results.scrollIntoView({
-                behavior:"smooth",
-                block:"start"
-            });
-
-        }, 100);
-
+        setStatus(
+            `${groups.length} KA dengan tarif khusus.`,
+            "success"
+        );
     }
 
+    /* =====================================================
+       SUGGESTION ENGINE
+       ===================================================== */
 
-    /* =============================================
-       PASANG KE TOMBOL CARI
-       ============================================= */
+    function getStationSuggestions(keyword) {
+        const query = normalize(keyword);
 
-    document.addEventListener(
-        "DOMContentLoaded",
-        function () {
+        if (!query) {
+            return MASTER_STASIUN.slice(0, 8);
+        }
 
-            const searchButton =
-                document.getElementById(
-                    "searchBtn"
+        return MASTER_STASIUN
+            .filter(station => {
+                const name = normalize(
+                    station.NAMA_STASIUN
                 );
 
+                const code = normalize(
+                    station.KODE_STASIUN
+                );
 
-            if (!searchButton) {
+                return (
+                    name.includes(query) ||
+                    code.includes(query)
+                );
+            })
+            .slice(0, 8);
+    }
+
+    function showSuggestions(input, container) {
+        if (!input || !container) {
+            return;
+        }
+
+        const keyword = input.value;
+
+        const stations =
+            getStationSuggestions(keyword);
+
+        if (!stations.length) {
+            container.innerHTML = "";
+            container.hidden = true;
+            return;
+        }
+
+        container.innerHTML = stations
+            .map(station => `
+                <button
+                    type="button"
+                    class="suggestion-item"
+                    data-station-id="${escapeAttr(
+                        station.ID_STASIUN ||
+                        station.KODE_STASIUN ||
+                        station.NAMA_STASIUN
+                    )}"
+                >
+
+                    <span class="suggestion-main">
+                        ${escapeHTML(
+                            station.NAMA_STASIUN
+                        )}
+                    </span>
+
+                    ${
+                        station.KODE_STASIUN
+                            ? `
+                                <span class="suggestion-code">
+                                    ${escapeHTML(
+                                        station.KODE_STASIUN
+                                    )}
+                                </span>
+                              `
+                            : ""
+                    }
+
+                </button>
+            `)
+            .join("");
+
+        container.hidden = false;
+
+        container
+            .querySelectorAll(".suggestion-item")
+            .forEach(button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        const station =
+                            findStation(
+                                button.dataset.stationId
+                            );
+
+                        if (!station) {
+                            return;
+                        }
+
+                        input.value =
+                            station.NAMA_STASIUN;
+
+                        closeSuggestions();
+                    }
+                );
+            });
+    }
+
+    function closeSuggestions() {
+        [
+            asalSuggestions,
+            tujuanSuggestions
+        ].forEach(container => {
+
+            if (!container) {
                 return;
             }
 
+            container.hidden = true;
+            container.innerHTML = "";
+        });
+    }
 
-            searchButton.addEventListener(
+    /* =====================================================
+       VALIDASI INPUT
+       ===================================================== */
+
+    function validateSearch() {
+        const origin =
+            clean(asalInput?.value);
+
+        const destination =
+            clean(tujuanInput?.value);
+
+        if (!origin || !destination) {
+            setStatus(
+                "Silakan isi stasiun asal dan tujuan.",
+                "warning"
+            );
+
+            return null;
+        }
+
+        if (
+            normalize(origin) ===
+            normalize(destination)
+        ) {
+            setStatus(
+                "Stasiun asal dan tujuan tidak boleh sama.",
+                "warning"
+            );
+
+            return null;
+        }
+
+        return {
+            origin,
+            destination
+        };
+    }
+
+    /* =====================================================
+       PERFORM SEARCH
+       ===================================================== */
+
+    async function performSearch() {
+        if (isSearching) {
+            return;
+        }
+
+        const query = validateSearch();
+
+        if (!query) {
+            return;
+        }
+
+        if (!isDataLoaded) {
+            setStatus(
+                "Data sedang dimuat. Silakan tunggu sebentar.",
+                "loading"
+            );
+
+            return;
+        }
+
+        isSearching = true;
+
+        closeSuggestions();
+
+        if (results) {
+            results.innerHTML = `
+                <div class="result-loading">
+
+                    <div class="result-spinner"></div>
+
+                    <div>
+                        Mencari tarif khusus...
+                    </div>
+
+                </div>
+            `;
+        }
+
+        setStatus(
+            "Mencari tarif khusus...",
+            "loading"
+        );
+
+        /*
+         * Sedikit delay agar loading state terlihat natural
+         * dan UI tidak terasa freeze.
+         */
+        await new Promise(resolve =>
+            requestAnimationFrame(resolve)
+        );
+
+        try {
+            const groups = searchTarif(
+                query.origin,
+                query.destination
+            );
+
+            renderResults(
+                groups,
+                query.origin,
+                query.destination
+            );
+
+            /*
+             * Scroll ke hasil pada mobile.
+             */
+            if (results && groups.length) {
+                setTimeout(() => {
+                    results.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                    });
+                }, 80);
+            }
+
+        } catch (error) {
+
+            console.error(
+                "[TARSUS] Search error:",
+                error
+            );
+
+            if (results) {
+                results.innerHTML = `
+                    <div class="result-empty">
+
+                        <div class="result-empty-icon">
+                            ⚠️
+                        </div>
+
+                        <div class="result-empty-title">
+                            Terjadi kesalahan
+                        </div>
+
+                        <div class="result-empty-text">
+                            Pencarian tidak dapat diproses.
+                            Silakan coba lagi.
+                        </div>
+
+                    </div>
+                `;
+            }
+
+            setStatus(
+                "Terjadi kesalahan saat mencari data.",
+                "error"
+            );
+
+        } finally {
+            isSearching = false;
+        }
+    }
+
+    /* =====================================================
+       SWAP
+       ===================================================== */
+
+    function swapStations() {
+        if (!asalInput || !tujuanInput) {
+            return;
+        }
+
+        const oldOrigin = asalInput.value;
+
+        asalInput.value =
+            tujuanInput.value;
+
+        tujuanInput.value =
+            oldOrigin;
+
+        closeSuggestions();
+
+        /*
+         * Jika keduanya sudah terisi, langsung cari ulang.
+         */
+        if (
+            clean(asalInput.value) &&
+            clean(tujuanInput.value) &&
+            isDataLoaded
+        ) {
+            performSearch();
+        }
+    }
+
+    /* =====================================================
+       ENTER HANDLER
+       ===================================================== */
+
+    function handleEnter(event) {
+        if (event.key !== "Enter") {
+            return;
+        }
+
+        event.preventDefault();
+
+        performSearch();
+    }
+
+    /* =====================================================
+       DYNAMIC STYLE UNTUK SUGGESTION
+       ===================================================== */
+
+    function injectDynamicStyles() {
+        if (document.getElementById("tarsus-data-styles")) {
+            return;
+        }
+
+        const style = document.createElement("style");
+
+        style.id = "tarsus-data-styles";
+
+        style.textContent = `
+            .suggestion-item {
+                width: 100%;
+                border: 0;
+                background: transparent;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                padding: 12px 14px;
+                text-align: left;
+                cursor: pointer;
+                color: inherit;
+                font: inherit;
+            }
+
+            .suggestion-item:hover {
+                background: rgba(0,0,0,.05);
+            }
+
+            [data-theme="dark"] .suggestion-item:hover {
+                background: rgba(255,255,255,.06);
+            }
+
+            .suggestion-main {
+                font-weight: 700;
+            }
+
+            .suggestion-code {
+                font-size: .78rem;
+                opacity: .6;
+                font-weight: 700;
+            }
+
+            .ka-code {
+                font-size: .75rem;
+                font-weight: 800;
+                opacity: .6;
+            }
+
+            .route-fallback {
+                margin-top: 10px;
+            }
+
+            .alternative-note {
+                margin-top: 3px;
+                font-size: .76rem;
+                opacity: .65;
+            }
+
+            .tariff-main {
+                margin-top: 14px;
+            }
+        `;
+
+        document.head.appendChild(style);
+    }
+
+    /* =====================================================
+       DEBUG INFO
+       ===================================================== */
+
+    function debugData() {
+        console.group(
+            "%cTARSUS FINDER DATA",
+            "font-weight:bold"
+        );
+
+        console.log(
+            "MASTER_KA:",
+            MASTER_KA.length
+        );
+
+        console.log(
+            "MASTER_TARIF:",
+            MASTER_TARIF.length
+        );
+
+        console.log(
+            "MASTER_STASIUN:",
+            MASTER_STASIUN.length
+        );
+
+        console.log(
+            "STATION_INDEX:",
+            STATION_INDEX.size
+        );
+
+        console.log(
+            "VERSION:",
+            VERSION
+        );
+
+        console.groupEnd();
+    }
+
+    /* =====================================================
+       LOAD ALL DATA
+       ===================================================== */
+
+    async function loadData() {
+        splashStatus(
+            "Menghubungkan ke database..."
+        );
+
+        try {
+            const [
+                kaRows,
+                tarifRows,
+                stasiunRows
+            ] = await Promise.all([
+                fetchSheet(SHEETS.ka),
+                fetchSheet(SHEETS.tarif),
+                fetchSheet(SHEETS.stasiun)
+            ]);
+
+            splashStatus(
+                "Memproses data..."
+            );
+
+            MASTER_KA =
+                parseMasterKA(kaRows);
+
+            MASTER_TARIF =
+                parseMasterTarif(tarifRows);
+
+            MASTER_STASIUN =
+                parseMasterStasiun(stasiunRows);
+
+            buildStationIndex();
+
+            isDataLoaded = true;
+
+            debugData();
+
+            splashStatus(
+                "Database siap."
+            );
+
+            setStatus(
+                `${MASTER_STASIUN.length} stasiun siap dicari.`,
+                "success"
+            );
+
+            /*
+             * Sedikit waktu agar splash tidak terasa
+             * langsung hilang secara kasar.
+             */
+            setTimeout(() => {
+
+                if (
+                    window.TARSUS_UI &&
+                    typeof window.TARSUS_UI.finishSplash ===
+                        "function"
+                ) {
+                    window.TARSUS_UI.finishSplash();
+                }
+
+            }, 350);
+
+        } catch (error) {
+
+            console.error(
+                "[TARSUS] Gagal memuat database:",
+                error
+            );
+
+            isDataLoaded = false;
+
+            splashStatus(
+                "Gagal memuat database."
+            );
+
+            setStatus(
+                "Database tidak dapat dimuat. Periksa koneksi atau akses Google Sheet.",
+                "error"
+            );
+
+            if (results) {
+                results.innerHTML = `
+                    <div class="result-empty">
+
+                        <div class="result-empty-icon">
+                            ⚠️
+                        </div>
+
+                        <div class="result-empty-title">
+                            Database belum tersedia
+                        </div>
+
+                        <div class="result-empty-text">
+                            TARSUS Finder tidak dapat
+                            mengambil data dari Google Sheet.
+                            Silakan periksa koneksi internet
+                            dan akses spreadsheet.
+                        </div>
+
+                    </div>
+                `;
+            }
+
+            /*
+             * Jangan biarkan splash menggantung selamanya
+             * ketika database gagal.
+             */
+            setTimeout(() => {
+
+                if (
+                    window.TARSUS_UI &&
+                    typeof window.TARSUS_UI.finishSplash ===
+                        "function"
+                ) {
+                    window.TARSUS_UI.finishSplash();
+                }
+
+            }, 1200);
+        }
+    }
+
+    /* =====================================================
+       EVENT BINDING
+       ===================================================== */
+
+    function bindEvents() {
+        injectDynamicStyles();
+
+        if (searchBtn) {
+            searchBtn.addEventListener(
                 "click",
-                function () {
+                performSearch
+            );
+        }
 
-                    setTimeout(
-                        renderTarsusResultsPatch,
-                        300
+        if (swapBtn) {
+            swapBtn.addEventListener(
+                "click",
+                swapStations
+            );
+        }
+
+        if (asalInput) {
+
+            asalInput.addEventListener(
+                "input",
+                () => {
+                    showSuggestions(
+                        asalInput,
+                        asalSuggestions
                     );
-
                 }
             );
 
-        }
-    );
+            asalInput.addEventListener(
+                "focus",
+                () => {
+                    showSuggestions(
+                        asalInput,
+                        asalSuggestions
+                    );
+                }
+            );
 
+            asalInput.addEventListener(
+                "keydown",
+                handleEnter
+            );
+        }
+
+        if (tujuanInput) {
+
+            tujuanInput.addEventListener(
+                "input",
+                () => {
+                    showSuggestions(
+                        tujuanInput,
+                        tujuanSuggestions
+                    );
+                }
+            );
+
+            tujuanInput.addEventListener(
+                "focus",
+                () => {
+                    showSuggestions(
+                        tujuanInput,
+                        tujuanSuggestions
+                    );
+                }
+            );
+
+            tujuanInput.addEventListener(
+                "keydown",
+                handleEnter
+            );
+        }
+
+        document.addEventListener(
+            "click",
+            event => {
+
+                const insideOrigin =
+                    asalInput?.contains(event.target) ||
+                    asalSuggestions?.contains(event.target);
+
+                const insideDestination =
+                    tujuanInput?.contains(event.target) ||
+                    tujuanSuggestions?.contains(event.target);
+
+                if (
+                    !insideOrigin &&
+                    !insideDestination
+                ) {
+                    closeSuggestions();
+                }
+            }
+        );
+    }
+
+    /* =====================================================
+       PUBLIC API
+       ===================================================== */
+
+    window.TARSUS_DATA = {
+        getKA,
+        getNamaKA,
+        findStation,
+        searchTarif,
+        formatRupiah,
+        isDataLoaded: () => isDataLoaded,
+
+        getAllKA: () =>
+            [...MASTER_KA],
+
+        getAllTarif: () =>
+            [...MASTER_TARIF],
+
+        getAllStasiun: () =>
+            [...MASTER_STASIUN]
+    };
+
+    /* =====================================================
+       START
+       ===================================================== */
+
+    function init() {
+        bindEvents();
+        loadData();
+    }
+
+    if (
+        document.readyState === "loading"
+    ) {
+        document.addEventListener(
+            "DOMContentLoaded",
+            init,
+            { once: true }
+        );
+    } else {
+        init();
+    }
 
 })();
