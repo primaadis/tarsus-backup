@@ -1,9 +1,9 @@
 const CACHE_NAME = "tarsus-v1";
 
 const FILES_TO_CACHE = [
-  "/tarif-khusus/",
-  "/tarif-khusus/index.html",
-  "/tarif-khusus/data.js"
+  "/tarsus-backup/",
+  "/tarsus-backup/index.html",
+  "/tarsus-backup/data.js"
 ];
 
 self.addEventListener("install", event => {
@@ -31,8 +31,6 @@ self.addEventListener("activate", event => {
 self.addEventListener("fetch", event => {
   event.respondWith(
     caches.match(event.request)
-      .then(cachedResponse => {
-        return cachedResponse || fetch(event.request);
-      })
+      .then(response => response || fetch(event.request))
   );
 });
