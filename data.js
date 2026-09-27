@@ -2994,3 +2994,411 @@ if (
    ===================================================== */
 
 })();
+/* =====================================================
+   TARSUS RESULT DISPLAY PATCH
+   ===================================================== */
+
+(function () {
+
+    function showTarsusResultsPatch() {
+
+        const results =
+            document.getElementById("results");
+
+        if (!results) {
+            console.error("TARSUS: #results tidak ditemukan.");
+            return;
+        }
+
+        results.style.display = "block";
+        results.style.visibility = "visible";
+        results.style.opacity = "1";
+        results.style.height = "auto";
+        results.style.maxHeight = "none";
+        results.style.overflow = "visible";
+
+    }
+
+
+    function renderTarsusResultsPatch() {
+
+        const results =
+            document.getElementById("results");
+
+        if (!results) {
+            return;
+        }
+
+
+        if (
+            typeof TARSUS_MASTER_TARIF === "undefined" ||
+            typeof TARSUS_MASTER_KA === "undefined"
+        ) {
+            return;
+        }
+
+
+        const asal =
+            document.getElementById("asal")?.value?.trim();
+
+        const tujuan =
+            document.getElementById("tujuan")?.value?.trim();
+
+
+        if (!asal || !tujuan) {
+            return;
+        }
+
+
+        if (
+            typeof tarsusSearchTarif !== "function"
+        ) {
+            return;
+        }
+
+
+        const data =
+            tarsusSearchTarif(
+                asal,
+                tujuan
+            );
+
+
+        if (
+            !data ||
+            !data.results ||
+            data.results.length === 0
+        ) {
+
+            results.innerHTML = `
+                <div style="
+                    margin-top:16px;
+                    padding:20px;
+                    border-radius:16px;
+                    text-align:center;
+                    background:rgba(127,127,127,.08);
+                ">
+                    <strong>Tarif tidak ditemukan</strong>
+                    <div style="
+                        margin-top:6px;
+                        font-size:12px;
+                        opacity:.65;
+                    ">
+                        Tidak ada tarif khusus untuk rute tersebut.
+                    </div>
+                </div>
+            `;
+
+            showTarsusResultsPatch();
+
+            return;
+        }
+
+
+        const groups =
+            tarsusGroupResults(
+                data.results
+            );
+
+
+        let html = "";
+
+
+        groups.forEach(group => {
+
+            const first =
+                group.items[0];
+
+
+            html += `
+                <div style="
+                    display:block;
+                    margin:14px 0;
+                    padding:18px;
+                    border-radius:18px;
+                    background:var(--card,#ffffff);
+                    border:1px solid var(--border,rgba(0,0,0,.08));
+                    box-shadow:0 6px 20px rgba(0,0,0,.08);
+                ">
+
+                    <div style="
+                        font-size:18px;
+                        font-weight:800;
+                        margin-bottom:5px;
+                    ">
+                        ${tarsusEscapeHTML(
+                            group.nama_ka
+                        )}
+                    </div>
+
+
+                    <div style="
+                        font-size:12px;
+                        opacity:.65;
+                        margin-bottom:14px;
+                    ">
+                        ${tarsusEscapeHTML(
+                            first.asal
+                        )}
+                        →
+                        ${tarsusEscapeHTML(
+                            first.tujuan
+                        )}
+                    </div>
+
+
+                    <div style="
+                        padding:14px;
+                        border-radius:13px;
+                        background:rgba(127,127,127,.08);
+                    ">
+
+                        <div style="
+                            font-size:11px;
+                            opacity:.6;
+                            margin-bottom:3px;
+                        ">
+                            TARIF KHUSUS
+                        </div>
+
+
+                        <div style="
+                            font-size:24px;
+                            font-weight:900;
+                        ">
+                            Rp ${tarsusFormatRupiah(
+                                first.harga
+                            )}
+                        </div>
+
+
+                        <div style="
+                            margin-top:3px;
+                            font-size:11px;
+                            opacity:.6;
+                        ">
+                            ${tarsusEscapeHTML(
+                                first.kelas
+                            )}
+                        </div>
+
+                    </div>
+
+
+                    <div style="
+                        margin-top:12px;
+                    ">
+
+                        ${first.fares.map(fare => `
+
+                            <div style="
+                                display:flex;
+                                justify-content:space-between;
+                                padding:9px 2px;
+                                border-bottom:1px solid rgba(127,127,127,.12);
+                                font-size:12px;
+                            ">
+
+                                <span>
+                                    ${tarsusEscapeHTML(
+                                        fare.label
+                                    )}
+                                </span>
+
+                                <strong>
+                                    Rp ${tarsusFormatRupiah(
+                                        fare.value
+                                    )}
+                                </strong>
+
+                            </div>
+
+                        `).join("")}
+
+                    </div>
+
+
+                    ${
+                        group.items.length > 1
+                        ? `
+
+                            <details style="
+                                margin-top:12px;
+                            ">
+
+                                <summary style="
+                                    cursor:pointer;
+                                    font-size:12px;
+                                    font-weight:700;
+                                ">
+                                    Lihat ${group.items.length - 1}
+                                    alternatif tarif
+                                </summary>
+
+
+                                <div style="
+                                    margin-top:8px;
+                                ">
+
+                                    ${
+                                        group.items
+                                            .slice(1)
+                                            .map(item => `
+
+                                                <div style="
+                                                    margin-top:8px;
+                                                    padding:11px;
+                                                    border-radius:12px;
+                                                    background:rgba(127,127,127,.06);
+                                                ">
+
+                                                    <div style="
+                                                        font-size:11px;
+                                                        font-weight:700;
+                                                    ">
+                                                        ${
+                                                            tarsusEscapeHTML(
+                                                                item.route[0] ||
+                                                                item.asal
+                                                            )
+                                                        }
+
+                                                        →
+
+                                                        ${
+                                                            tarsusEscapeHTML(
+                                                                item.route[
+                                                                    item.route.length - 1
+                                                                ] ||
+                                                                item.tujuan
+                                                            )
+                                                        }
+                                                    </div>
+
+
+                                                    <div style="
+                                                        margin-top:4px;
+                                                        font-size:14px;
+                                                        font-weight:900;
+                                                    ">
+                                                        Rp ${
+                                                            tarsusFormatRupiah(
+                                                                item.harga
+                                                            )
+                                                        }
+                                                    </div>
+
+
+                                                    <div style="
+                                                        margin-top:2px;
+                                                        font-size:10px;
+                                                        opacity:.6;
+                                                    ">
+                                                        ${
+                                                            tarsusEscapeHTML(
+                                                                item.kelas
+                                                            )
+                                                        }
+                                                    </div>
+
+                                                </div>
+
+                                            `)
+                                            .join("")
+                                    }
+
+                                </div>
+
+                            </details>
+
+                        `
+                        : ""
+                    }
+
+                </div>
+            `;
+
+        });
+
+
+        results.innerHTML = `
+
+            <div style="
+                margin-bottom:10px;
+                padding:0 4px;
+            ">
+
+                <div style="
+                    font-size:17px;
+                    font-weight:800;
+                ">
+                    Hasil Pencarian
+                </div>
+
+                <div style="
+                    margin-top:3px;
+                    font-size:12px;
+                    opacity:.6;
+                ">
+                    ${groups.length} KA dengan tarif khusus
+                </div>
+
+            </div>
+
+
+            ${html}
+
+        `;
+
+
+        showTarsusResultsPatch();
+
+
+        setTimeout(() => {
+
+            results.scrollIntoView({
+                behavior:"smooth",
+                block:"start"
+            });
+
+        }, 100);
+
+    }
+
+
+    /* =============================================
+       PASANG KE TOMBOL CARI
+       ============================================= */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            const searchButton =
+                document.getElementById(
+                    "searchBtn"
+                );
+
+
+            if (!searchButton) {
+                return;
+            }
+
+
+            searchButton.addEventListener(
+                "click",
+                function () {
+
+                    setTimeout(
+                        renderTarsusResultsPatch,
+                        300
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+})();
