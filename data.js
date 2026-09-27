@@ -1,1680 +1,2480 @@
 /* =========================================================
    TARSUS FINDER
-   DATA ENGINE - FINAL
+   DATA ENGINE — FINAL
    ---------------------------------------------------------
    DATABASE:
    1. MASTER_KA
    2. MASTER_TARIF
    3. MASTER_STASIUN
-   ========================================================= */
 
-(() => {
-    "use strict";
+   FITUR:
+   - Pencarian tarif khusus berdasarkan stasiun
+   - MASTER_TARIF = 1 baris = 1 relasi tarif
+   - Nama KA diambil dari MASTER_KA
+   - KA yang sama digabung menjadi 1 hasil
+   - Tarif termurah menjadi TARIF UTAMA
+   - Tarif lainnya menjadi TARIF KHUSUS ALTERNATIF
+   - Alternatif dapat dibuka/tutup
+   - Acuan tarif = stasiun pertama → stasiun terakhir
+========================================================= */
 
-    /* =====================================================
-       KONFIGURASI
-       ===================================================== */
 
-    const SHEET_ID = "1a4Ln_wASazV35F2M3MKZcJHEmiAV8G-0WmkMmU4Csls";
+/* =========================================================
+   GOOGLE SHEET
+========================================================= */
 
-    const SHEETS = {
-        ka: "MASTER_KA",
-        tarif: "MASTER_TARIF",
-        stasiun: "MASTER_STASIUN"
-    };
+const SHEET_ID =
+    "1a4Ln_wASazV35F2M3MKZcJHEmiAV8G-0WmkMmU4Csls";
 
-    const VERSION = "1.0.0";
 
-    /* =====================================================
-       STATE
-       ===================================================== */
+const SHEETS = {
 
-    let MASTER_KA = [];
-    let MASTER_TARIF = [];
-    let MASTER_STASIUN = [];
+    ka: "MASTER_KA",
 
-    let STATION_INDEX = new Map();
+    tarif: "MASTER_TARIF",
 
-    let isDataLoaded = false;
-    let isSearching = false;
+    stasiun: "MASTER_STASIUN"
 
-    /* =====================================================
-       DOM
-       ===================================================== */
+};
 
-    const $ = (selector) => document.querySelector(selector);
 
-    const asalInput = $("#asal");
-    const tujuanInput = $("#tujuan");
-    const asalSuggestions = $("#asal-suggestions");
-    const tujuanSuggestions = $("#tujuan-suggestions");
-    const searchBtn = $("#searchBtn");
-    const swapBtn = $("#swapBtn");
-    const results = $("#results");
-    const statusBox = $("#status");
+/* =========================================================
+   DATA STORAGE
+========================================================= */
 
-    /* =====================================================
-       UTILITAS DASAR
-       ===================================================== */
+let MASTER_KA = [];
 
-    function clean(value) {
-        if (value === null || value === undefined) {
-            return "";
-        }
+let MASTER_TARIF = [];
 
-        return String(value)
-            .replace(/\u00A0/g, " ")
-            .trim();
-    }
+let MASTER_STASIUN = [];
 
-    function normalize(value) {
-        return clean(value)
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/\s+/g, " ")
-            .trim();
-    }
 
-    function normalizeKey(value) {
-        return normalize(value)
-            .replace(/[^a-z0-9]+/g, "");
-    }
+/* =========================================================
+   ELEMENT STORAGE
+========================================================= */
 
-    function escapeHTML(value) {
-        return clean(value)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
+let asalInput = null;
 
-    function escapeAttr(value) {
-        return escapeHTML(value);
-    }
+let tujuanInput = null;
 
-    function makeSafeId(value) {
-        return normalizeKey(value)
-            .replace(/^[^a-z]+/, "")
-            .slice(0, 50) || "item";
-    }
+let asalSuggestions = null;
 
-    function unique(array) {
-        return [...new Set(array)];
-    }
+let tujuanSuggestions = null;
 
-    /* =====================================================
-       STATUS UI
-       ===================================================== */
+let searchBtn = null;
 
-    function setStatus(message, type = "normal") {
-        if (!statusBox) {
-            return;
-        }
+let swapBtn = null;
 
-        statusBox.textContent = message;
-        statusBox.dataset.type = type;
-    }
+let statusEl = null;
 
-    function splashStatus(message) {
+let resultsEl = null;
+
+
+/* =========================================================
+   DOM INIT
+========================================================= */
+
+function initElements() {
+
+    asalInput =
+        document.getElementById("asal");
+
+    tujuanInput =
+        document.getElementById("tujuan");
+
+    asalSuggestions =
+        document.getElementById(
+            "asal-suggestions"
+        );
+
+    tujuanSuggestions =
+        document.getElementById(
+            "tujuan-suggestions"
+        );
+
+    searchBtn =
+        document.getElementById(
+            "searchBtn"
+        );
+
+    swapBtn =
+        document.getElementById(
+            "swapBtn"
+        );
+
+    statusEl =
+        document.getElementById(
+            "status"
+        );
+
+    resultsEl =
+        document.getElementById(
+            "results"
+        );
+
+}
+
+
+/* =========================================================
+   UTILITY
+========================================================= */
+
+function clean(value) {
+
+    return String(
+        value ?? ""
+    )
+        .replace(/\u00A0/g, " ")
+        .trim();
+
+}
+
+
+function normalize(value) {
+
+    return clean(value)
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, " ");
+
+}
+
+
+function normalizeCompact(value) {
+
+    return normalize(value)
+        .replace(/[^a-z0-9]/g, "");
+
+}
+
+
+function escapeHTML(value) {
+
+    return String(
+        value ?? ""
+    )
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+function escapeAttr(value) {
+
+    return escapeHTML(value);
+
+}
+
+
+/* =========================================================
+   CSV PARSER
+========================================================= */
+
+function parseCSV(text) {
+
+    const rows = [];
+
+    let row = [];
+
+    let cell = "";
+
+    let insideQuotes = false;
+
+
+    for (
+        let i = 0;
+        i < text.length;
+        i++
+    ) {
+
+        const char =
+            text[i];
+
+        const next =
+            text[i + 1];
+
+
         if (
-            window.TARSUS_UI &&
-            typeof window.TARSUS_UI.setSplashStatus === "function"
+            char === '"' &&
+            insideQuotes &&
+            next === '"'
         ) {
-            window.TARSUS_UI.setSplashStatus(message);
+
+            cell += '"';
+
+            i++;
+
+            continue;
+
         }
+
+
+        if (
+            char === '"'
+        ) {
+
+            insideQuotes =
+                !insideQuotes;
+
+            continue;
+
+        }
+
+
+        if (
+            char === "," &&
+            !insideQuotes
+        ) {
+
+            row.push(cell);
+
+            cell = "";
+
+            continue;
+
+        }
+
+
+        if (
+            (
+                char === "\n" ||
+                char === "\r"
+            ) &&
+            !insideQuotes
+        ) {
+
+            if (
+                char === "\r" &&
+                next === "\n"
+            ) {
+
+                i++;
+
+            }
+
+
+            row.push(cell);
+
+            cell = "";
+
+
+            if (
+                row.some(
+                    item =>
+                        clean(item) !== ""
+                )
+            ) {
+
+                rows.push(row);
+
+            }
+
+
+            row = [];
+
+            continue;
+
+        }
+
+
+        cell += char;
+
     }
 
-    /* =====================================================
-       CSV PARSER
-       ===================================================== */
 
-    function parseCSV(text) {
-        const rows = [];
-        let row = [];
-        let cell = "";
-        let insideQuotes = false;
-
-        for (let i = 0; i < text.length; i++) {
-            const char = text[i];
-            const next = text[i + 1];
-
-            if (char === '"') {
-                if (insideQuotes && next === '"') {
-                    cell += '"';
-                    i++;
-                } else {
-                    insideQuotes = !insideQuotes;
-                }
-            } else if (char === "," && !insideQuotes) {
-                row.push(cell);
-                cell = "";
-            } else if (
-                (char === "\n" || char === "\r") &&
-                !insideQuotes
-            ) {
-                if (char === "\r" && next === "\n") {
-                    i++;
-                }
-
-                row.push(cell);
-                cell = "";
-
-                if (row.some(item => clean(item) !== "")) {
-                    rows.push(row);
-                }
-
-                row = [];
-            } else {
-                cell += char;
-            }
-        }
+    if (cell !== "" || row.length > 0) {
 
         row.push(cell);
 
-        if (row.some(item => clean(item) !== "")) {
-            rows.push(row);
-        }
-
-        return rows;
     }
 
-    /* =====================================================
-       CSV -> OBJECT
-       ===================================================== */
 
-    function rowsToObjects(rows) {
-        if (!rows || rows.length === 0) {
-            return [];
-        }
+    if (
+        row.some(
+            item =>
+                clean(item) !== ""
+        )
+    ) {
 
-        const headers = rows[0].map(header => clean(header));
+        rows.push(row);
 
-        return rows
-            .slice(1)
-            .map(row => {
-                const object = {};
-
-                headers.forEach((header, index) => {
-                    object[header] = clean(row[index] ?? "");
-                });
-
-                return object;
-            })
-            .filter(object =>
-                Object.values(object).some(value => clean(value) !== "")
-            );
     }
 
-    /* =====================================================
-       HEADER HELPER
-       ===================================================== */
 
-    function getField(row, possibleNames) {
-        if (!row || typeof row !== "object") {
-            return "";
-        }
+    return rows;
 
-        const keys = Object.keys(row);
+}
 
-        for (const wanted of possibleNames) {
-            const wantedKey = normalizeKey(wanted);
 
-            const actualKey = keys.find(
-                key => normalizeKey(key) === wantedKey
-            );
+/* =========================================================
+   GOOGLE SHEET LOADER
+========================================================= */
 
-            if (actualKey !== undefined) {
-                return clean(row[actualKey]);
+async function loadSheet(
+    sheetName
+) {
+
+    const url =
+        "https://docs.google.com/spreadsheets/d/" +
+        SHEET_ID +
+        "/gviz/tq?tqx=out:csv&sheet=" +
+        encodeURIComponent(
+            sheetName
+        );
+
+
+    const response =
+        await fetch(
+            url,
+            {
+                method: "GET",
+                cache: "no-store"
             }
-        }
+        );
 
-        return "";
+
+    if (
+        !response.ok
+    ) {
+
+        throw new Error(
+            "Gagal mengambil sheet: " +
+            sheetName +
+            " (" +
+            response.status +
+            ")"
+        );
+
     }
 
-    /* =====================================================
-       LOAD GOOGLE SHEET
-       ===================================================== */
 
-    async function fetchSheet(sheetName) {
-        const url =
-            `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq` +
-            `?sheet=${encodeURIComponent(sheetName)}` +
-            `&tqx=out:csv`;
+    return await response.text();
 
-        const response = await fetch(url, {
-            cache: "no-store"
-        });
+}
 
-        if (!response.ok) {
-            throw new Error(
-                `Gagal mengambil ${sheetName}: HTTP ${response.status}`
+
+/* =========================================================
+   CSV → OBJECT
+========================================================= */
+
+function rowsToObjects(rows) {
+
+    if (
+        !rows ||
+        rows.length === 0
+    ) {
+
+        return [];
+
+    }
+
+
+    const headers =
+        rows[0].map(
+            header =>
+                clean(header)
+        );
+
+
+    return rows
+        .slice(1)
+        .map(row => {
+
+            const obj = {};
+
+
+            headers.forEach(
+                (
+                    header,
+                    index
+                ) => {
+
+                    if (
+                        header !== ""
+                    ) {
+
+                        obj[header] =
+                            clean(
+                                row[index] ??
+                                ""
+                            );
+
+                    }
+
+                }
             );
-        }
 
-        const text = await response.text();
 
-        if (!text || !text.trim()) {
-            throw new Error(
-                `${sheetName} kosong atau tidak dapat dibaca.`
+            return obj;
+
+        });
+
+}
+
+
+/* =========================================================
+   GET FIELD
+   ---------------------------------------------------------
+   Membuat pembacaan header lebih toleran
+   tanpa mengubah struktur spreadsheet.
+========================================================= */
+
+function getField(
+    row,
+    ...names
+) {
+
+    const keys =
+        Object.keys(row);
+
+
+    for (
+        const wanted of names
+    ) {
+
+        const wantedNorm =
+            normalizeCompact(
+                wanted
             );
-        }
 
-        return rowsToObjects(parseCSV(text));
-    }
 
-    /* =====================================================
-       ACTIVE STATUS
-       ===================================================== */
+        const key =
+            keys.find(
+                existing =>
+                    normalizeCompact(
+                        existing
+                    ) === wantedNorm
+            );
 
-    function isExplicitInactive(value) {
-        const n = normalize(value);
-
-        return [
-            "tidak",
-            "nonaktif",
-            "non active",
-            "inactive",
-            "no",
-            "0",
-            "false",
-            "off"
-        ].includes(n);
-    }
-
-    function isActive(value) {
-        const n = normalize(value);
-
-        if (!n) {
-            return true;
-        }
-
-        if (isExplicitInactive(n)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    function isKAActive(row) {
-        if (!row) {
-            return false;
-        }
-
-        const status = getField(row, [
-            "STATUS",
-            "STATUS_KA",
-            "AKTIF",
-            "ACTIVE"
-        ]);
-
-        return isActive(status);
-    }
-
-    function isTarifActive(row) {
-        if (!row) {
-            return false;
-        }
-
-        const status = getField(row, [
-            "STATUS",
-            "STATUS_TARIF",
-            "AKTIF",
-            "ACTIVE"
-        ]);
-
-        return isActive(status);
-    }
-
-    /* =====================================================
-       PARSE MASTER KA
-       ===================================================== */
-
-    function parseMasterKA(rows) {
-        return rows.map(row => {
-            const idKA = getField(row, [
-                "ID_KA",
-                "ID KA",
-                "KODE_KA",
-                "KODE KA",
-                "KA_ID"
-            ]);
-
-            const namaKA = getField(row, [
-                "NAMA_KA",
-                "NAMA KA",
-                "NAMA",
-                "KA"
-            ]);
-
-            const kelas = getField(row, [
-                "KELAS",
-                "CLASS"
-            ]);
-
-            const relasi = getField(row, [
-                "RELASI",
-                "RUTE",
-                "ROUTE"
-            ]);
-
-            const status = getField(row, [
-                "STATUS",
-                "STATUS_KA",
-                "AKTIF",
-                "ACTIVE"
-            ]);
-
-            return {
-                ...row,
-
-                ID_KA: idKA,
-                NAMA_KA: namaKA,
-                KELAS: kelas,
-                RELASI: relasi,
-                STATUS: status
-            };
-        }).filter(row => {
-            return row.ID_KA || row.NAMA_KA;
-        });
-    }
-
-    /* =====================================================
-       PARSE MASTER STASIUN
-       ===================================================== */
-
-    function parseMasterStasiun(rows) {
-        return rows.map(row => {
-            const id = getField(row, [
-                "ID_STASIUN",
-                "ID STASIUN",
-                "ID",
-                "KODE_STASIUN",
-                "KODE STASIUN",
-                "KODE"
-            ]);
-
-            const kode = getField(row, [
-                "KODE_STASIUN",
-                "KODE STASIUN",
-                "KODE",
-                "CODE"
-            ]);
-
-            const nama = getField(row, [
-                "NAMA_STASIUN",
-                "NAMA STASIUN",
-                "NAMA",
-                "STASIUN",
-                "STATION"
-            ]);
-
-            const urutan = getField(row, [
-                "URUTAN",
-                "NO_URUT",
-                "NO URUT",
-                "ORDER",
-                "SEQUENCE"
-            ]);
-
-            return {
-                ...row,
-
-                ID_STASIUN: id,
-                KODE_STASIUN: kode,
-                NAMA_STASIUN: nama,
-                URUTAN: urutan
-            };
-        }).filter(row => {
-            return row.ID_STASIUN ||
-                row.KODE_STASIUN ||
-                row.NAMA_STASIUN;
-        });
-    }
-
-    /* =====================================================
-       PARSE MASTER TARIF
-       ===================================================== */
-
-    function parseMasterTarif(rows) {
-        return rows.map(row => {
-            const idKA = getField(row, [
-                "ID_KA",
-                "ID KA",
-                "KODE_KA",
-                "KODE KA",
-                "KA_ID"
-            ]);
-
-            const asal = getField(row, [
-                "ASAL",
-                "STASIUN_ASAL",
-                "STASIUN ASAL",
-                "ORIGIN",
-                "FROM"
-            ]);
-
-            const tujuan = getField(row, [
-                "TUJUAN",
-                "STASIUN_TUJUAN",
-                "STASIUN TUJUAN",
-                "DESTINATION",
-                "TO"
-            ]);
-
-            const tarif = getField(row, [
-                "TARIF",
-                "HARGA",
-                "FARE",
-                "TARIF_KHUSUS",
-                "TARIF KHUSUS"
-            ]);
-
-            const relasi = getField(row, [
-                "RELASI",
-                "RUTE",
-                "ROUTE",
-                "ARAH"
-            ]);
-
-            const status = getField(row, [
-                "STATUS",
-                "STATUS_TARIF",
-                "AKTIF",
-                "ACTIVE"
-            ]);
-
-            const catatan = getField(row, [
-                "CATATAN",
-                "KETERANGAN",
-                "NOTE",
-                "NOTES"
-            ]);
-
-            return {
-                ...row,
-
-                ID_KA: idKA,
-                ASAL: asal,
-                TUJUAN: tujuan,
-                TARIF: tarif,
-                RELASI: relasi,
-                STATUS: status,
-                CATATAN: catatan
-            };
-        }).filter(row => {
-            return row.ID_KA &&
-                (row.ASAL || row.TUJUAN);
-        });
-    }
-
-    /* =====================================================
-       PARSE TARIF
-       ===================================================== */
-
-    function parseFare(value) {
-        const original = clean(value);
 
         if (
-            !original ||
-            original === "-" ||
-            original === "—" ||
-            original === "–"
+            key !== undefined
         ) {
-            return null;
+
+            return clean(
+                row[key]
+            );
+
         }
 
-        let number = original
+    }
+
+
+    return "";
+
+}
+
+
+/* =========================================================
+   MASTER KA
+========================================================= */
+
+function parseMasterKA(csv) {
+
+    const objects =
+        rowsToObjects(
+            parseCSV(csv)
+        );
+
+
+    return objects
+        .filter(
+            row =>
+                getField(
+                    row,
+                    "ID_KA"
+                ) !== ""
+        )
+        .map(
+            row => {
+
+                return {
+
+                    idKA:
+                        getField(
+                            row,
+                            "ID_KA"
+                        ),
+
+                    namaKA:
+                        getField(
+                            row,
+                            "NAMA_KA",
+                            "NAMA KA"
+                        ),
+
+                    aktif:
+                        getField(
+                            row,
+                            "AKTIF",
+                            "STATUS"
+
+                        )
+
+                };
+
+            }
+        );
+
+}
+
+
+/* =========================================================
+   MASTER STASIUN
+========================================================= */
+
+function parseMasterStasiun(csv) {
+
+    const objects =
+        rowsToObjects(
+            parseCSV(csv)
+        );
+
+
+    return objects
+        .filter(
+            row => {
+
+                return (
+                    getField(
+                        row,
+                        "ID_STASIUN"
+                    ) !== "" &&
+                    getField(
+                        row,
+                        "NAMA_STASIUN",
+                        "NAMA STASIUN"
+                    ) !== ""
+                );
+
+            }
+        )
+        .map(
+            row => {
+
+                return {
+
+                    idStasiun:
+                        getField(
+                            row,
+                            "ID_STASIUN"
+                        ),
+
+                    namaStasiun:
+                        getField(
+                            row,
+                            "NAMA_STASIUN",
+                            "NAMA STASIUN"
+                        ),
+
+                    daop:
+                        getField(
+                            row,
+                            "DAOP_DIVRE",
+                            "DAOP",
+                            "DIVRE"
+                        ),
+
+                    provinsi:
+                        getField(
+                            row,
+                            "PROVINSI"
+                        ),
+
+                    aktif:
+                        getField(
+                            row,
+                            "AKTIF",
+                            "STATUS"
+                        )
+
+                };
+
+            }
+        );
+
+}
+
+
+/* =========================================================
+   MASTER TARIF
+========================================================= */
+
+function parseMasterTarif(csv) {
+
+    const objects =
+        rowsToObjects(
+            parseCSV(csv)
+        );
+
+
+    return objects
+        .filter(
+            row => {
+
+                return (
+                    getField(
+                        row,
+                        "ID_TARIF"
+                    ) !== "" &&
+                    getField(
+                        row,
+                        "ID_KA"
+                    ) !== ""
+                );
+
+            }
+        )
+        .map(
+            row => {
+
+                const stations = [];
+
+
+                for (
+                    let i = 1;
+                    i <= 15;
+                    i++
+                ) {
+
+                    const station =
+                        getField(
+                            row,
+                            "STASIUN_" + i,
+                            "STASIUN " + i
+                        );
+
+
+                    if (
+                        station !== ""
+                    ) {
+
+                        stations.push(
+                            station
+                        );
+
+                    }
+
+                }
+
+
+                return {
+
+                    idTarif:
+                        getField(
+                            row,
+                            "ID_TARIF"
+                        ),
+
+                    idKA:
+                        getField(
+                            row,
+                            "ID_KA"
+                        ),
+
+                    arah:
+                        getField(
+                            row,
+                            "ARAH"
+                        ).toUpperCase(),
+
+                    polaRelasi:
+                        getField(
+                            row,
+                            "POLA_RELASI",
+                            "POLA RELASI"
+                        ),
+
+                    stations,
+
+                    eks:
+                        parseFare(
+                            getField(
+                                row,
+                                "EKS",
+                                "EKSEKUTIF"
+                            )
+                        ),
+
+                    bis:
+                        parseFare(
+                            getField(
+                                row,
+                                "BIS",
+                                "BISNIS"
+                            )
+                        ),
+
+                    eko:
+                        parseFare(
+                            getField(
+                                row,
+                                "EKO",
+                                "EKONOMI"
+                            )
+                        ),
+
+                    status:
+                        getField(
+                            row,
+                            "STATUS",
+                            "AKTIF"
+                        )
+
+                };
+
+            }
+        );
+
+}
+
+
+/* =========================================================
+   FARE
+========================================================= */
+
+function parseFare(value) {
+
+    const raw =
+        clean(value);
+
+
+    if (
+        raw === "" ||
+        raw === "-" ||
+        raw === "—" ||
+        normalize(raw) === "null" ||
+        normalize(raw) === "tidak tersedia"
+    ) {
+
+        return null;
+
+    }
+
+
+    const numberText =
+        raw
             .replace(/rp/gi, "")
             .replace(/\s/g, "")
             .replace(/\./g, "")
             .replace(/,/g, "");
 
-        number = number.replace(/[^\d]/g, "");
 
-        if (!number) {
-            return null;
-        }
+    const number =
+        Number(numberText);
 
-        const result = Number(number);
 
-        if (!Number.isFinite(result)) {
-            return null;
-        }
-
-        return result;
-    }
-
-    function formatRupiah(value) {
-        const number = parseFare(value);
-
-        if (number === null) {
-            return "Tidak tersedia";
-        }
-
-        return new Intl.NumberFormat("id-ID", {
-            style: "currency",
-            currency: "IDR",
-            maximumFractionDigits: 0
-        }).format(number);
-    }
-
-    /* =====================================================
-       STATION INDEX
-       ===================================================== */
-
-    function addStationAlias(alias, station) {
-        const key = normalize(alias);
-
-        if (!key) {
-            return;
-        }
-
-        if (!STATION_INDEX.has(key)) {
-            STATION_INDEX.set(key, station);
-        }
-    }
-
-    function buildStationIndex() {
-        STATION_INDEX = new Map();
-
-        MASTER_STASIUN.forEach(station => {
-            addStationAlias(station.ID_STASIUN, station);
-            addStationAlias(station.KODE_STASIUN, station);
-            addStationAlias(station.NAMA_STASIUN, station);
-
-            const aliases = [
-                getField(station, ["ALIAS"]),
-                getField(station, ["NAMA_ALIAS"]),
-                getField(station, ["NAMA LENGKAP"])
-            ];
-
-            aliases.forEach(alias => {
-                addStationAlias(alias, station);
-            });
-        });
-    }
-
-    function findStation(value) {
-        const key = normalize(value);
-
-        if (!key) {
-            return null;
-        }
-
-        if (STATION_INDEX.has(key)) {
-            return STATION_INDEX.get(key);
-        }
-
-        const stations = MASTER_STASIUN;
-
-        const exactName = stations.find(station =>
-            normalize(station.NAMA_STASIUN) === key
-        );
-
-        if (exactName) {
-            return exactName;
-        }
-
-        const exactCode = stations.find(station =>
-            normalize(station.KODE_STASIUN) === key
-        );
-
-        if (exactCode) {
-            return exactCode;
-        }
+    if (
+        !Number.isFinite(number)
+    ) {
 
         return null;
+
     }
 
-    function stationMatches(value, station) {
-        const a = normalize(value);
 
-        if (!a || !station) {
-            return false;
-        }
+    return number;
 
-        const aliases = [
-            station.ID_STASIUN,
-            station.KODE_STASIUN,
-            station.NAMA_STASIUN,
-            getField(station, ["ALIAS"]),
-            getField(station, ["NAMA_ALIAS"])
-        ];
+}
 
-        return aliases.some(alias =>
-            normalize(alias) === a
-        );
-    }
 
-    /* =====================================================
-       KA HELPERS
-       ===================================================== */
+/* =========================================================
+   RUPIAH
+========================================================= */
 
-    function getNamaKA(idKA) {
-        const key = normalize(idKA);
+function formatRupiah(value) {
 
-        const ka = MASTER_KA.find(item =>
-            normalize(item.ID_KA) === key
-        );
-
-        if (ka) {
-            return ka.NAMA_KA || ka.ID_KA;
-        }
-
-        return idKA || "KA Tidak Diketahui";
-    }
-
-    function getKA(idKA) {
-        const key = normalize(idKA);
-
-        return MASTER_KA.find(item =>
-            normalize(item.ID_KA) === key
-        ) || null;
-    }
-
-    /* =====================================================
-       ROUTE
-       ===================================================== */
-
-    function getReferenceRoute(ka) {
-        if (!ka) {
-            return [];
-        }
-
-        const rawRoute =
-            ka.RELASI ||
-            getField(ka, [
-                "RUTE",
-                "ROUTE",
-                "LINTASAN",
-                "JALUR"
-            ]);
-
-        if (!rawRoute) {
-            return [];
-        }
-
-        return rawRoute
-            .split(/\s*(?:-|>|→|↔|\/|;|\|)\s*/)
-            .map(item => clean(item))
-            .filter(Boolean);
-    }
-
-    function relationHTML(route) {
-        if (!route || route.length === 0) {
-            return "";
-        }
-
-        return `
-            <div class="route-line">
-                ${route.map((station, index) => `
-                    <span class="route-station">
-                        ${escapeHTML(station)}
-                    </span>
-                    ${
-                        index < route.length - 1
-                            ? `<span class="route-arrow">→</span>`
-                            : ""
-                    }
-                `).join("")}
-            </div>
-        `;
-    }
-
-    /* =====================================================
-       CEK COVERAGE RUTE
-       ===================================================== */
-
-    function routeIsCovered(ka, origin, destination, tariffRow = null) {
-        const originStation = findStation(origin);
-        const destinationStation = findStation(destination);
-
-        /*
-         * Jika MASTER_STASIUN tersedia, kedua stasiun harus
-         * dikenali. Ini mencegah pencarian ngawur.
-         */
-        if (MASTER_STASIUN.length > 0) {
-            if (!originStation || !destinationStation) {
-                return false;
-            }
-        }
-
-        /*
-         * Tarif khusus yang sudah secara eksplisit memiliki
-         * ASAL dan TUJUAN dianggap sebagai rute utama.
-         */
-        if (tariffRow) {
-            const tariffOrigin = normalize(tariffRow.ASAL);
-            const tariffDestination = normalize(tariffRow.TUJUAN);
-
-            const originKey = normalize(origin);
-            const destinationKey = normalize(destination);
-
-            const directMatch =
-                tariffOrigin === originKey &&
-                tariffDestination === destinationKey;
-
-            const reverseMatch =
-                normalize(tariffRow.RELASI) === "pp" &&
-                tariffDestination === originKey &&
-                tariffOrigin === destinationKey;
-
-            if (directMatch || reverseMatch) {
-                return true;
-            }
-        }
-
-        /*
-         * Cari rute KA.
-         */
-        const route = getReferenceRoute(ka);
-
-        if (route.length < 2) {
-            /*
-             * Jika KA tidak memiliki data rute pada MASTER_KA,
-             * jangan menolak tarif yang sudah ditemukan.
-             */
-            return true;
-        }
-
-        const normalizedRoute = route.map(normalize);
-
-        const originIndex = normalizedRoute.findIndex(
-            station => station === normalize(origin)
-        );
-
-        const destinationIndex = normalizedRoute.findIndex(
-            station => station === normalize(destination)
-        );
-
-        /*
-         * Coba berdasarkan kode/nama stasiun.
-         */
-        if (
-            originIndex === -1 &&
-            originStation
-        ) {
-            const aliases = [
-                originStation.ID_STASIUN,
-                originStation.KODE_STASIUN,
-                originStation.NAMA_STASIUN
-            ].map(normalize);
-
-            const idx = normalizedRoute.findIndex(
-                station => aliases.includes(station)
-            );
-
-            if (idx !== -1) {
-                return routeIsCoveredByIndex(
-                    idx,
-                    destination,
-                    normalizedRoute,
-                    destinationStation
-                );
-            }
-        }
-
-        if (
-            destinationIndex === -1 &&
-            destinationStation
-        ) {
-            const aliases = [
-                destinationStation.ID_STASIUN,
-                destinationStation.KODE_STASIUN,
-                destinationStation.NAMA_STASIUN
-            ].map(normalize);
-
-            const idx = normalizedRoute.findIndex(
-                station => aliases.includes(station)
-            );
-
-            if (idx !== -1 && originIndex !== -1) {
-                return originIndex < idx;
-            }
-        }
-
-        if (originIndex === -1 || destinationIndex === -1) {
-            return false;
-        }
-
-        /*
-         * PP = kedua arah diterima.
-         */
-        const relation =
-            normalize(
-                tariffRow?.RELASI ||
-                ka.RELASI ||
-                ""
-            );
-
-        if (
-            relation === "pp" ||
-            relation.includes("pp")
-        ) {
-            return true;
-        }
-
-        /*
-         * Default = arah perjalanan mengikuti urutan route.
-         */
-        return originIndex < destinationIndex;
-    }
-
-    function routeIsCoveredByIndex(
-        originIndex,
-        destination,
-        normalizedRoute,
-        destinationStation
+    if (
+        value === null ||
+        value === undefined ||
+        !Number.isFinite(value)
     ) {
-        let destinationIndex = normalizedRoute.findIndex(
-            station => station === normalize(destination)
+
+        return "—";
+
+    }
+
+
+    return (
+        "Rp " +
+        new Intl.NumberFormat(
+            "id-ID"
+        ).format(value)
+    );
+
+}
+
+
+/* =========================================================
+   LOWEST FARE
+========================================================= */
+
+function getLowestFare(tarif) {
+
+    const fares = [
+
+        tarif.eks,
+
+        tarif.bis,
+
+        tarif.eko
+
+    ].filter(
+        value =>
+            value !== null &&
+            Number.isFinite(value)
+    );
+
+
+    if (
+        fares.length === 0
+    ) {
+
+        return Infinity;
+
+    }
+
+
+    return Math.min(
+        ...fares
+    );
+
+}
+
+
+/* =========================================================
+   REFERENCE ROUTE
+========================================================= */
+
+function getReferenceRoute(tarif) {
+
+    if (
+        !tarif ||
+        !Array.isArray(
+            tarif.stations
+        ) ||
+        tarif.stations.length < 2
+    ) {
+
+        return [];
+
+    }
+
+
+    return [
+
+        tarif.stations[0],
+
+        tarif.stations[
+            tarif.stations.length - 1
+        ]
+
+    ];
+
+}
+
+
+/* =========================================================
+   RELATION HTML
+========================================================= */
+
+function relationHTML(stations) {
+
+    if (
+        !stations ||
+        stations.length === 0
+    ) {
+
+        return "—";
+
+    }
+
+
+    return stations
+        .map(
+            station =>
+                escapeHTML(station)
+        )
+        .join(
+            '<span class="relation-arrow">→</span>'
         );
 
-        if (
-            destinationIndex === -1 &&
-            destinationStation
-        ) {
-            const aliases = [
-                destinationStation.ID_STASIUN,
-                destinationStation.KODE_STASIUN,
-                destinationStation.NAMA_STASIUN
-            ].map(normalize);
+}
 
-            destinationIndex = normalizedRoute.findIndex(
-                station => aliases.includes(station)
-            );
-        }
 
-        if (destinationIndex === -1) {
-            return false;
-        }
+/* =========================================================
+   STATION ALIAS MATCH
+   ---------------------------------------------------------
+   Memungkinkan nama stasiun dibandingkan dengan:
+   - nama asli
+   - ID stasiun
+========================================================= */
 
-        return originIndex < destinationIndex;
+function stationMatches(
+    tarifStation,
+    searchStation
+) {
+
+    const target =
+        normalize(
+            searchStation
+        );
+
+    const targetCompact =
+        normalizeCompact(
+            searchStation
+        );
+
+
+    if (
+        !target
+    ) {
+
+        return false;
+
     }
 
-    /* =====================================================
-       FARE ITEM
-       ===================================================== */
 
-    function fareItem(tarifRow) {
-        const fare = parseFare(tarifRow.TARIF);
+    const station =
+        MASTER_STASIUN.find(
+            item => {
 
-        if (fare === null) {
-            return null;
-        }
+                const nama =
+                    normalize(
+                        item.namaStasiun
+                    );
 
-        return {
-            ...tarifRow,
-            fare
-        };
+                const id =
+                    normalize(
+                        item.idStasiun
+                    );
+
+                return (
+                    nama ===
+                        normalize(
+                            tarifStation
+                        ) ||
+                    id ===
+                        normalize(
+                            tarifStation
+                        )
+                );
+
+            }
+        );
+
+
+    if (
+        station
+    ) {
+
+        return (
+            normalize(
+                station.namaStasiun
+            ) === target ||
+            normalize(
+                station.idStasiun
+            ) === target ||
+            normalizeCompact(
+                station.namaStasiun
+            ) === targetCompact ||
+            normalizeCompact(
+                station.idStasiun
+            ) === targetCompact
+        );
+
     }
 
-    /* =====================================================
-       LOWEST FARE
-       ===================================================== */
 
-    function getLowestFare(rows) {
-        const fares = rows
-            .map(fareItem)
-            .filter(Boolean)
-            .sort((a, b) => a.fare - b.fare);
+    return (
+        normalize(
+            tarifStation
+        ) === target ||
+        normalizeCompact(
+            tarifStation
+        ) === targetCompact
+    );
 
-        return fares[0] || null;
+}
+
+
+/* =========================================================
+   RESOLVE STATION INDEX
+========================================================= */
+
+function findStationIndex(
+    stations,
+    searchStation
+) {
+
+    if (
+        !Array.isArray(stations)
+    ) {
+
+        return -1;
+
     }
 
-    /* =====================================================
-       CREATE TARIF DETAIL
-       ===================================================== */
 
-    function createTarifDetail(tarifRow, isMain = false) {
-        const fare = parseFare(tarifRow.TARIF);
+    return stations.findIndex(
+        station =>
+            stationMatches(
+                station,
+                searchStation
+            )
+    );
 
-        if (fare === null) {
-            return "";
-        }
+}
 
-        const relation =
-            clean(tarifRow.RELASI) ||
-            "Sekali jalan";
 
-        const note =
-            clean(tarifRow.CATATAN);
+/* =========================================================
+   ROUTE MATCHING
+========================================================= */
 
-        return `
-            <div class="tariff-box ${isMain ? "tariff-main" : ""}">
-                <div class="tariff-label">
-                    ${isMain ? "TARIF KHUSUS" : "ALTERNATIF"}
+function routeIsCovered(
+    tarif,
+    asal,
+    tujuan
+) {
+
+    const stations =
+        tarif.stations;
+
+
+    if (
+        !Array.isArray(stations) ||
+        stations.length < 2
+    ) {
+
+        return false;
+
+    }
+
+
+    const asalIndex =
+        findStationIndex(
+            stations,
+            asal
+        );
+
+
+    const tujuanIndex =
+        findStationIndex(
+            stations,
+            tujuan
+        );
+
+
+    if (
+        asalIndex === -1 ||
+        tujuanIndex === -1
+    ) {
+
+        return false;
+
+    }
+
+
+    if (
+        tarif.arah === "PP"
+    ) {
+
+        return true;
+
+    }
+
+
+    return (
+        asalIndex <
+        tujuanIndex
+    );
+
+}
+
+
+/* =========================================================
+   GET NAMA KA
+========================================================= */
+
+function getNamaKA(idKA) {
+
+    const ka =
+        MASTER_KA.find(
+            item =>
+                normalize(
+                    item.idKA
+                ) ===
+                normalize(idKA)
+        );
+
+
+    if (
+        !ka
+    ) {
+
+        return clean(idKA);
+
+    }
+
+
+    return (
+        clean(ka.namaKA) ||
+        clean(idKA)
+    );
+
+}
+
+
+/* =========================================================
+   STATUS PARSER
+========================================================= */
+
+function statusIsActive(
+    value
+) {
+
+    const status =
+        normalize(value);
+
+
+    if (
+        status === ""
+    ) {
+
+        return true;
+
+    }
+
+
+    if (
+        [
+            "tidak",
+            "nonaktif",
+            "non aktif",
+            "inactive",
+            "no",
+            "false",
+            "0"
+        ].includes(status)
+    ) {
+
+        return false;
+
+    }
+
+
+    return [
+        "ya",
+        "aktif",
+        "active",
+        "yes",
+        "true",
+        "1"
+    ].includes(status);
+
+}
+
+
+/* =========================================================
+   KA ACTIVE
+========================================================= */
+
+function isKAActive(idKA) {
+
+    const ka =
+        MASTER_KA.find(
+            item =>
+                normalize(
+                    item.idKA
+                ) ===
+                normalize(idKA)
+        );
+
+
+    if (
+        !ka
+    ) {
+
+        return true;
+
+    }
+
+
+    return statusIsActive(
+        ka.aktif
+    );
+
+}
+
+
+/* =========================================================
+   TARIF ACTIVE
+========================================================= */
+
+function isTarifActive(
+    tarif
+) {
+
+    return statusIsActive(
+        tarif.status
+    );
+
+}
+
+
+/* =========================================================
+   FARE ITEM
+========================================================= */
+
+function fareItem(
+    label,
+    value
+) {
+
+    const unavailable =
+        value === null ||
+        value === undefined;
+
+
+    return `
+
+        <div class="fare-item">
+
+            <span class="fare-class">
+                ${escapeHTML(label)}
+            </span>
+
+            <span class="fare-price ${
+                unavailable
+                    ? "fare-unavailable"
+                    : ""
+            }">
+
+                ${
+                    unavailable
+                        ? "—"
+                        : formatRupiah(value)
+                }
+
+            </span>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   SAFE ID
+========================================================= */
+
+function makeSafeId(value) {
+
+    return String(value)
+        .toLowerCase()
+        .replace(
+            /[^a-z0-9]+/g,
+            "-"
+        )
+        .replace(
+            /^-+|-+$/g,
+            ""
+        );
+
+}
+
+
+/* =========================================================
+   TARIF DETAIL
+========================================================= */
+
+function createTarifDetail(
+    tarif,
+    isMain
+) {
+
+    const reference =
+        getReferenceRoute(
+            tarif
+        );
+
+
+    const referenceHTML =
+        relationHTML(
+            reference
+        );
+
+
+    const title =
+        isMain
+            ? "TARIF UTAMA"
+            : "TARIF KHUSUS ALTERNATIF";
+
+
+    return `
+
+        <div
+            class="tariff-detail ${
+                isMain
+                    ? "tariff-main"
+                    : "tariff-alternative"
+            }"
+        >
+
+            <div class="reference-box">
+
+                <div class="reference-label">
+
+                    ${title}
+
                 </div>
 
-                <div class="tariff-price">
-                    ${formatRupiah(fare)}
+                <div class="reference-route">
+
+                    ${referenceHTML}
+
                 </div>
 
-                <div class="tariff-note">
-                    ${escapeHTML(relation)}
-                    ${
-                        note
-                            ? ` · ${escapeHTML(note)}`
-                            : ""
-                    }
-                </div>
             </div>
-        `;
+
+
+            <div class="fare-list">
+
+                ${fareItem(
+                    "EKS",
+                    tarif.eks
+                )}
+
+                ${fareItem(
+                    "BIS",
+                    tarif.bis
+                )}
+
+                ${fareItem(
+                    "EKO",
+                    tarif.eko
+                )}
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   GROUPED KA CARD
+========================================================= */
+
+function createKAGroupCard(
+    namaKA,
+    group,
+    asal,
+    tujuan,
+    index
+) {
+
+    if (
+        !group ||
+        group.length === 0
+    ) {
+
+        return "";
+
     }
 
-    /* =====================================================
-       CREATE KA CARD
-       ===================================================== */
 
-    function createKAGroupCard(group, origin, destination) {
-        const ka = group.ka;
-        const fares = group.fares;
+    const cardId =
+        "ka-" +
+        makeSafeId(namaKA) +
+        "-" +
+        index;
 
-        const sorted = [...fares]
-            .map(fareItem)
-            .filter(Boolean)
-            .sort((a, b) => a.fare - b.fare);
 
-        if (sorted.length === 0) {
-            return "";
-        }
+    const mainTarif =
+        group[0];
 
-        const mainFare = sorted[0];
 
-        const alternatives = sorted.slice(1);
+    const alternatives =
+        group.slice(1);
 
-        const kaName =
-            ka?.NAMA_KA ||
-            getNamaKA(mainFare.ID_KA);
 
-        const kelas =
-            ka?.KELAS ||
-            getField(ka, ["KELAS", "CLASS"]);
+    let alternativeHTML =
+        "";
 
-        const route =
-            getReferenceRoute(ka);
 
-        const safeId = makeSafeId(
-            `${mainFare.ID_KA}-${origin}-${destination}`
-        );
+    if (
+        alternatives.length > 0
+    ) {
 
-        return `
-            <article
-                class="result-card"
-                id="result-${safeId}"
+        const detailHTML =
+            alternatives
+                .map(
+                    tarif =>
+                        createTarifDetail(
+                            tarif,
+                            false
+                        )
+                )
+                .join("");
+
+
+        alternativeHTML = `
+
+            <details
+                class="tariff-alternatives"
             >
 
-                <div class="result-card-head">
+                <summary>
 
-                    <div>
-                        <div class="ka-name">
-                            ${escapeHTML(kaName)}
-                        </div>
+                    <span>
+                        Lihat
+                        ${alternatives.length}
+                        tarif khusus alternatif
+                    </span>
 
-                        ${
-                            kelas
-                                ? `
-                                    <div class="ka-badge">
-                                        ${escapeHTML(kelas)}
-                                    </div>
-                                  `
-                                : ""
-                        }
-                    </div>
+                    <span
+                        class="alternative-arrow"
+                    >
+                        +
+                    </span>
 
-                    <div class="ka-code">
-                        ${escapeHTML(mainFare.ID_KA)}
-                    </div>
+                </summary>
+
+
+                <div class="alternative-content">
+
+                    ${detailHTML}
 
                 </div>
 
-                ${
-                    route.length
-                        ? relationHTML(route)
-                        : `
-                            <div class="route-line route-fallback">
-                                ${escapeHTML(origin)}
-                                <span class="route-arrow">→</span>
-                                ${escapeHTML(destination)}
-                            </div>
-                          `
-                }
+            </details>
 
-                ${createTarifDetail(mainFare, true)}
-
-                ${
-                    alternatives.length
-                        ? `
-                            <div class="alternative-title">
-                                Tarif alternatif
-                            </div>
-
-                            <div class="alternative-list">
-
-                                ${alternatives.map(item => `
-                                    <div class="alternative-item">
-
-                                        <div>
-                                            <div class="alternative-relation">
-                                                ${
-                                                    escapeHTML(
-                                                        item.RELASI ||
-                                                        "Alternatif"
-                                                    )
-                                                }
-                                            </div>
-
-                                            ${
-                                                item.CATATAN
-                                                    ? `
-                                                        <div class="alternative-note">
-                                                            ${escapeHTML(item.CATATAN)}
-                                                        </div>
-                                                      `
-                                                    : ""
-                                            }
-                                        </div>
-
-                                        <div class="alternative-price">
-                                            ${formatRupiah(item.fare)}
-                                        </div>
-
-                                    </div>
-                                `).join("")}
-
-                            </div>
-                          `
-                        : ""
-                }
-
-            </article>
         `;
+
     }
 
-    /* =====================================================
-       SEARCH TARIF
-       ===================================================== */
 
-    function searchTarif(origin, destination) {
-        const originClean = clean(origin);
-        const destinationClean = clean(destination);
+    return `
 
-        if (!originClean || !destinationClean) {
-            return [];
-        }
+        <article
+            class="result-card grouped-result-card"
+            id="${escapeAttr(cardId)}"
+        >
 
-        const groups = new Map();
+            <div class="result-name">
 
-        MASTER_TARIF.forEach(tarif => {
-            if (!isTarifActive(tarif)) {
-                return;
-            }
-
-            const fare = parseFare(tarif.TARIF);
-
-            if (fare === null) {
-                return;
-            }
-
-            const ka = getKA(tarif.ID_KA);
-
-            /*
-             * Jika ID_KA ada di MASTER_KA dan KA tersebut
-             * secara eksplisit nonaktif, tarif ikut disembunyikan.
-             *
-             * Jika ID_KA tidak ditemukan di MASTER_KA,
-             * tarif tetap diproses.
-             */
-            if (ka && !isKAActive(ka)) {
-                return;
-            }
-
-            if (
-                !routeIsCovered(
-                    ka,
-                    originClean,
-                    destinationClean,
-                    tarif
-                )
-            ) {
-                return;
-            }
-
-            /*
-             * Prioritaskan kecocokan langsung ASAL-TUJUAN
-             * pada MASTER_TARIF.
-             */
-            const tariffOrigin = normalize(tarif.ASAL);
-            const tariffDestination = normalize(tarif.TUJUAN);
-
-            const originKey = normalize(originClean);
-            const destinationKey = normalize(destinationClean);
-
-            const direct =
-                tariffOrigin === originKey &&
-                tariffDestination === destinationKey;
-
-            const ppReverse =
-                normalize(tarif.RELASI) === "pp" &&
-                tariffOrigin === destinationKey &&
-                tariffDestination === originKey;
-
-            /*
-             * Jika tarif memiliki ASAL/TUJUAN yang jelas,
-             * harus cocok dengan pencarian.
-             *
-             * Jika kosong, biarkan route KA yang menentukan.
-             */
-            const hasExplicitStations =
-                Boolean(tariffOrigin || tariffDestination);
-
-            if (hasExplicitStations) {
-                if (!direct && !ppReverse) {
-                    return;
-                }
-            }
-
-            const id = clean(tarif.ID_KA);
-
-            if (!groups.has(id)) {
-                groups.set(id, {
-                    ka,
-                    fares: []
-                });
-            }
-
-            groups.get(id).fares.push(tarif);
-        });
-
-        return [...groups.values()]
-            .filter(group => group.fares.length > 0)
-            .sort((a, b) => {
-                const fareA = getLowestFare(a.fares);
-                const fareB = getLowestFare(b.fares);
-
-                return (
-                    (fareA?.fare ?? Infinity) -
-                    (fareB?.fare ?? Infinity)
-                );
-            });
-    }
-
-    /* =====================================================
-       RENDER RESULTS
-       ===================================================== */
-
-    function renderResults(groups, origin, destination) {
-        if (!results) {
-            return;
-        }
-
-        results.style.display = "block";
-
-        if (!groups || groups.length === 0) {
-            results.innerHTML = `
-                <div class="result-empty">
-
-                    <div class="result-empty-icon">
-                        🔎
-                    </div>
-
-                    <div class="result-empty-title">
-                        Tarif khusus tidak ditemukan
-                    </div>
-
-                    <div class="result-empty-text">
-                        Belum ada tarif khusus yang sesuai
-                        dengan relasi ${escapeHTML(origin)}
-                        → ${escapeHTML(destination)}.
-                    </div>
-
-                </div>
-            `;
-
-            setStatus(
-                "Tarif khusus tidak ditemukan.",
-                "empty"
-            );
-
-            return;
-        }
-
-        const cards = groups
-            .map(group =>
-                createKAGroupCard(
-                    group,
-                    origin,
-                    destination
-                )
-            )
-            .filter(Boolean)
-            .join("");
-
-        results.innerHTML = `
-            <div class="results-header">
-
-                <div class="results-heading">
-                    Tarif khusus
-                </div>
-
-                <div class="results-count">
-                    ${groups.length} KA
-                </div>
+                ${escapeHTML(namaKA)}
 
             </div>
 
-            ${cards}
-        `;
 
-        setStatus(
-            `${groups.length} KA dengan tarif khusus.`,
-            "success"
+            <div class="journey">
+
+                <span>
+                    ${escapeHTML(asal)}
+                </span>
+
+                <span class="journey-arrow">
+                    →
+                </span>
+
+                <span>
+                    ${escapeHTML(tujuan)}
+                </span>
+
+            </div>
+
+
+            ${createTarifDetail(
+                mainTarif,
+                true
+            )}
+
+
+            ${alternativeHTML}
+
+        </article>
+
+    `;
+
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+function searchTarif(
+    asal,
+    tujuan
+) {
+
+    const asalNorm =
+        normalize(asal);
+
+    const tujuanNorm =
+        normalize(tujuan);
+
+
+    if (
+        !asalNorm ||
+        !tujuanNorm ||
+        asalNorm === tujuanNorm
+    ) {
+
+        return [];
+
+    }
+
+
+    const matches =
+        MASTER_TARIF.filter(
+            tarif => {
+
+                if (
+                    !isTarifActive(
+                        tarif
+                    )
+                ) {
+
+                    return false;
+
+                }
+
+
+                if (
+                    !isKAActive(
+                        tarif.idKA
+                    )
+                ) {
+
+                    return false;
+
+                }
+
+
+                if (
+                    getLowestFare(
+                        tarif
+                    ) === Infinity
+                ) {
+
+                    return false;
+
+                }
+
+
+                return routeIsCovered(
+                    tarif,
+                    asal,
+                    tujuan
+                );
+
+            }
         );
-    }
 
-    /* =====================================================
-       SUGGESTION ENGINE
-       ===================================================== */
 
-    function getStationSuggestions(keyword) {
-        const query = normalize(keyword);
+    const grouped =
+        new Map();
 
-        if (!query) {
-            return MASTER_STASIUN.slice(0, 8);
-        }
 
-        return MASTER_STASIUN
-            .filter(station => {
-                const name = normalize(
-                    station.NAMA_STASIUN
+    matches.forEach(
+        tarif => {
+
+            const namaKA =
+                getNamaKA(
+                    tarif.idKA
                 );
 
-                const code = normalize(
-                    station.KODE_STASIUN
+
+            const key =
+                normalize(
+                    namaKA
                 );
 
-                return (
-                    name.includes(query) ||
-                    code.includes(query)
+
+            if (
+                !grouped.has(key)
+            ) {
+
+                grouped.set(
+                    key,
+                    {
+
+                        namaKA,
+
+                        tarif: []
+
+                    }
                 );
-            })
-            .slice(0, 8);
-    }
 
-    function showSuggestions(input, container) {
-        if (!input || !container) {
-            return;
+            }
+
+
+            grouped
+                .get(key)
+                .tarif
+                .push(tarif);
+
         }
+    );
 
-        const keyword = input.value;
 
-        const stations =
-            getStationSuggestions(keyword);
+    grouped.forEach(
+        group => {
 
-        if (!stations.length) {
-            container.innerHTML = "";
-            container.hidden = true;
-            return;
-        }
+            group.tarif.sort(
+                (
+                    a,
+                    b
+                ) => {
 
-        container.innerHTML = stations
-            .map(station => `
-                <button
-                    type="button"
-                    class="suggestion-item"
-                    data-station-id="${escapeAttr(
-                        station.ID_STASIUN ||
-                        station.KODE_STASIUN ||
-                        station.NAMA_STASIUN
-                    )}"
-                >
+                    const fareA =
+                        getLowestFare(a);
 
-                    <span class="suggestion-main">
-                        ${escapeHTML(
-                            station.NAMA_STASIUN
-                        )}
-                    </span>
+                    const fareB =
+                        getLowestFare(b);
 
-                    ${
-                        station.KODE_STASIUN
-                            ? `
-                                <span class="suggestion-code">
-                                    ${escapeHTML(
-                                        station.KODE_STASIUN
-                                    )}
-                                </span>
-                              `
-                            : ""
+
+                    if (
+                        fareA !== fareB
+                    ) {
+
+                        return (
+                            fareA -
+                            fareB
+                        );
+
                     }
 
-                </button>
-            `)
+
+                    return (
+                        a.stations.length -
+                        b.stations.length
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+    const groups =
+        Array.from(
+            grouped.values()
+        );
+
+
+    groups.sort(
+        (
+            a,
+            b
+        ) => {
+
+            return (
+                getLowestFare(
+                    a.tarif[0]
+                ) -
+                getLowestFare(
+                    b.tarif[0]
+                )
+            );
+
+        }
+    );
+
+
+    return groups;
+
+}
+
+
+/* =========================================================
+   ENSURE RESULTS ELEMENT
+========================================================= */
+
+function ensureResultsElement() {
+
+    let el =
+        document.getElementById(
+            "results"
+        );
+
+
+    if (
+        el
+    ) {
+
+        resultsEl = el;
+
+        return el;
+
+    }
+
+
+    const home =
+        document.getElementById(
+            "page-home"
+        );
+
+
+    if (
+        !home
+    ) {
+
+        return null;
+
+    }
+
+
+    el =
+        document.createElement(
+            "div"
+        );
+
+
+    el.id =
+        "results";
+
+    el.className =
+        "results";
+
+
+    home.appendChild(
+        el
+    );
+
+
+    resultsEl =
+        el;
+
+
+    return el;
+
+}
+
+
+/* =========================================================
+   RENDER RESULTS
+========================================================= */
+
+function renderResults(
+    groups,
+    asal,
+    tujuan
+) {
+
+    const target =
+        ensureResultsElement();
+
+
+    if (
+        !target
+    ) {
+
+        return;
+
+    }
+
+
+    target.style.display =
+        "block";
+
+
+    if (
+        !groups ||
+        groups.length === 0
+    ) {
+
+        target.innerHTML = `
+
+            <div class="empty-state">
+
+                <div class="empty-symbol">
+                    ⌕
+                </div>
+
+                <h3>
+                    Tarif khusus tidak ditemukan
+                </h3>
+
+                <p>
+                    Belum ditemukan tarif khusus
+                    untuk perjalanan
+                    ${escapeHTML(asal)}
+                    →
+                    ${escapeHTML(tujuan)}.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    let html = `
+
+        <div class="results-heading">
+
+            <span>
+                Tarif Ditemukan
+            </span>
+
+            <span>
+                ${groups.length}
+                KA
+            </span>
+
+        </div>
+
+    `;
+
+
+    groups.forEach(
+        (
+            group,
+            index
+        ) => {
+
+            html +=
+                createKAGroupCard(
+                    group.namaKA,
+                    group.tarif,
+                    asal,
+                    tujuan,
+                    index
+                );
+
+        }
+    );
+
+
+    target.innerHTML =
+        html;
+
+}
+
+
+/* =========================================================
+   AUTOCOMPLETE
+========================================================= */
+
+function showSuggestions(
+    input,
+    container
+) {
+
+    if (
+        !input ||
+        !container
+    ) {
+
+        return;
+
+    }
+
+
+    const keyword =
+        normalize(
+            input.value
+        );
+
+
+    if (
+        !keyword
+    ) {
+
+        container.innerHTML =
+            "";
+
+        return;
+
+    }
+
+
+    const matches =
+        MASTER_STASIUN
+            .filter(
+                station => {
+
+                    if (
+                        !statusIsActive(
+                            station.aktif
+                        )
+                    ) {
+
+                        return false;
+
+                    }
+
+
+                    return normalize(
+                        station.namaStasiun
+                    ).includes(
+                        keyword
+                    );
+
+                }
+            )
+            .slice(
+                0,
+                8
+            );
+
+
+    if (
+        matches.length === 0
+    ) {
+
+        container.innerHTML =
+            "";
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+        matches
+            .map(
+                station => `
+
+                    <div
+                        class="suggestion-item"
+                        data-station="${escapeAttr(
+                            station.namaStasiun
+                        )}"
+                    >
+
+                        ${escapeHTML(
+                            station.namaStasiun
+                        )}
+
+                    </div>
+
+                `
+            )
             .join("");
 
-        container.hidden = false;
 
-        container
-            .querySelectorAll(".suggestion-item")
-            .forEach(button => {
+    container
+        .querySelectorAll(
+            ".suggestion-item"
+        )
+        .forEach(
+            item => {
 
-                button.addEventListener(
+                item.addEventListener(
                     "click",
                     () => {
 
-                        const station =
-                            findStation(
-                                button.dataset.stationId
-                            );
-
-                        if (!station) {
-                            return;
-                        }
-
                         input.value =
-                            station.NAMA_STASIUN;
+                            item.dataset.station;
 
-                        closeSuggestions();
+                        container.innerHTML =
+                            "";
+
+                        input.focus();
+
                     }
                 );
-            });
-    }
 
-    function closeSuggestions() {
-        [
-            asalSuggestions,
-            tujuanSuggestions
-        ].forEach(container => {
-
-            if (!container) {
-                return;
             }
+        );
 
-            container.hidden = true;
-            container.innerHTML = "";
-        });
+}
+
+
+/* =========================================================
+   CLOSE SUGGESTIONS
+========================================================= */
+
+function closeSuggestions() {
+
+    if (
+        asalSuggestions
+    ) {
+
+        asalSuggestions.innerHTML =
+            "";
+
     }
 
-    /* =====================================================
-       VALIDASI INPUT
-       ===================================================== */
 
-    function validateSearch() {
-        const origin =
-            clean(asalInput?.value);
+    if (
+        tujuanSuggestions
+    ) {
 
-        const destination =
-            clean(tujuanInput?.value);
+        tujuanSuggestions.innerHTML =
+            "";
 
-        if (!origin || !destination) {
-            setStatus(
-                "Silakan isi stasiun asal dan tujuan.",
-                "warning"
-            );
+    }
 
-            return null;
-        }
+}
+
+
+/* =========================================================
+   SEARCH BUTTON
+========================================================= */
+
+function performSearch() {
+
+    const asal =
+        clean(
+            asalInput?.value
+        );
+
+    const tujuan =
+        clean(
+            tujuanInput?.value
+        );
+
+
+    closeSuggestions();
+
+
+    if (
+        !asal ||
+        !tujuan
+    ) {
 
         if (
-            normalize(origin) ===
-            normalize(destination)
+            statusEl
         ) {
-            setStatus(
-                "Stasiun asal dan tujuan tidak boleh sama.",
-                "warning"
-            );
 
-            return null;
+            statusEl.textContent =
+                "Silakan pilih stasiun asal dan tujuan.";
+
         }
 
-        return {
-            origin,
-            destination
-        };
+
+        if (
+            resultsEl
+        ) {
+
+            resultsEl.innerHTML =
+                "";
+
+        }
+
+
+        return;
+
     }
 
-    /* =====================================================
-       PERFORM SEARCH
-       ===================================================== */
 
-    async function performSearch() {
-        if (isSearching) {
-            return;
+    if (
+        normalize(asal) ===
+        normalize(tujuan)
+    ) {
+
+        if (
+            statusEl
+        ) {
+
+            statusEl.textContent =
+                "Stasiun asal dan tujuan tidak boleh sama.";
+
         }
 
-        const query = validateSearch();
 
-        if (!query) {
-            return;
+        if (
+            resultsEl
+        ) {
+
+            resultsEl.innerHTML =
+                "";
+
         }
 
-        if (!isDataLoaded) {
-            setStatus(
-                "Data sedang dimuat. Silakan tunggu sebentar.",
-                "loading"
-            );
 
-            return;
+        return;
+
+    }
+
+
+    if (
+        MASTER_TARIF.length === 0
+    ) {
+
+        if (
+            statusEl
+        ) {
+
+            statusEl.textContent =
+                "Database tarif belum siap. Silakan coba lagi.";
+
         }
 
-        isSearching = true;
 
-        closeSuggestions();
+        return;
 
-        if (results) {
-            results.innerHTML = `
-                <div class="result-loading">
+    }
 
-                    <div class="result-spinner"></div>
 
-                    <div>
-                        Mencari tarif khusus...
-                    </div>
+    if (
+        statusEl
+    ) {
 
-                </div>
-            `;
-        }
+        statusEl.textContent =
+            "Mencari tarif khusus...";
 
-        setStatus(
-            "Mencari tarif khusus...",
-            "loading"
-        );
+    }
 
-        /*
-         * Sedikit delay agar loading state terlihat natural
-         * dan UI tidak terasa freeze.
-         */
-        await new Promise(resolve =>
-            requestAnimationFrame(resolve)
-        );
 
-        try {
-            const groups = searchTarif(
-                query.origin,
-                query.destination
-            );
+    setTimeout(
+        () => {
+
+            const groups =
+                searchTarif(
+                    asal,
+                    tujuan
+                );
+
+
+            if (
+                statusEl
+            ) {
+
+                statusEl.textContent =
+                    groups.length > 0
+                        ? (
+                            "Ditemukan " +
+                            groups.length +
+                            " KA dengan tarif khusus."
+                        )
+                        : "Tidak ditemukan tarif khusus.";
+
+            }
+
 
             renderResults(
                 groups,
-                query.origin,
-                query.destination
+                asal,
+                tujuan
             );
 
-            /*
-             * Scroll ke hasil pada mobile.
-             */
-            if (results && groups.length) {
-                setTimeout(() => {
-                    results.scrollIntoView({
-                        behavior: "smooth",
-                        block: "start"
-                    });
-                }, 80);
-            }
+        },
+        80
+    );
 
-        } catch (error) {
+}
 
-            console.error(
-                "[TARSUS] Search error:",
-                error
-            );
 
-            if (results) {
-                results.innerHTML = `
-                    <div class="result-empty">
+/* =========================================================
+   SWAP
+========================================================= */
 
-                        <div class="result-empty-icon">
-                            ⚠️
-                        </div>
+function swapStations() {
 
-                        <div class="result-empty-title">
-                            Terjadi kesalahan
-                        </div>
+    if (
+        !asalInput ||
+        !tujuanInput
+    ) {
 
-                        <div class="result-empty-text">
-                            Pencarian tidak dapat diproses.
-                            Silakan coba lagi.
-                        </div>
+        return;
 
-                    </div>
-                `;
-            }
-
-            setStatus(
-                "Terjadi kesalahan saat mencari data.",
-                "error"
-            );
-
-        } finally {
-            isSearching = false;
-        }
     }
 
-    /* =====================================================
-       SWAP
-       ===================================================== */
 
-    function swapStations() {
-        if (!asalInput || !tujuanInput) {
-            return;
-        }
+    const oldAsal =
+        asalInput.value;
 
-        const oldOrigin = asalInput.value;
 
-        asalInput.value =
-            tujuanInput.value;
+    asalInput.value =
+        tujuanInput.value;
 
-        tujuanInput.value =
-            oldOrigin;
+    tujuanInput.value =
+        oldAsal;
 
-        closeSuggestions();
 
-        /*
-         * Jika keduanya sudah terisi, langsung cari ulang.
-         */
-        if (
-            clean(asalInput.value) &&
-            clean(tujuanInput.value) &&
-            isDataLoaded
-        ) {
-            performSearch();
-        }
+    closeSuggestions();
+
+
+    if (
+        clean(asalInput.value) &&
+        clean(tujuanInput.value)
+    ) {
+
+        performSearch();
+
     }
 
-    /* =====================================================
-       ENTER HANDLER
-       ===================================================== */
+}
 
-    function handleEnter(event) {
-        if (event.key !== "Enter") {
-            return;
-        }
+
+/* =========================================================
+   ENTER
+========================================================= */
+
+function handleEnter(
+    event
+) {
+
+    if (
+        event.key === "Enter"
+    ) {
 
         event.preventDefault();
 
         performSearch();
+
     }
 
-    /* =====================================================
-       DYNAMIC STYLE UNTUK SUGGESTION
-       ===================================================== */
+}
 
-    function injectDynamicStyles() {
-        if (document.getElementById("tarsus-data-styles")) {
-            return;
+
+/* =========================================================
+   EVENT BINDING
+========================================================= */
+
+function bindEvents() {
+
+    if (
+        asalInput
+    ) {
+
+        asalInput.addEventListener(
+            "input",
+            () => {
+
+                showSuggestions(
+                    asalInput,
+                    asalSuggestions
+                );
+
+            }
+        );
+
+
+        asalInput.addEventListener(
+            "keydown",
+            handleEnter
+        );
+
+    }
+
+
+    if (
+        tujuanInput
+    ) {
+
+        tujuanInput.addEventListener(
+            "input",
+            () => {
+
+                showSuggestions(
+                    tujuanInput,
+                    tujuanSuggestions
+                );
+
+            }
+        );
+
+
+        tujuanInput.addEventListener(
+            "keydown",
+            handleEnter
+        );
+
+    }
+
+
+    if (
+        searchBtn
+    ) {
+
+        searchBtn.addEventListener(
+            "click",
+            performSearch
+        );
+
+    }
+
+
+    if (
+        swapBtn
+    ) {
+
+        swapBtn.addEventListener(
+            "click",
+            swapStations
+        );
+
+    }
+
+
+    document.addEventListener(
+        "click",
+        event => {
+
+            if (
+                !event.target.closest(
+                    ".input-wrap"
+                )
+            ) {
+
+                closeSuggestions();
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   UPDATE DATABASE STATUS
+========================================================= */
+
+function updateDatabaseStatus(
+    text
+) {
+
+    const el =
+        document.getElementById(
+            "databaseStatus"
+        );
+
+
+    if (
+        el
+    ) {
+
+        el.textContent =
+            text;
+
+    }
+
+}
+
+
+/* =========================================================
+   LOAD DATA
+========================================================= */
+
+async function loadData() {
+
+    try {
+
+        if (
+            statusEl
+        ) {
+
+            statusEl.textContent =
+                "Menghubungkan ke database tarif...";
+
         }
 
-        const style = document.createElement("style");
 
-        style.id = "tarsus-data-styles";
+        if (
+            window.TARSUS_UI
+        ) {
 
-        style.textContent = `
-            .suggestion-item {
-                width: 100%;
-                border: 0;
-                background: transparent;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: 12px;
-                padding: 12px 14px;
-                text-align: left;
-                cursor: pointer;
-                color: inherit;
-                font: inherit;
-            }
+            window.TARSUS_UI
+                .setSplashStatus(
+                    "Memuat database..."
+                );
 
-            .suggestion-item:hover {
-                background: rgba(0,0,0,.05);
-            }
+        }
 
-            [data-theme="dark"] .suggestion-item:hover {
-                background: rgba(255,255,255,.06);
-            }
 
-            .suggestion-main {
-                font-weight: 700;
-            }
+        /*
+           Ambil 3 database bersamaan.
+        */
 
-            .suggestion-code {
-                font-size: .78rem;
-                opacity: .6;
-                font-weight: 700;
-            }
+        const [
+            kaCSV,
+            tarifCSV,
+            stasiunCSV
+        ] = await Promise.all([
 
-            .ka-code {
-                font-size: .75rem;
-                font-weight: 800;
-                opacity: .6;
-            }
+            loadSheet(
+                SHEETS.ka
+            ),
 
-            .route-fallback {
-                margin-top: 10px;
-            }
+            loadSheet(
+                SHEETS.tarif
+            ),
 
-            .alternative-note {
-                margin-top: 3px;
-                font-size: .76rem;
-                opacity: .65;
-            }
+            loadSheet(
+                SHEETS.stasiun
+            )
 
-            .tariff-main {
-                margin-top: 14px;
-            }
-        `;
+        ]);
 
-        document.head.appendChild(style);
-    }
 
-    /* =====================================================
-       DEBUG INFO
-       ===================================================== */
+        MASTER_KA =
+            parseMasterKA(
+                kaCSV
+            );
 
-    function debugData() {
-        console.group(
-            "%cTARSUS FINDER DATA",
-            "font-weight:bold"
+
+        MASTER_TARIF =
+            parseMasterTarif(
+                tarifCSV
+            );
+
+
+        MASTER_STASIUN =
+            parseMasterStasiun(
+                stasiunCSV
+            );
+
+
+        updateDatabaseStatus(
+            "Siap digunakan"
+        );
+
+
+        if (
+            statusEl
+        ) {
+
+            statusEl.textContent =
+                "Database tarif siap digunakan.";
+
+        }
+
+
+        if (
+            window.TARSUS_UI
+        ) {
+
+            window.TARSUS_UI
+                .setSplashStatus(
+                    "Aplikasi siap"
+                );
+
+            /*
+               Tidak perlu menunggu lebih lama.
+            */
+
+            window.TARSUS_UI
+                .hideSplash();
+
+        }
+
+
+        console.log(
+            "================================"
+        );
+
+        console.log(
+            "TARSUS FINDER — DATABASE LOADED"
         );
 
         console.log(
@@ -1693,281 +2493,160 @@
         );
 
         console.log(
-            "STATION_INDEX:",
-            STATION_INDEX.size
+            "================================"
         );
 
-        console.log(
-            "VERSION:",
-            VERSION
+
+    } catch (error) {
+
+        console.error(
+            "TARSUS FINDER ERROR:",
+            error
         );
 
-        console.groupEnd();
-    }
 
-    /* =====================================================
-       LOAD ALL DATA
-       ===================================================== */
-
-    async function loadData() {
-        splashStatus(
-            "Menghubungkan ke database..."
+        updateDatabaseStatus(
+            "Gagal dimuat"
         );
 
-        try {
-            const [
-                kaRows,
-                tarifRows,
-                stasiunRows
-            ] = await Promise.all([
-                fetchSheet(SHEETS.ka),
-                fetchSheet(SHEETS.tarif),
-                fetchSheet(SHEETS.stasiun)
-            ]);
 
-            splashStatus(
-                "Memproses data..."
-            );
+        if (
+            statusEl
+        ) {
 
-            MASTER_KA =
-                parseMasterKA(kaRows);
+            statusEl.textContent =
+                "Database belum dapat dimuat. Periksa koneksi atau Google Sheet.";
 
-            MASTER_TARIF =
-                parseMasterTarif(tarifRows);
+        }
 
-            MASTER_STASIUN =
-                parseMasterStasiun(stasiunRows);
 
-            buildStationIndex();
+        const target =
+            ensureResultsElement();
 
-            isDataLoaded = true;
 
-            debugData();
+        if (
+            target
+        ) {
 
-            splashStatus(
-                "Database siap."
-            );
+            target.innerHTML = `
 
-            setStatus(
-                `${MASTER_STASIUN.length} stasiun siap dicari.`,
-                "success"
-            );
+                <div class="empty-state">
 
-            /*
-             * Sedikit waktu agar splash tidak terasa
-             * langsung hilang secara kasar.
-             */
-            setTimeout(() => {
-
-                if (
-                    window.TARSUS_UI &&
-                    typeof window.TARSUS_UI.finishSplash ===
-                        "function"
-                ) {
-                    window.TARSUS_UI.finishSplash();
-                }
-
-            }, 350);
-
-        } catch (error) {
-
-            console.error(
-                "[TARSUS] Gagal memuat database:",
-                error
-            );
-
-            isDataLoaded = false;
-
-            splashStatus(
-                "Gagal memuat database."
-            );
-
-            setStatus(
-                "Database tidak dapat dimuat. Periksa koneksi atau akses Google Sheet.",
-                "error"
-            );
-
-            if (results) {
-                results.innerHTML = `
-                    <div class="result-empty">
-
-                        <div class="result-empty-icon">
-                            ⚠️
-                        </div>
-
-                        <div class="result-empty-title">
-                            Database belum tersedia
-                        </div>
-
-                        <div class="result-empty-text">
-                            TARSUS Finder tidak dapat
-                            mengambil data dari Google Sheet.
-                            Silakan periksa koneksi internet
-                            dan akses spreadsheet.
-                        </div>
-
+                    <div class="empty-symbol">
+                        !
                     </div>
-                `;
-            }
 
-            /*
-             * Jangan biarkan splash menggantung selamanya
-             * ketika database gagal.
-             */
-            setTimeout(() => {
+                    <h3>
+                        Database belum tersedia
+                    </h3>
 
-                if (
-                    window.TARSUS_UI &&
-                    typeof window.TARSUS_UI.finishSplash ===
-                        "function"
-                ) {
-                    window.TARSUS_UI.finishSplash();
-                }
+                    <p>
+                        Aplikasi tetap dapat dibuka,
+                        tetapi pencarian tarif belum
+                        dapat digunakan sampai database
+                        berhasil dimuat.
+                    </p>
 
-            }, 1200);
+                </div>
+
+            `;
+
         }
+
+
+        /*
+           Sangat penting:
+           error database TIDAK boleh membuat
+           aplikasi tertahan di splash.
+        */
+
+        if (
+            window.TARSUS_UI
+        ) {
+
+            window.TARSUS_UI
+                .setSplashStatus(
+                    "Aplikasi siap"
+                );
+
+            window.TARSUS_UI
+                .hideSplash();
+
+        }
+
     }
 
-    /* =====================================================
-       EVENT BINDING
-       ===================================================== */
+}
 
-    function bindEvents() {
-        injectDynamicStyles();
 
-        if (searchBtn) {
-            searchBtn.addEventListener(
-                "click",
-                performSearch
-            );
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+function initializeTarsus() {
+
+    initElements();
+
+    bindEvents();
+
+    /*
+       Load database setelah UI siap.
+    */
+
+    loadData();
+
+}
+
+
+/*
+   DOMContentLoaded aman untuk browser
+   maupun TWA Android.
+*/
+
+if (
+    document.readyState ===
+    "loading"
+) {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        initializeTarsus,
+        {
+            once: true
         }
+    );
 
-        if (swapBtn) {
-            swapBtn.addEventListener(
-                "click",
-                swapStations
-            );
-        }
+} else {
 
-        if (asalInput) {
+    initializeTarsus();
 
-            asalInput.addEventListener(
-                "input",
-                () => {
-                    showSuggestions(
-                        asalInput,
-                        asalSuggestions
-                    );
-                }
-            );
+}
 
-            asalInput.addEventListener(
-                "focus",
-                () => {
-                    showSuggestions(
-                        asalInput,
-                        asalSuggestions
-                    );
-                }
-            );
 
-            asalInput.addEventListener(
-                "keydown",
-                handleEnter
-            );
-        }
+/* =========================================================
+   PUBLIC API
+   ---------------------------------------------------------
+   Berguna untuk debugging dari console.
+========================================================= */
 
-        if (tujuanInput) {
+window.TARSUS_DATA = {
 
-            tujuanInput.addEventListener(
-                "input",
-                () => {
-                    showSuggestions(
-                        tujuanInput,
-                        tujuanSuggestions
-                    );
-                }
-            );
+    get MASTER_KA() {
+        return MASTER_KA;
+    },
 
-            tujuanInput.addEventListener(
-                "focus",
-                () => {
-                    showSuggestions(
-                        tujuanInput,
-                        tujuanSuggestions
-                    );
-                }
-            );
+    get MASTER_TARIF() {
+        return MASTER_TARIF;
+    },
 
-            tujuanInput.addEventListener(
-                "keydown",
-                handleEnter
-            );
-        }
+    get MASTER_STASIUN() {
+        return MASTER_STASIUN;
+    },
 
-        document.addEventListener(
-            "click",
-            event => {
+    searchTarif,
 
-                const insideOrigin =
-                    asalInput?.contains(event.target) ||
-                    asalSuggestions?.contains(event.target);
+    performSearch,
 
-                const insideDestination =
-                    tujuanInput?.contains(event.target) ||
-                    tujuanSuggestions?.contains(event.target);
+    formatRupiah
 
-                if (
-                    !insideOrigin &&
-                    !insideDestination
-                ) {
-                    closeSuggestions();
-                }
-            }
-        );
-    }
-
-    /* =====================================================
-       PUBLIC API
-       ===================================================== */
-
-    window.TARSUS_DATA = {
-        getKA,
-        getNamaKA,
-        findStation,
-        searchTarif,
-        formatRupiah,
-        isDataLoaded: () => isDataLoaded,
-
-        getAllKA: () =>
-            [...MASTER_KA],
-
-        getAllTarif: () =>
-            [...MASTER_TARIF],
-
-        getAllStasiun: () =>
-            [...MASTER_STASIUN]
-    };
-
-    /* =====================================================
-       START
-       ===================================================== */
-
-    function init() {
-        bindEvents();
-        loadData();
-    }
-
-    if (
-        document.readyState === "loading"
-    ) {
-        document.addEventListener(
-            "DOMContentLoaded",
-            init,
-            { once: true }
-        );
-    } else {
-        init();
-    }
-
-})();
+};
