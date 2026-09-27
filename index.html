@@ -1,1 +1,3693 @@
+<!DOCTYPE html>
+<html lang="id">
 
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>TARSUS FINDER — KAI 121</title>
+
+
+    <!-- FONT -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <style>
+
+        /* =====================================================
+           COLOR SYSTEM
+           HANYA WARNA YANG DIUBAH
+        ===================================================== */
+
+        :root {
+
+            --navy-deep: #102536;
+            --navy: #17384b;
+            --navy-light: #21536a;
+            --navy-card: #1b4053;
+
+            --orange: #d98282;
+            --gold: #e4c783;
+            --amber: #d8b66a;
+
+            --kai-red: #c76568;
+            --kai-red-light: #d98282;
+
+            --kai-white: #f5f8f8;
+
+            --kai-green: #6fa783;
+            --kai-green-light: #8bba9a;
+
+            --white: #f4f8f8;
+            --soft: #cbd9dc;
+            --muted: #8fa9b1;
+
+            --border:
+                rgba(213,236,236,.13);
+
+            --orange-border:
+                rgba(216,182,106,.22);
+        }
+
+
+        /* =====================================================
+           RESET
+        ===================================================== */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+
+        body {
+
+            min-height: 100vh;
+
+            color: var(--white);
+
+            font-family:
+                "DM Sans",
+                sans-serif;
+
+            overflow-x: hidden;
+
+            background:
+
+                radial-gradient(
+                    circle at 50% -15%,
+                    rgba(111,175,193,.26),
+                    transparent 31%
+                ),
+
+                radial-gradient(
+                    circle at 0% 50%,
+                    rgba(79,159,150,.20),
+                    transparent 32%
+                ),
+
+                radial-gradient(
+                    circle at 100% 75%,
+                    rgba(111,167,131,.13),
+                    transparent 30%
+                ),
+
+                linear-gradient(
+                    145deg,
+                    var(--navy-deep),
+                    var(--navy) 48%,
+                    #102b3c
+                );
+        }
+
+
+        /* =====================================================
+           BACKGROUND GRID
+        ===================================================== */
+
+        body::before {
+
+            content: "";
+
+            position: fixed;
+
+            inset: 0;
+
+            pointer-events: none;
+
+            opacity: .45;
+
+            background-image:
+
+                linear-gradient(
+                    rgba(220,242,242,.025) 1px,
+                    transparent 1px
+                ),
+
+                linear-gradient(
+                    90deg,
+                    rgba(220,242,242,.025) 1px,
+                    transparent 1px
+                );
+
+            background-size:
+                48px 48px;
+
+            mask-image:
+                linear-gradient(
+                    to bottom,
+                    black,
+                    transparent 88%
+                );
+
+            z-index: -10;
+        }
+
+
+        /* =====================================================
+           FLOATING ORNAMENT
+        ===================================================== */
+
+        .bg-orbit {
+
+            position: fixed;
+
+            width: 470px;
+            height: 470px;
+
+            top: -260px;
+            right: -220px;
+
+            border:
+                1px solid
+                rgba(228,199,131,.10);
+
+            border-radius: 50%;
+
+            pointer-events: none;
+
+            z-index: -3;
+
+            animation:
+                orbitSpin
+                22s
+                linear
+                infinite;
+        }
+
+
+        .bg-orbit::before {
+
+            content: "";
+
+            position: absolute;
+
+            inset: 50px;
+
+            border:
+                1px solid
+                rgba(228,199,131,.065);
+
+            border-radius: 50%;
+        }
+
+
+        .bg-orbit::after {
+
+            content: "";
+
+            position: absolute;
+
+            inset: 105px;
+
+            border:
+                1px solid
+                rgba(139,186,154,.055);
+
+            border-radius: 50%;
+        }
+
+
+        /* =====================================================
+           SPLASH SCREEN
+        ===================================================== */
+
+        .splash {
+
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 9999;
+
+            overflow: hidden;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background:
+
+                radial-gradient(
+                    ellipse at 50% 25%,
+                    rgba(111,175,193,.32),
+                    transparent 40%
+                ),
+
+                radial-gradient(
+                    ellipse at 15% 80%,
+                    rgba(111,167,131,.20),
+                    transparent 35%
+                ),
+
+                radial-gradient(
+                    ellipse at 85% 70%,
+                    rgba(199,101,104,.13),
+                    transparent 30%
+                ),
+
+                linear-gradient(
+                    135deg,
+                    #123247 0%,
+                    #1b5063 45%,
+                    #1d5960 70%,
+                    #143749 100%
+                );
+
+            animation:
+                splashExit
+                4s
+                cubic-bezier(.65,0,.35,1)
+                forwards;
+        }
+
+
+        /* =====================================================
+           SPLASH GRID
+        ===================================================== */
+
+        .splash::before {
+
+            content: "";
+
+            position: absolute;
+
+            inset: 0;
+
+            opacity: .22;
+
+            background-image:
+
+                linear-gradient(
+                    rgba(255,255,255,.045) 1px,
+                    transparent 1px
+                ),
+
+                linear-gradient(
+                    90deg,
+                    rgba(255,255,255,.045) 1px,
+                    transparent 1px
+                );
+
+            background-size:
+                55px 55px;
+
+            mask-image:
+                radial-gradient(
+                    ellipse at center,
+                    black 15%,
+                    transparent 78%
+                );
+        }
+
+
+        /* =====================================================
+           SPLASH LIGHT
+        ===================================================== */
+
+        .splash-light {
+
+            position: absolute;
+
+            width: 470px;
+            height: 470px;
+
+            left: 50%;
+            top: 40%;
+
+            transform:
+                translate(-50%, -50%);
+
+            border-radius: 50%;
+
+            background:
+
+                radial-gradient(
+                    circle,
+                    rgba(228,199,131,.13),
+                    rgba(111,183,167,.09) 35%,
+                    transparent 68%
+                );
+
+            filter:
+                blur(8px);
+
+            animation:
+                splashPulse
+                3.4s
+                ease-in-out
+                infinite;
+        }
+
+
+        /* =====================================================
+           SPLASH CONTENT
+        ===================================================== */
+
+        .splash-content {
+
+            position: relative;
+
+            z-index: 10;
+
+            width: 100%;
+
+            text-align: center;
+
+            transform:
+                translateY(-45px);
+        }
+
+
+        /* =====================================================
+           SPLASH KAI
+        ===================================================== */
+
+        .splash-kai {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            margin-bottom: 15px;
+
+            color: #edf6f5;
+
+            font-family:
+                Manrope,
+                sans-serif;
+
+            font-size: 11px;
+
+            font-weight: 800;
+
+            letter-spacing: .32em;
+
+            opacity: 0;
+
+            animation:
+                splashKai
+                .7s
+                .15s
+                ease-out
+                forwards;
+        }
+
+
+        .splash-kai::before,
+        .splash-kai::after {
+
+            content: "";
+
+            width: 35px;
+
+            height: 1px;
+
+            background:
+
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(228,199,131,.85)
+                );
+        }
+
+
+        .splash-kai::after {
+
+            background:
+
+                linear-gradient(
+                    90deg,
+                    rgba(228,199,131,.85),
+                    transparent
+                );
+        }
+
+
+        /* =====================================================
+           SPLASH TITLE
+        ===================================================== */
+
+        .splash-title {
+
+            position: relative;
+
+            font-family:
+                Manrope,
+                sans-serif;
+
+            font-size:
+                clamp(
+                    28px,
+                    6vw,
+                    48px
+                );
+
+            line-height: 1;
+
+            font-weight: 800;
+
+            letter-spacing: .09em;
+
+            color: #f4f8f7;
+
+            opacity: 0;
+
+            transform:
+                translateY(12px)
+                scale(.97);
+
+            animation:
+
+                splashTitle
+                .9s
+                .4s
+                cubic-bezier(.2,.8,.2,1)
+                forwards;
+        }
+
+
+        .splash-title::after {
+
+            content: "";
+
+            position: absolute;
+
+            left: 28%;
+
+            right: 28%;
+
+            bottom: -12px;
+
+            height: 1px;
+
+            background:
+
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(228,199,131,.75),
+                    rgba(139,186,154,.7),
+                    transparent
+                );
+
+            opacity: .8;
+        }
+
+
+        /* =====================================================
+           SPLASH SUBTITLE
+        ===================================================== */
+
+        .splash-subtitle {
+
+            margin-top: 27px;
+
+            color:
+                rgba(235,246,245,.78);
+
+            font-size: 10px;
+
+            letter-spacing: .16em;
+
+            text-transform: uppercase;
+
+            opacity: 0;
+
+            animation:
+
+                splashSubtitle
+                .8s
+                .8s
+                ease-out
+                forwards;
+        }
+
+
+        /* =====================================================
+           SPLASH STATUS
+        ===================================================== */
+
+        .splash-status {
+
+            margin-top: 12px;
+
+            color:
+                rgba(228,199,131,.80);
+
+            font-size: 8px;
+
+            font-weight: 700;
+
+            letter-spacing: .22em;
+
+            text-transform: uppercase;
+
+            opacity: 0;
+
+            animation:
+                splashStatus
+                .7s
+                1.1s
+                ease-out
+                forwards;
+        }
+
+
+        /* =====================================================
+           SPEED LINES
+        ===================================================== */
+
+        .speed-lines {
+
+            position: absolute;
+
+            left: 0;
+            right: 0;
+
+            bottom: 16%;
+
+            height: 60px;
+
+            overflow: hidden;
+
+            opacity: .25;
+        }
+
+
+        .speed-lines span {
+
+            position: absolute;
+
+            height: 1px;
+
+            border-radius: 50%;
+
+            background:
+
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(222,240,240,.45),
+                    transparent
+                );
+
+            animation:
+                speedLine
+                3.4s
+                linear
+                infinite;
+        }
+
+
+        .speed-lines span:nth-child(1) {
+            width: 100px;
+            top: 12px;
+            animation-delay: -.3s;
+        }
+
+        .speed-lines span:nth-child(2) {
+            width: 150px;
+            top: 25px;
+            animation-delay: -1.2s;
+        }
+
+        .speed-lines span:nth-child(3) {
+            width: 80px;
+            top: 39px;
+            animation-delay: -2s;
+        }
+
+        .speed-lines span:nth-child(4) {
+            width: 120px;
+            top: 51px;
+            animation-delay: -.8s;
+        }
+
+        .speed-lines span:nth-child(5) {
+            width: 70px;
+            top: 57px;
+            animation-delay: -1.8s;
+        }
+
+
+        /* =====================================================
+           SPLASH TRAIN AREA
+        ===================================================== */
+
+        .splash-track {
+
+            position: absolute;
+
+            left: 0;
+            right: 0;
+
+            bottom: 10%;
+
+            height: 70px;
+
+            overflow: hidden;
+        }
+
+
+        .splash-track::before {
+
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+            right: 0;
+
+            bottom: 8px;
+
+            height: 2px;
+
+            background:
+
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(235,246,245,.18) 15%,
+                    rgba(228,199,131,.48) 50%,
+                    rgba(235,246,245,.18) 85%,
+                    transparent
+                );
+
+            box-shadow:
+                0 4px 0
+                rgba(235,246,245,.035);
+        }
+
+
+        .splash-track::after {
+
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+            right: 0;
+
+            bottom: 0;
+
+            height: 22px;
+
+            background:
+
+                linear-gradient(
+                    to top,
+                    rgba(16,42,58,.65),
+                    transparent
+                );
+        }
+
+
+        /* =====================================================
+           SPLASH TRAIN
+        ===================================================== */
+
+        .splash-train {
+
+            position: absolute;
+
+            left: -260px;
+
+            bottom: 12px;
+
+            width: 230px;
+
+            height: 38px;
+
+            animation:
+
+                splashTrainMove
+                3.3s
+                .2s
+                cubic-bezier(.42,0,.58,1)
+                forwards;
+        }
+
+
+        /* =====================================================
+           COACH
+        ===================================================== */
+
+        .splash-coach {
+
+            position: absolute;
+
+            bottom: 8px;
+
+            width: 40px;
+
+            height: 14px;
+
+            border-radius:
+                3px 4px 2px 2px;
+
+            background:
+
+                linear-gradient(
+                    to bottom,
+                    #f6faf9 0%,
+                    #edf4f3 34%,
+                    #c76568 35%,
+                    #c76568 47%,
+                    #e6edec 48%,
+                    #c8d5d6 100%
+                );
+
+            border:
+                1px solid
+                rgba(255,255,255,.48);
+
+            box-shadow:
+
+                0 3px 8px
+                rgba(0,0,0,.28);
+        }
+
+
+        .splash-coach::before {
+
+            content: "";
+
+            position: absolute;
+
+            left: 4px;
+
+            top: 3px;
+
+            width: 6px;
+
+            height: 4px;
+
+            border-radius: 1px;
+
+            background:
+                #23485b;
+
+            box-shadow:
+
+                9px 0 0 #23485b,
+                18px 0 0 #23485b,
+                27px 0 0 #23485b;
+        }
+
+
+        .splash-coach::after {
+
+            content: "";
+
+            position: absolute;
+
+            left: 3px;
+            right: 3px;
+
+            bottom: 2px;
+
+            height: 1px;
+
+            border-radius: 3px;
+
+            background:
+                rgba(111,167,131,.9);
+        }
+
+
+        .splash-coach.one {
+            left: 0;
+        }
+
+        .splash-coach.two {
+            left: 43px;
+        }
+
+        .splash-coach.three {
+            left: 86px;
+        }
+
+        .splash-coach.four {
+            left: 129px;
+        }
+
+
+        /* =====================================================
+           COUPLER
+        ===================================================== */
+
+        .splash-coupler {
+
+            position: absolute;
+
+            bottom: 11px;
+
+            width: 4px;
+
+            height: 2px;
+
+            border-radius: 2px;
+
+            background:
+                #71868b;
+        }
+
+
+        .splash-coupler.one {
+            left: 39px;
+        }
+
+        .splash-coupler.two {
+            left: 82px;
+        }
+
+        .splash-coupler.three {
+            left: 125px;
+        }
+
+        .splash-coupler.four {
+            left: 168px;
+        }
+
+
+        /* =====================================================
+           LOCOMOTIVE
+        ===================================================== */
+
+        .splash-loco {
+
+            position: absolute;
+
+            left: 173px;
+
+            bottom: 8px;
+
+            width: 57px;
+
+            height: 22px;
+        }
+
+
+        .splash-loco-body {
+
+            position: absolute;
+
+            left: 0;
+
+            bottom: 0;
+
+            width: 51px;
+
+            height: 14px;
+
+            border-radius:
+                3px 4px 2px 2px;
+
+            background:
+
+                linear-gradient(
+                    to bottom,
+                    #f7faf9 0%,
+                    #edf4f3 27%,
+                    #c76568 28%,
+                    #c76568 43%,
+                    #dce6e5 44%,
+                    #c3d0d1 100%
+                );
+
+            border:
+                1px solid
+                rgba(255,255,255,.52);
+
+            box-shadow:
+                0 3px 9px
+                rgba(0,0,0,.32);
+        }
+
+
+        .splash-loco-body::after {
+
+            content: "";
+
+            position: absolute;
+
+            left: 3px;
+
+            right: 5px;
+
+            bottom: 2px;
+
+            height: 1px;
+
+            border-radius: 3px;
+
+            background:
+                var(--kai-green);
+        }
+
+
+        .splash-loco-cabin {
+
+            position: absolute;
+
+            left: 11px;
+
+            bottom: 13px;
+
+            width: 23px;
+
+            height: 11px;
+
+            border-radius:
+                3px 3px 0 0;
+
+            background:
+
+                linear-gradient(
+                    135deg,
+                    #f7faf9,
+                    #e2ebea
+                );
+
+            border:
+                1px solid
+                rgba(255,255,255,.55);
+
+            z-index: 3;
+        }
+
+
+        .splash-loco-cabin::before {
+
+            content: "";
+
+            position: absolute;
+
+            left: 3px;
+
+            top: 3px;
+
+            width: 6px;
+
+            height: 4px;
+
+            border-radius: 1px;
+
+            background:
+                #23485b;
+
+            box-shadow:
+                9px 0 0 #23485b;
+
+            border:
+                1px solid
+                rgba(111,167,131,.5);
+        }
+
+
+        .splash-loco-roof {
+
+            position: absolute;
+
+            left: 9px;
+
+            bottom: 23px;
+
+            width: 27px;
+
+            height: 2px;
+
+            border-radius: 5px;
+
+            background:
+                #c8d6d6;
+
+            z-index: 4;
+        }
+
+
+        .splash-loco-nose {
+
+            position: absolute;
+
+            right: 0;
+
+            bottom: 0;
+
+            width: 17px;
+
+            height: 15px;
+
+            border-radius:
+                0 4px 3px 0;
+
+            background:
+
+                linear-gradient(
+                    to bottom,
+                    #f7faf9 0%,
+                    #edf4f3 30%,
+                    #c76568 31%,
+                    #c76568 47%,
+                    #d1dcdd 48%,
+                    #bac9ca 100%
+                );
+
+            clip-path:
+                polygon(
+                    0 0,
+                    62% 8%,
+                    100% 50%,
+                    62% 92%,
+                    0 100%
+                );
+
+            z-index: 5;
+        }
+
+
+        .splash-loco-light {
+
+            position: absolute;
+
+            right: 1px;
+
+            bottom: 7px;
+
+            width: 4px;
+
+            height: 4px;
+
+            border-radius: 50%;
+
+            background:
+                #fff9d8;
+
+            box-shadow:
+                0 0 5px
+                rgba(255,232,151,.9),
+
+                0 0 10px
+                rgba(228,199,131,.45);
+
+            z-index: 8;
+        }
+
+
+        .splash-chimney {
+
+            position: absolute;
+
+            left: 38px;
+
+            bottom: 22px;
+
+            width: 4px;
+
+            height: 8px;
+
+            border-radius:
+                2px 2px 1px 1px;
+
+            background:
+                #75878a;
+
+            z-index: 4;
+        }
+
+
+        .splash-chimney::before {
+
+            content: "";
+
+            position: absolute;
+
+            left: -2px;
+
+            top: -2px;
+
+            width: 8px;
+
+            height: 2px;
+
+            border-radius: 5px;
+
+            background:
+                #687b7f;
+        }
+
+
+        /* =====================================================
+           TRAIN WHEELS
+        ===================================================== */
+
+        .splash-wheel {
+
+            position: absolute;
+
+            bottom: -3px;
+
+            width: 8px;
+
+            height: 8px;
+
+            border-radius: 50%;
+
+            background:
+
+                radial-gradient(
+                    circle,
+                    #e8eeee 0 15%,
+                    #6d7f83 16% 35%,
+                    #273b45 36% 65%,
+                    #152630 66%
+                );
+
+            border:
+                1px solid
+                rgba(255,255,255,.42);
+
+            z-index: 10;
+
+            animation:
+                splashWheel
+                .65s
+                linear
+                infinite;
+        }
+
+
+        .splash-wheel.w1 {
+            left: 7px;
+        }
+
+        .splash-wheel.w2 {
+            left: 28px;
+        }
+
+        .splash-wheel.w3 {
+            left: 50px;
+        }
+
+        .splash-wheel.w4 {
+            left: 71px;
+        }
+
+        .splash-wheel.w5 {
+            left: 92px;
+        }
+
+        .splash-wheel.w6 {
+            left: 113px;
+        }
+
+        .splash-wheel.w7 {
+            left: 134px;
+        }
+
+        .splash-wheel.w8 {
+            left: 155px;
+        }
+
+        .splash-wheel.w9 {
+            left: 181px;
+        }
+
+        .splash-wheel.w10 {
+            left: 201px;
+        }
+
+
+        /* =====================================================
+           SMOKE
+        ===================================================== */
+
+        .splash-smoke {
+
+            position: absolute;
+
+            left: 39px;
+
+            bottom: 30px;
+
+            width: 7px;
+
+            height: 7px;
+
+            border-radius: 50%;
+
+            background:
+                rgba(236,245,244,.15);
+
+            filter:
+                blur(1px);
+
+            opacity: 0;
+
+            animation:
+                splashSmoke
+                2.5s
+                .7s
+                ease-out
+                infinite;
+        }
+
+
+        .splash-smoke::before {
+
+            content: "";
+
+            position: absolute;
+
+            left: 6px;
+
+            top: -5px;
+
+            width: 8px;
+
+            height: 8px;
+
+            border-radius: 50%;
+
+            background:
+                rgba(236,245,244,.11);
+        }
+
+
+        .splash-smoke::after {
+
+            content: "";
+
+            position: absolute;
+
+            left: -3px;
+
+            top: -10px;
+
+            width: 6px;
+
+            height: 6px;
+
+            border-radius: 50%;
+
+            background:
+                rgba(236,245,244,.08);
+        }
+
+
+        /* =====================================================
+           TRAIN GLOW
+        ===================================================== */
+
+        .splash-train-glow {
+
+            position: absolute;
+
+            left: 0;
+
+            bottom: 2px;
+
+            width: 226px;
+
+            height: 4px;
+
+            border-radius: 50%;
+
+            background:
+
+                linear-gradient(
+                    90deg,
+                    rgba(111,167,131,.04),
+                    rgba(228,199,131,.22),
+                    rgba(199,101,104,.07)
+                );
+
+            filter:
+                blur(4px);
+        }
+
+
+        /* =====================================================
+           SPLASH FOOTER
+        ===================================================== */
+
+        .splash-footer {
+
+            position: absolute;
+
+            left: 0;
+            right: 0;
+
+            bottom: 24px;
+
+            text-align: center;
+
+            color:
+                rgba(205,224,224,.50);
+
+            font-size: 8px;
+
+            letter-spacing: .22em;
+
+            text-transform: uppercase;
+
+            opacity: 0;
+
+            animation:
+                splashFooter
+                .7s
+                1.3s
+                ease-out
+                forwards;
+        }
+
+
+        /* =====================================================
+           SPLASH ANIMATIONS
+        ===================================================== */
+
+        @keyframes splashKai {
+
+            from {
+                opacity: 0;
+                transform:
+                    translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform:
+                    translateY(0);
+            }
+        }
+
+
+        @keyframes splashTitle {
+
+            from {
+                opacity: 0;
+                transform:
+                    translateY(12px)
+                    scale(.97);
+            }
+
+            to {
+                opacity: 1;
+                transform:
+                    translateY(0)
+                    scale(1);
+            }
+        }
+
+
+        @keyframes splashSubtitle {
+
+            from {
+                opacity: 0;
+                transform:
+                    translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform:
+                    translateY(0);
+            }
+        }
+
+
+        @keyframes splashStatus {
+
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+
+        @keyframes splashFooter {
+
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+
+        @keyframes splashPulse {
+
+            0%,
+            100% {
+                opacity: .55;
+                transform:
+                    translate(-50%, -50%)
+                    scale(.94);
+            }
+
+            50% {
+                opacity: 1;
+                transform:
+                    translate(-50%, -50%)
+                    scale(1.06);
+            }
+        }
+
+
+        @keyframes speedLine {
+
+            0% {
+                left: -180px;
+                opacity: 0;
+            }
+
+            20% {
+                opacity: .35;
+            }
+
+            80% {
+                opacity: .12;
+            }
+
+            100% {
+                left: calc(100% + 180px);
+                opacity: 0;
+            }
+        }
+
+
+        @keyframes splashTrainMove {
+
+            0% {
+                left: -270px;
+                opacity: 0;
+            }
+
+            12% {
+                opacity: 1;
+            }
+
+            25% {
+                opacity: 1;
+            }
+
+            82% {
+                opacity: 1;
+            }
+
+            100% {
+                left: calc(100% + 270px);
+                opacity: 0;
+            }
+        }
+
+
+        @keyframes splashWheel {
+
+            from {
+                transform:
+                    rotate(0deg);
+            }
+
+            to {
+                transform:
+                    rotate(360deg);
+            }
+        }
+
+
+        @keyframes splashSmoke {
+
+            0% {
+                opacity: 0;
+                transform:
+                    translate(0, 2px)
+                    scale(.6);
+            }
+
+            20% {
+                opacity: .32;
+            }
+
+            60% {
+                opacity: .12;
+                transform:
+                    translate(-5px, -13px)
+                    scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform:
+                    translate(-9px, -25px)
+                    scale(1.2);
+            }
+        }
+
+
+        @keyframes splashExit {
+
+            0%,
+            82% {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            100% {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+
+
+        /* =====================================================
+           APP
+        ===================================================== */
+
+        .app {
+
+            width:
+                min(
+                    920px,
+                    calc(100% - 28px)
+                );
+
+            margin:
+                0 auto;
+
+            padding:
+                25px 0 35px;
+
+            opacity: 0;
+
+            animation:
+                appReveal
+                .9s
+                3.15s
+                cubic-bezier(.2,.8,.2,1)
+                forwards;
+        }
+
+
+        /* =====================================================
+           HEADER
+        ===================================================== */
+
+        .header {
+
+            position: relative;
+
+            text-align: center;
+
+            padding:
+                25px 10px 42px;
+
+            overflow: hidden;
+        }
+
+
+        .header::before {
+
+            content: "";
+
+            position: absolute;
+
+            width: 360px;
+            height: 170px;
+
+            left: 50%;
+            top: 0;
+
+            transform:
+                translateX(-50%);
+
+            background:
+                radial-gradient(
+                    ellipse,
+                    rgba(111,175,193,.22),
+                    transparent 68%
+                );
+
+            filter:
+                blur(15px);
+
+            animation:
+                headerGlow
+                4.5s
+                ease-in-out
+                infinite;
+
+            pointer-events: none;
+        }
+
+
+        .header::after {
+
+            content: "";
+
+            position: absolute;
+
+            left: 50%;
+            bottom: 20px;
+
+            width: 240px;
+            height: 1px;
+
+            transform:
+                translateX(-50%);
+
+            background:
+
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(228,199,131,.55),
+                    transparent
+                );
+        }
+
+
+        .kai-label {
+
+            position: relative;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 9px;
+
+            margin-bottom: 13px;
+
+            color:
+                var(--gold);
+
+            font-family:
+                Manrope,
+                sans-serif;
+
+            font-size:
+                10px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                .27em;
+        }
+
+
+        .kai-label::before,
+        .kai-label::after {
+
+            content: "";
+
+            width: 23px;
+            height: 1px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    var(--orange)
+                );
+        }
+
+
+        .kai-label::after {
+
+            background:
+                linear-gradient(
+                    90deg,
+                    var(--orange),
+                    transparent
+                );
+        }
+
+
+        .header h1 {
+
+            position: relative;
+
+            font-family:
+                Manrope,
+                sans-serif;
+
+            font-size:
+                clamp(
+                    33px,
+                    7vw,
+                    54px
+                );
+
+            font-weight:
+                800;
+
+            line-height:
+                1;
+
+            letter-spacing:
+                .075em;
+
+            background:
+
+                linear-gradient(
+                    105deg,
+                    #dceef0,
+                    #70afc1,
+                    #e4c783,
+                    #67b7a7,
+                    #eaf5f4
+                );
+
+            background-size:
+                260% auto;
+
+            -webkit-background-clip:
+                text;
+
+            background-clip:
+                text;
+
+            color:
+                transparent;
+
+            animation:
+                titleGradient
+                5s
+                ease-in-out
+                infinite;
+        }
+
+
+        .subtitle {
+
+            position: relative;
+
+            margin-top:
+                13px;
+
+            color:
+                var(--soft);
+
+            font-size:
+                12px;
+
+            letter-spacing:
+                .06em;
+        }
+
+
+        /* =====================================================
+           SEARCH PANEL
+        ===================================================== */
+
+        .search-panel {
+
+            position: relative;
+
+            padding:
+                25px;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:
+                25px;
+
+            background:
+
+                linear-gradient(
+                    145deg,
+                    rgba(31,76,95,.88),
+                    rgba(18,48,64,.88)
+                );
+
+            /*
+               DIKURANGI DARI 18px → 12px
+               Agar GPU HP lebih ringan
+            */
+
+            backdrop-filter:
+                blur(12px);
+
+            -webkit-backdrop-filter:
+                blur(12px);
+
+            box-shadow:
+
+                0 25px 70px
+                rgba(4,22,31,.30),
+
+                inset 0 1px 0
+                rgba(255,255,255,.055);
+
+            animation:
+                panelReveal
+                .8s
+                .08s
+                cubic-bezier(.2,.8,.2,1)
+                both;
+        }
+
+
+        .search-panel::before {
+
+            content: "";
+
+            position: absolute;
+
+            top: 0;
+            left: 14%;
+            right: 14%;
+
+            height: 1px;
+
+            background:
+
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(228,199,131,.70),
+                    transparent
+                );
+        }
+
+
+        /* =====================================================
+           INPUT AREA
+        ===================================================== */
+
+        .route-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                1fr 58px 1fr;
+
+            align-items:
+                end;
+
+            gap:
+                14px;
+        }
+
+
+        .field {
+            position: relative;
+        }
+
+
+        .field-label {
+
+            display: flex;
+
+            align-items:
+                center;
+
+            gap:
+                8px;
+
+            margin-bottom:
+                9px;
+
+            color:
+                var(--muted);
+
+            font-size:
+                9px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                .16em;
+
+            text-transform:
+                uppercase;
+        }
+
+
+        .field-label .dot {
+
+            width: 5px;
+            height: 5px;
+
+            border-radius:
+                50%;
+
+            background:
+                var(--orange);
+
+            box-shadow:
+                0 0 10px
+                rgba(217,130,130,.55);
+        }
+
+
+        .input-wrap {
+            position: relative;
+        }
+
+
+        .input-wrap input {
+
+            width: 100%;
+            height: 58px;
+
+            padding:
+                0 16px;
+
+            outline: none;
+
+            border:
+                1px solid
+                rgba(220,240,240,.13);
+
+            border-radius:
+                15px;
+
+            color:
+                var(--white);
+
+            background:
+                rgba(11,35,48,.70);
+
+            font-family:
+                "DM Sans",
+                sans-serif;
+
+            font-size:
+                14px;
+
+            font-weight:
+                600;
+
+            transition:
+                .25s ease;
+        }
+
+
+        .input-wrap input::placeholder {
+
+            color:
+                #86a0a9;
+
+            font-weight:
+                400;
+        }
+
+
+        .input-wrap input:focus {
+
+            border-color:
+                rgba(111,183,167,.55);
+
+            box-shadow:
+
+                0 0 0 4px
+                rgba(111,183,167,.08),
+
+                0 12px 35px
+                rgba(5,25,35,.20);
+        }
+
+
+        /* =====================================================
+           SUGGESTIONS
+        ===================================================== */
+
+        .suggestions {
+
+            position: absolute;
+
+            top:
+                calc(100% + 8px);
+
+            left: 0;
+            right: 0;
+
+            z-index: 50;
+
+            overflow-x: hidden;
+            overflow-y: auto;
+
+            max-height: 260px;
+
+            overscroll-behavior: contain;
+
+            -webkit-overflow-scrolling: touch;
+
+            border:
+                1px solid
+                rgba(220,240,240,.13);
+
+            border-radius:
+                14px;
+
+            background:
+                rgba(18,48,64,.98);
+
+            backdrop-filter:
+                blur(10px);
+
+            -webkit-backdrop-filter:
+                blur(10px);
+
+            box-shadow:
+                0 20px 55px
+                rgba(3,20,29,.42);
+
+            animation:
+                suggestionReveal
+                .18s
+                ease
+                both;
+        }
+
+
+        .suggestion-item {
+
+            padding:
+                13px 15px;
+
+            border-bottom:
+                1px solid
+                rgba(220,240,240,.06);
+
+            color:
+                #dfeceb;
+
+            font-size:
+                13px;
+
+            cursor:
+                pointer;
+
+            transition:
+                .2s ease;
+        }
+
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+
+        .suggestion-item:hover {
+
+            padding-left:
+                19px;
+
+            color:
+                var(--gold);
+
+            background:
+                rgba(111,183,167,.09);
+        }
+
+
+        /* =====================================================
+           SWAP
+        ===================================================== */
+
+        .swap-wrap {
+
+            display:
+                flex;
+
+            justify-content:
+                center;
+        }
+
+
+        #swapBtn {
+
+            width: 45px;
+            height: 45px;
+
+            border:
+                1px solid
+                rgba(111,183,167,.28);
+
+            border-radius:
+                14px;
+
+            color:
+                var(--gold);
+
+            background:
+                rgba(111,183,167,.08);
+
+            font-size:
+                20px;
+
+            cursor:
+                pointer;
+
+            transition:
+                .3s
+                cubic-bezier(.2,.8,.2,1);
+        }
+
+
+        #swapBtn:hover {
+
+            transform:
+                rotate(180deg);
+
+            border-color:
+                rgba(111,183,167,.55);
+
+            background:
+                rgba(111,183,167,.14);
+
+            box-shadow:
+                0 10px 30px
+                rgba(111,183,167,.10);
+        }
+
+
+        /* =====================================================
+           SEARCH BUTTON
+        ===================================================== */
+
+        .search-button {
+
+            width: 100%;
+            height: 56px;
+
+            margin-top:
+                21px;
+
+            border: none;
+
+            border-radius:
+                15px;
+
+            color:
+                #18313b;
+
+            background:
+
+                linear-gradient(
+                    105deg,
+                    #8bba9a,
+                    #e4c783,
+                    #70afc1,
+                    #8bc4b5
+                );
+
+            background-size:
+                250% auto;
+
+            font-family:
+                Manrope,
+                sans-serif;
+
+            font-size:
+                11px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                .12em;
+
+            text-transform:
+                uppercase;
+
+            cursor:
+                pointer;
+
+            box-shadow:
+                0 14px 36px
+                rgba(111,183,167,.15);
+
+            transition:
+                .25s ease;
+
+            animation:
+                buttonGradient
+                5s
+                ease
+                infinite;
+        }
+
+
+        .search-button:hover {
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 18px 42px
+                rgba(111,183,167,.22);
+        }
+
+
+        .search-button:active {
+
+            transform:
+                translateY(0)
+                scale(.99);
+        }
+
+
+        /* =====================================================
+           STATUS
+        ===================================================== */
+
+        #status {
+
+            min-height:
+                18px;
+
+            margin:
+                17px 2px 0;
+
+            color:
+                var(--muted);
+
+            font-size:
+                10px;
+
+            text-align:
+                center;
+        }
+
+
+        /* =====================================================
+           RESULTS
+        ===================================================== */
+
+        #results {
+
+            margin-top:
+                27px;
+
+            contain:
+                layout;
+        }
+
+
+        .results-heading {
+
+            display:
+                flex;
+
+            justify-content:
+                space-between;
+
+            align-items:
+                center;
+
+            margin:
+                0 4px 12px;
+        }
+
+
+        .results-heading span:first-child {
+
+            color:
+                var(--soft);
+
+            font-size:
+                9px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                .16em;
+
+            text-transform:
+                uppercase;
+        }
+
+
+        .results-heading span:last-child {
+
+            color:
+                var(--muted);
+
+            font-size:
+                9px;
+        }
+
+
+        /* =====================================================
+           RESULT CARD
+        ===================================================== */
+
+        .result-card {
+
+            position:
+                relative;
+
+            margin-bottom:
+                13px;
+
+            padding:
+                21px;
+
+            overflow:
+                hidden;
+
+            border:
+                1px solid
+                var(--border);
+
+            border-radius:
+                21px;
+
+            background:
+
+                linear-gradient(
+                    145deg,
+                    rgba(29,69,88,.90),
+                    rgba(16,43,57,.90)
+                );
+
+            box-shadow:
+
+                0 16px 40px
+                rgba(3,20,29,.22),
+
+                inset 0 1px 0
+                rgba(255,255,255,.035);
+
+            animation:
+                resultReveal
+                .5s
+                cubic-bezier(.2,.8,.2,1)
+                both;
+
+            transition:
+                .25s ease;
+
+            contain:
+                layout
+                paint;
+        }
+
+
+        .result-card::before {
+
+            content: "";
+
+            position:
+                absolute;
+
+            left: 0;
+
+            top: 18px;
+            bottom: 18px;
+
+            width: 2px;
+
+            border-radius:
+                2px;
+
+            background:
+
+                linear-gradient(
+                    to bottom,
+                    transparent,
+                    var(--kai-green),
+                    var(--gold),
+                    transparent
+                );
+
+            box-shadow:
+                0 0 13px
+                rgba(111,167,131,.22);
+        }
+
+
+        .result-card:hover {
+
+            transform:
+                translateY(-3px);
+
+            border-color:
+                rgba(111,183,167,.20);
+        }
+
+
+        /* =====================================================
+           TRAIN NAME
+        ===================================================== */
+
+        .result-name {
+
+            font-family:
+                Manrope,
+                sans-serif;
+
+            font-size:
+                18px;
+
+            font-weight:
+                800;
+
+            color:
+                #f5f9f8;
+        }
+
+
+        /* =====================================================
+           ACTUAL JOURNEY
+        ===================================================== */
+
+        .journey {
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            flex-wrap:
+                wrap;
+
+            gap:
+                8px;
+
+            margin-top:
+                7px;
+
+            color:
+                var(--soft);
+
+            font-size:
+                12px;
+
+            font-weight:
+                500;
+        }
+
+
+        .journey-arrow {
+
+            color:
+                var(--orange);
+
+            font-weight:
+                800;
+        }
+
+
+        /* =====================================================
+           ACUAN TARIF
+        ===================================================== */
+
+        .reference-box {
+
+            margin-top:
+                17px;
+
+            padding:
+                14px 15px;
+
+            border:
+                1px solid
+                var(--orange-border);
+
+            border-radius:
+                14px;
+
+            background:
+
+                linear-gradient(
+                    110deg,
+                    rgba(228,199,131,.075),
+                    rgba(111,183,167,.035)
+                );
+        }
+
+
+        .reference-label {
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            gap:
+                7px;
+
+            margin-bottom:
+                8px;
+
+            color:
+                var(--gold);
+
+            font-size:
+                8px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                .16em;
+
+            text-transform:
+                uppercase;
+        }
+
+
+        .reference-label::before {
+
+            content: "";
+
+            width: 5px;
+            height: 5px;
+
+            border-radius:
+                50%;
+
+            background:
+                var(--orange);
+
+            box-shadow:
+                0 0 8px
+                rgba(217,130,130,.55);
+        }
+
+
+        .reference-route {
+
+            color:
+                #e5efee;
+
+            font-size:
+                12px;
+
+            font-weight:
+                700;
+
+            line-height:
+                1.7;
+        }
+
+
+        .relation-arrow {
+
+            margin:
+                0 5px;
+
+            color:
+                var(--orange);
+        }
+
+
+        /* =====================================================
+           FARE
+        ===================================================== */
+
+        .fare-list {
+
+            display:
+                flex;
+
+            flex-wrap:
+                wrap;
+
+            gap:
+                7px;
+
+            margin-top:
+                14px;
+        }
+
+
+        .fare-item {
+
+            min-width:
+                105px;
+
+            padding:
+                10px 13px;
+
+            border:
+                1px solid
+                rgba(220,240,240,.065);
+
+            border-radius:
+                12px;
+
+            background:
+                rgba(220,240,240,.035);
+        }
+
+
+        .fare-class {
+
+            display:
+                block;
+
+            margin-bottom:
+                3px;
+
+            color:
+                var(--muted);
+
+            font-size:
+                8px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                .13em;
+        }
+
+
+        .fare-price {
+
+            display:
+                block;
+
+            color:
+                var(--gold);
+
+            font-family:
+                Manrope,
+                sans-serif;
+
+            font-size:
+                13px;
+
+            font-weight:
+                800;
+        }
+
+
+        .fare-unavailable {
+
+            color:
+                #78919a;
+        }
+
+
+        /* =====================================================
+           EMPTY STATE
+        ===================================================== */
+
+        .empty-state {
+
+            padding:
+                48px 25px;
+
+            border:
+                1px dashed
+                rgba(220,240,240,.10);
+
+            border-radius:
+                20px;
+
+            text-align:
+                center;
+
+            background:
+                rgba(220,240,240,.015);
+
+            animation:
+                resultReveal
+                .4s
+                ease
+                both;
+        }
+
+
+        .empty-symbol {
+
+            width: 50px;
+            height: 50px;
+
+            display:
+                grid;
+
+            place-items:
+                center;
+
+            margin:
+                0 auto 15px;
+
+            border:
+                1px solid
+                rgba(111,183,167,.22);
+
+            border-radius:
+                15px;
+
+            color:
+                var(--orange);
+
+            font-size:
+                18px;
+        }
+
+
+        .empty-state h3 {
+
+            font-family:
+                Manrope,
+                sans-serif;
+
+            font-size:
+                15px;
+        }
+
+
+        .empty-state p {
+
+            max-width:
+                400px;
+
+            margin:
+                7px auto 0;
+
+            color:
+                var(--muted);
+
+            font-size:
+                11px;
+
+            line-height:
+                1.7;
+        }
+
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
+        .footer {
+
+            padding:
+                35px 0 5px;
+
+            text-align:
+                center;
+
+            color:
+                #789099;
+
+            font-size:
+                9px;
+
+            letter-spacing:
+                .14em;
+
+            text-transform:
+                uppercase;
+        }
+
+
+        .footer strong {
+
+            color:
+                rgba(228,199,131,.78);
+
+            font-weight:
+                700;
+        }
+
+
+        /* =====================================================
+           MAIN ANIMATION
+        ===================================================== */
+
+        @keyframes appReveal {
+
+            0% {
+
+                opacity: 0;
+
+                transform:
+                    translateY(22px)
+                    scale(.985);
+            }
+
+            100% {
+
+                opacity: 1;
+
+                transform:
+                    translateY(0)
+                    scale(1);
+            }
+
+        }
+
+
+        @keyframes panelReveal {
+
+            from {
+                opacity: 0;
+                transform:
+                    translateY(18px);
+            }
+
+            to {
+                opacity: 1;
+                transform:
+                    translateY(0);
+            }
+
+        }
+
+
+        @keyframes resultReveal {
+
+            from {
+                opacity: 0;
+                transform:
+                    translateY(12px)
+                    scale(.985);
+            }
+
+            to {
+                opacity: 1;
+                transform:
+                    translateY(0)
+                    scale(1);
+            }
+
+        }
+
+
+        @keyframes suggestionReveal {
+
+            from {
+                opacity: 0;
+                transform:
+                    translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform:
+                    translateY(0);
+            }
+
+        }
+
+
+        @keyframes headerGlow {
+
+            0%,
+            100% {
+
+                opacity:
+                    .55;
+
+                transform:
+                    translateX(-50%)
+                    scale(.92);
+            }
+
+            50% {
+
+                opacity:
+                    1;
+
+                transform:
+                    translateX(-50%)
+                    scale(1.08);
+            }
+
+        }
+
+
+        @keyframes titleGradient {
+
+            0% {
+                background-position:
+                    0% center;
+            }
+
+            50% {
+                background-position:
+                    100% center;
+            }
+
+            100% {
+                background-position:
+                    0% center;
+            }
+
+        }
+
+
+        @keyframes buttonGradient {
+
+            0% {
+                background-position:
+                    0% center;
+            }
+
+            50% {
+                background-position:
+                    100% center;
+            }
+
+            100% {
+                background-position:
+                    0% center;
+            }
+
+        }
+
+
+        @keyframes orbitSpin {
+
+            from {
+                transform:
+                    rotate(0deg);
+            }
+
+            to {
+                transform:
+                    rotate(360deg);
+            }
+
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media (max-width: 680px) {
+
+            .app {
+
+                width:
+                    calc(100% - 20px);
+
+                padding-top:
+                    14px;
+            }
+
+
+            .header {
+
+                padding:
+                    23px 5px 36px;
+            }
+
+
+            .header h1 {
+
+                font-size:
+                    31px;
+            }
+
+
+            .subtitle {
+
+                font-size:
+                    10px;
+
+                letter-spacing:
+                    .035em;
+            }
+
+
+            .search-panel {
+
+                padding:
+                    18px;
+
+                border-radius:
+                    21px;
+
+                box-shadow:
+
+                    0 18px 45px
+                    rgba(4,22,31,.24),
+
+                    inset 0 1px 0
+                    rgba(255,255,255,.045);
+            }
+
+
+            .route-grid {
+
+                grid-template-columns:
+                    1fr;
+
+                gap:
+                    10px;
+            }
+
+
+            .swap-wrap {
+
+                position:
+                    absolute;
+
+                top:
+                    85px;
+
+                right:
+                    26px;
+
+                z-index:
+                    10;
+            }
+
+
+            #swapBtn {
+
+                width:
+                    40px;
+
+                height:
+                    40px;
+
+                border-radius:
+                    12px;
+            }
+
+
+            .input-wrap input {
+
+                height:
+                    54px;
+            }
+
+
+            .result-card {
+
+                padding:
+                    18px;
+
+                box-shadow:
+
+                    0 12px 30px
+                    rgba(3,20,29,.18),
+
+                    inset 0 1px 0
+                    rgba(255,255,255,.03);
+            }
+
+
+            .fare-item {
+
+                min-width:
+                    88px;
+            }
+
+
+            /* SPLASH MOBILE */
+
+            .splash-title {
+
+                font-size:
+                    clamp(
+                        25px,
+                        8vw,
+                        40px
+                    );
+
+                letter-spacing:
+                    .06em;
+            }
+
+
+            .splash-subtitle {
+
+                font-size:
+                    8px;
+
+                letter-spacing:
+                    .10em;
+
+                padding:
+                    0 20px;
+            }
+
+
+            .splash-kai {
+
+                font-size:
+                    9px;
+
+                letter-spacing:
+                    .25em;
+            }
+
+
+            .splash-track {
+
+                bottom:
+                    12%;
+            }
+
+
+            .splash-train {
+
+                transform:
+                    scale(.78);
+
+                transform-origin:
+                    left bottom;
+            }
+
+
+            .speed-lines {
+
+                bottom:
+                    15%;
+            }
+
+
+            .suggestions {
+
+                max-height:
+                    240px;
+            }
+
+        }
+
+
+        /* =====================================================
+           TOUCH DEVICE
+           MATIKAN EFEK HOVER YANG TIDAK DIPERLUKAN
+        ===================================================== */
+
+        @media (hover: none) {
+
+            .result-card:hover {
+
+                transform:
+                    none;
+
+                border-color:
+                    var(--border);
+            }
+
+
+            .search-button:hover {
+
+                transform:
+                    none;
+
+                box-shadow:
+                    0 14px 36px
+                    rgba(111,183,167,.15);
+            }
+
+
+            #swapBtn:hover {
+
+                transform:
+                    none;
+
+                border-color:
+                    rgba(111,183,167,.28);
+
+                background:
+                    rgba(111,183,167,.08);
+
+                box-shadow:
+                    none;
+            }
+
+
+            .suggestion-item:hover {
+
+                padding-left:
+                    15px;
+
+                color:
+                    #dfeceb;
+
+                background:
+                    transparent;
+            }
+
+        }
+
+
+        /* =====================================================
+           PERFORMANCE MODE
+           AKTIF SETELAH SPLASH SELESAI
+           SPLASH TETAP TIDAK DIUBAH
+        ===================================================== */
+
+        .performance-mode .bg-orbit {
+
+            animation:
+                none;
+        }
+
+
+        .performance-mode .header::before {
+
+            animation:
+                none;
+        }
+
+
+        .performance-mode .header h1 {
+
+            animation:
+                none;
+
+            background-position:
+                50% center;
+        }
+
+
+        .performance-mode .search-button {
+
+            animation:
+                none;
+
+            background-position:
+                50% center;
+        }
+
+
+        /* =====================================================
+           REDUCE MOTION
+        ===================================================== */
+
+        @media (
+            prefers-reduced-motion: reduce
+        ) {
+
+            .splash {
+
+                animation:
+                    splashExit
+                    .01ms
+                    forwards;
+            }
+
+
+            .app {
+
+                opacity: 1;
+
+                animation:
+                    none;
+            }
+
+
+            *,
+            *::before,
+            *::after {
+
+                animation-duration:
+                    .01ms !important;
+
+                animation-iteration-count:
+                    1 !important;
+
+                transition-duration:
+                    .01ms !important;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         SPLASH SCREEN
+    ===================================================== -->
+
+    <div class="splash">
+
+        <div class="splash-light"></div>
+
+
+        <!-- SPEED LINES -->
+
+        <div class="speed-lines">
+
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+
+        </div>
+
+
+        <!-- CONTENT -->
+
+        <div class="splash-content">
+
+            <div class="splash-kai">
+                KERETA API INDONESIA
+            </div>
+
+
+            <div class="splash-title">
+                TARSUS FINDER
+            </div>
+
+
+            <div class="splash-subtitle">
+                Sistem Pencarian Tarif Khusus
+            </div>
+
+
+            <div class="splash-status">
+                C O N T A C T  C E N T E R  1 2 1
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             SPLASH TRAIN
+        ================================================== -->
+
+        <div class="splash-track">
+
+            <div class="splash-train">
+
+
+                <!-- GLOW -->
+
+                <div class="splash-train-glow"></div>
+
+
+                <!-- SMOKE -->
+
+                <div class="splash-smoke"></div>
+
+
+                <!-- GERBONG -->
+
+                <div class="splash-coach one"></div>
+
+                <div class="splash-coach two"></div>
+
+                <div class="splash-coach three"></div>
+
+                <div class="splash-coach four"></div>
+
+
+                <!-- COUPLER -->
+
+                <div class="splash-coupler one"></div>
+
+                <div class="splash-coupler two"></div>
+
+                <div class="splash-coupler three"></div>
+
+                <div class="splash-coupler four"></div>
+
+
+                <!-- LOKOMOTIF -->
+
+                <div class="splash-loco">
+
+                    <div class="splash-loco-body"></div>
+
+                    <div class="splash-loco-cabin"></div>
+
+                    <div class="splash-loco-roof"></div>
+
+                    <div class="splash-loco-nose"></div>
+
+                    <div class="splash-loco-light"></div>
+
+                    <div class="splash-chimney"></div>
+
+                </div>
+
+
+                <!-- RODA -->
+
+                <div class="splash-wheel w1"></div>
+                <div class="splash-wheel w2"></div>
+                <div class="splash-wheel w3"></div>
+                <div class="splash-wheel w4"></div>
+                <div class="splash-wheel w5"></div>
+                <div class="splash-wheel w6"></div>
+                <div class="splash-wheel w7"></div>
+                <div class="splash-wheel w8"></div>
+                <div class="splash-wheel w9"></div>
+                <div class="splash-wheel w10"></div>
+
+            </div>
+
+        </div>
+
+
+        <div class="splash-footer">
+            created by prima_adis
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         BACKGROUND
+    ===================================================== -->
+
+    <div class="bg-orbit"></div>
+
+
+    <!-- =====================================================
+         MAIN APP
+    ===================================================== -->
+
+    <main class="app">
+
+
+        <!-- HEADER -->
+
+        <header class="header">
+
+            <div class="kai-label">
+                KAI 121
+            </div>
+
+
+            <h1>
+                TARSUS FINDER
+            </h1>
+
+
+            <p class="subtitle">
+                Tarif Khusus Perjalanan Kereta Api
+            </p>
+
+        </header>
+
+
+        <!-- =================================================
+             SEARCH
+        ================================================== -->
+
+        <section class="search-panel">
+
+
+            <div class="route-grid">
+
+
+                <!-- ASAL -->
+
+                <div class="field">
+
+                    <div class="field-label">
+
+                        <span class="dot"></span>
+
+                        Stasiun Asal
+
+                    </div>
+
+
+                    <div class="input-wrap">
+
+                        <input
+                            id="asal"
+                            type="text"
+                            autocomplete="off"
+                            placeholder="Cari stasiun asal..."
+                        >
+
+
+                        <div
+                            id="asal-suggestions"
+                            class="suggestions"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SWAP -->
+
+                <div class="swap-wrap">
+
+                    <button
+                        id="swapBtn"
+                        type="button"
+                        title="Tukar stasiun"
+                    >
+                        ⇄
+                    </button>
+
+                </div>
+
+
+                <!-- TUJUAN -->
+
+                <div class="field">
+
+                    <div class="field-label">
+
+                        <span class="dot"></span>
+
+                        Stasiun Tujuan
+
+                    </div>
+
+
+                    <div class="input-wrap">
+
+                        <input
+                            id="tujuan"
+                            type="text"
+                            autocomplete="off"
+                            placeholder="Cari stasiun tujuan..."
+                        >
+
+
+                        <div
+                            id="tujuan-suggestions"
+                            class="suggestions"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <button
+                id="searchBtn"
+                class="search-button"
+                type="button"
+            >
+                Temukan Tarif Khusus
+            </button>
+
+
+            <div id="status"></div>
+
+
+        </section>
+
+
+        <!-- =================================================
+             RESULTS
+        ================================================== -->
+
+        <section id="results"></section>
+
+
+        <!-- =================================================
+             FOOTER
+        ================================================== -->
+
+        <footer class="footer">
+
+            any question? ask me
+            <strong>primaadis46@gmail.com</strong>
+
+        </footer>
+
+
+    </main>
+
+
+    <!-- =====================================================
+         DATA ENGINE
+    ===================================================== -->
+
+    <script src="data.js"></script>
+
+
+    <!-- =====================================================
+         PERFORMANCE MODE
+         AKTIF SETELAH SPLASH SELESAI
+    ===================================================== -->
+
+    <script>
+
+        window.addEventListener("load", function () {
+
+            setTimeout(function () {
+
+                document.body.classList.add(
+                    "performance-mode"
+                );
+
+            }, 4100);
+
+        });
+
+    </script>
+
+
+</body>
+
+</html>
