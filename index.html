@@ -454,6 +454,7 @@
 
         /* =====================================================
            SPLASH TITLE
+           TIDAK LAGI MENGULANG TARSUS FINDER
         ===================================================== */
 
         .splash-title {
@@ -584,6 +585,7 @@
 
         /* =====================================================
            SPEED LINES
+           DIPERHALUS
         ===================================================== */
 
         .speed-lines {
@@ -661,6 +663,7 @@
 
         /* =====================================================
            SPLASH TRAIN AREA
+           TRAIN KECIL DAN RENDAH
         ===================================================== */
 
         .splash-track {
@@ -677,6 +680,8 @@
             overflow: hidden;
         }
 
+
+        /* rail */
 
         .splash-track::before {
 
@@ -733,6 +738,7 @@
 
         /* =====================================================
            SPLASH TRAIN
+           LEBIH KECIL
         ===================================================== */
 
         .splash-train {
@@ -917,6 +923,8 @@
         }
 
 
+        /* body */
+
         .splash-loco-body {
 
             position: absolute;
@@ -954,6 +962,8 @@
         }
 
 
+        /* green lower accent */
+
         .splash-loco-body::after {
 
             content: "";
@@ -974,6 +984,8 @@
                 var(--kai-green);
         }
 
+
+        /* cabin */
 
         .splash-loco-cabin {
 
@@ -1006,6 +1018,8 @@
         }
 
 
+        /* windows */
+
         .splash-loco-cabin::before {
 
             content: "";
@@ -1034,6 +1048,8 @@
         }
 
 
+        /* roof */
+
         .splash-loco-roof {
 
             position: absolute;
@@ -1054,6 +1070,8 @@
             z-index: 4;
         }
 
+
+        /* nose */
 
         .splash-loco-nose {
 
@@ -1095,6 +1113,8 @@
         }
 
 
+        /* front light */
+
         .splash-loco-light {
 
             position: absolute;
@@ -1122,6 +1142,8 @@
             z-index: 8;
         }
 
+
+        /* chimney */
 
         .splash-chimney {
 
@@ -1858,16 +1880,11 @@
                     rgba(18,48,64,.88)
                 );
 
-            /*
-               DIKURANGI DARI 18px → 12px
-               Agar GPU HP lebih ringan
-            */
-
             backdrop-filter:
-                blur(12px);
+                blur(18px);
 
             -webkit-backdrop-filter:
-                blur(12px);
+                blur(18px);
 
             box-shadow:
 
@@ -2064,14 +2081,7 @@
 
             z-index: 50;
 
-            overflow-x: hidden;
-            overflow-y: auto;
-
-            max-height: 260px;
-
-            overscroll-behavior: contain;
-
-            -webkit-overflow-scrolling: touch;
+            overflow: hidden;
 
             border:
                 1px solid
@@ -2084,10 +2094,7 @@
                 rgba(18,48,64,.98);
 
             backdrop-filter:
-                blur(10px);
-
-            -webkit-backdrop-filter:
-                blur(10px);
+                blur(18px);
 
             box-shadow:
                 0 20px 55px
@@ -2317,12 +2324,7 @@
         ===================================================== */
 
         #results {
-
-            margin-top:
-                27px;
-
-            contain:
-                layout;
+            margin-top: 27px;
         }
 
 
@@ -2420,10 +2422,6 @@
 
             transition:
                 .25s ease;
-
-            contain:
-                layout
-                paint;
         }
 
 
@@ -3060,14 +3058,6 @@
 
                 border-radius:
                     21px;
-
-                box-shadow:
-
-                    0 18px 45px
-                    rgba(4,22,31,.24),
-
-                    inset 0 1px 0
-                    rgba(255,255,255,.045);
             }
 
 
@@ -3121,14 +3111,6 @@
 
                 padding:
                     18px;
-
-                box-shadow:
-
-                    0 12px 30px
-                    rgba(3,20,29,.18),
-
-                    inset 0 1px 0
-                    rgba(255,255,255,.03);
             }
 
 
@@ -3201,112 +3183,6 @@
                     15%;
             }
 
-
-            .suggestions {
-
-                max-height:
-                    240px;
-            }
-
-        }
-
-
-        /* =====================================================
-           TOUCH DEVICE
-           MATIKAN EFEK HOVER YANG TIDAK DIPERLUKAN
-        ===================================================== */
-
-        @media (hover: none) {
-
-            .result-card:hover {
-
-                transform:
-                    none;
-
-                border-color:
-                    var(--border);
-            }
-
-
-            .search-button:hover {
-
-                transform:
-                    none;
-
-                box-shadow:
-                    0 14px 36px
-                    rgba(111,183,167,.15);
-            }
-
-
-            #swapBtn:hover {
-
-                transform:
-                    none;
-
-                border-color:
-                    rgba(111,183,167,.28);
-
-                background:
-                    rgba(111,183,167,.08);
-
-                box-shadow:
-                    none;
-            }
-
-
-            .suggestion-item:hover {
-
-                padding-left:
-                    15px;
-
-                color:
-                    #dfeceb;
-
-                background:
-                    transparent;
-            }
-
-        }
-
-
-        /* =====================================================
-           PERFORMANCE MODE
-           AKTIF SETELAH SPLASH SELESAI
-           SPLASH TETAP TIDAK DIUBAH
-        ===================================================== */
-
-        .performance-mode .bg-orbit {
-
-            animation:
-                none;
-        }
-
-
-        .performance-mode .header::before {
-
-            animation:
-                none;
-        }
-
-
-        .performance-mode .header h1 {
-
-            animation:
-                none;
-
-            background-position:
-                50% center;
-        }
-
-
-        .performance-mode .search-button {
-
-            animation:
-                none;
-
-            background-position:
-                50% center;
         }
 
 
@@ -3650,7 +3526,7 @@
 
         <footer class="footer">
 
-            any question? ask me
+            any question? ask me 
             <strong>primaadis46@gmail.com</strong>
 
         </footer>
@@ -3664,28 +3540,6 @@
     ===================================================== -->
 
     <script src="data.js"></script>
-
-
-    <!-- =====================================================
-         PERFORMANCE MODE
-         AKTIF SETELAH SPLASH SELESAI
-    ===================================================== -->
-
-    <script>
-
-        window.addEventListener("load", function () {
-
-            setTimeout(function () {
-
-                document.body.classList.add(
-                    "performance-mode"
-                );
-
-            }, 4100);
-
-        });
-
-    </script>
 
 
 </body>
