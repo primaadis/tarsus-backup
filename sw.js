@@ -1,9 +1,12 @@
-const CACHE_NAME = "tarsus-v1";
+const CACHE_NAME = "tarsus-v2";
 
 const FILES_TO_CACHE = [
   "/tarsus-backup/",
   "/tarsus-backup/index.html",
-  "/tarsus-backup/data.js"
+  "/tarsus-backup/data.js",
+  "/tarsus-backup/manifest.json",
+  "/tarsus-backup/icon-192.png",
+  "/tarsus-backup/icon-512.png"
 ];
 
 self.addEventListener("install", event => {
@@ -30,7 +33,12 @@ self.addEventListener("activate", event => {
 
 self.addEventListener("fetch", event => {
   event.respondWith(
-    caches.match(event.request)
-      .then(response => response || fetch(event.request))
+    caches.match(event.request).then(cachedResponse => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+
+      return fetch(event.request);
+    })
   );
 });
