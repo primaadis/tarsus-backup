@@ -16,6 +16,11 @@
     >
 
     <meta
+        name="description"
+        content="TARSUS Finder — Pencarian tarif khusus perjalanan kereta api."
+    >
+
+    <meta
         name="mobile-web-app-capable"
         content="yes"
     >
@@ -35,39 +40,25 @@
         content="TARSUS"
     >
 
-    <meta
-        name="description"
-        content="TARSUS Finder — Tarif Khusus Perjalanan Kereta Api"
-    >
-
     <title>TARSUS FINDER — KAI 121</title>
 
     <link
         rel="manifest"
-        href="/tarsus-backup/manifest.json"
+        href="/tarsus-backup/manifest.json?v=3"
     >
 
     <link
         rel="icon"
         type="image/png"
-        sizes="192x192"
-        href="/tarsus-backup/icon-192.png"
+        href="/tarsus-backup/icon-192.png?v=3"
     >
 
     <link
         rel="apple-touch-icon"
-        href="/tarsus-backup/icon-192.png"
+        href="/tarsus-backup/icon-192.png?v=3"
     >
 
-
-    <!-- =====================================================
-         FONT
-         ===================================================== -->
-
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com"
-    >
+    <link rel="preconnect" href="https://fonts.googleapis.com">
 
     <link
         rel="preconnect"
@@ -83,9 +74,11 @@
 
     <style>
 
-        /* =================================================
-           ROOT
-           ================================================= */
+        /* =========================================================
+           TARSUS FINDER
+           UI VERSION 3.0
+           ========================================================= */
+
 
         :root {
 
@@ -102,142 +95,147 @@
             --kai-red-light: #d98282;
 
             --kai-white: #f5f8f8;
+            --white: #f4f8f8;
+
+            --soft: #cbd9dc;
+            --muted: #8fa9b1;
 
             --kai-green: #6fa783;
             --kai-green-light: #8bba9a;
 
-            --white: #f4f8f8;
-            --soft: #cbd9dc;
-            --muted: #8fa9b1;
-
             --border: rgba(213,236,236,.13);
             --orange-border: rgba(216,182,106,.22);
 
-            --bg: #102536;
-            --card: #17384b;
-            --card-soft: #1b4053;
-
-            --text: #f4f8f8;
-            --text-soft: #cbd9dc;
-            --text-muted: #8fa9b1;
-
             --shadow:
-                0 18px 50px rgba(0,0,0,.22);
+                0 20px 60px rgba(0,0,0,.22);
 
+            --shadow-small:
+                0 10px 30px rgba(0,0,0,.14);
+
+            --radius-xl: 28px;
+            --radius-lg: 22px;
+            --radius-md: 16px;
+
+            --transition:
+                180ms cubic-bezier(.2,.8,.2,1);
+
+            --drawer-width: 310px;
         }
 
-
-        /* =================================================
-           LIGHT MODE
-           ================================================= */
-
-        body.light-mode {
-
-            --bg: #f3f6f7;
-            --card: #ffffff;
-            --card-soft: #edf3f4;
-
-            --text: #17384b;
-            --text-soft: #45616b;
-            --text-muted: #71868d;
-
-            --border: rgba(23,56,75,.10);
-            --orange-border: rgba(199,101,104,.20);
-
-            --shadow:
-                0 18px 45px rgba(23,56,75,.10);
-
-        }
-
-
-        /* =================================================
-           RESET
-           ================================================= */
 
         * {
-
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-
+            -webkit-tap-highlight-color: transparent;
         }
 
 
         html {
-
             min-height: 100%;
             scroll-behavior: smooth;
-
         }
 
 
         body {
 
+            margin: 0;
+
             min-height: 100vh;
-
-            background:
-                radial-gradient(
-                    circle at 15% 10%,
-                    rgba(33,83,106,.35),
-                    transparent 32%
-                ),
-                var(--bg);
-
-            color: var(--text);
 
             font-family:
                 "DM Sans",
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
                 sans-serif;
 
             font-size: 14px;
+
             line-height: 1.55;
 
-            letter-spacing: -.01em;
+            letter-spacing: -.008em;
 
-            -webkit-font-smoothing: antialiased;
-            text-rendering: optimizeLegibility;
+            color: var(--white);
+
+            background:
+                radial-gradient(
+                    circle at 50% -10%,
+                    rgba(33,83,106,.65),
+                    transparent 42%
+                ),
+                linear-gradient(
+                    180deg,
+                    #102536 0%,
+                    #102c3d 48%,
+                    #0d2231 100%
+                );
+
+            min-height: 100dvh;
 
             overflow-x: hidden;
 
-            transition:
-                background .35s ease,
-                color .35s ease;
+            text-rendering: optimizeLegibility;
 
+            -webkit-font-smoothing: antialiased;
+
+            transition:
+                background .3s ease,
+                color .3s ease;
         }
 
 
         body.light-mode {
 
+            --navy-deep: #eef4f5;
+            --navy: #ffffff;
+            --navy-light: #edf4f5;
+            --navy-card: #ffffff;
+
+            --white: #17384b;
+            --kai-white: #17384b;
+
+            --soft: #536b73;
+            --muted: #70868d;
+
+            --border: rgba(23,56,75,.11);
+
+            color: #17384b;
+
             background:
                 radial-gradient(
-                    circle at 15% 10%,
-                    rgba(111,167,131,.10),
-                    transparent 30%
+                    circle at 50% -10%,
+                    rgba(111,167,131,.12),
+                    transparent 42%
                 ),
-                var(--bg);
-
+                #eef4f5;
         }
 
 
         button,
         input {
-
-            font-family: inherit;
-
+            font: inherit;
         }
 
 
         button {
-
             border: 0;
-            cursor: pointer;
-
         }
 
 
-        /* =================================================
-           SPLASH SCREEN
-           ================================================= */
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+
+        .hidden {
+            display: none !important;
+        }
+
+
+        /* =========================================================
+           SPLASH
+           ========================================================= */
 
         #splashScreen {
 
@@ -250,130 +248,128 @@
             display: flex;
 
             align-items: center;
+
             justify-content: center;
+
+            padding:
+                env(safe-area-inset-top)
+                24px
+                env(safe-area-inset-bottom)
+                24px;
 
             background:
                 radial-gradient(
-                    circle at center,
-                    #21536a 0%,
-                    #102536 65%,
-                    #0b1c29 100%
+                    circle at 50% 40%,
+                    #21536a,
+                    #102536 65%
                 );
 
             transition:
-                opacity .45s ease,
-                visibility .45s ease;
-
+                opacity .35s ease,
+                visibility .35s ease;
         }
 
 
         #splashScreen.hide {
 
             opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
 
+            visibility: hidden;
+
+            pointer-events: none;
         }
 
 
         .splash-content {
 
-            width: 100%;
-            max-width: 360px;
-
-            padding: 30px;
+            width: min(90vw, 360px);
 
             text-align: center;
-
         }
 
 
         .splash-logo {
 
             width: 82px;
+
             height: 82px;
 
             margin: 0 auto 22px;
 
+            border-radius: 24px;
+
             display: flex;
 
             align-items: center;
-            justify-content: center;
 
-            border-radius: 24px;
+            justify-content: center;
 
             background:
                 linear-gradient(
                     145deg,
-                    #e4c783,
-                    #c76568
+                    rgba(228,199,131,.98),
+                    rgba(199,101,104,.98)
                 );
 
-            color: #102536;
-
-            font-family:
-                "Manrope",
-                sans-serif;
-
-            font-size: 28px;
-            font-weight: 800;
-
             box-shadow:
-                0 20px 50px rgba(0,0,0,.30);
+                0 20px 50px rgba(0,0,0,.28);
 
             animation:
                 splashLogo .8s ease both;
-
         }
 
 
-        .splash-title {
+        .splash-logo svg {
 
-            font-family:
-                "Manrope",
-                sans-serif;
+            width: 48px;
 
-            font-size: 25px;
+            height: 48px;
+
+            fill: #102536;
+        }
+
+
+        .splash-brand {
+
+            margin: 0;
+
+            font-family: "Manrope", sans-serif;
+
+            font-size: 30px;
+
             font-weight: 800;
 
-            letter-spacing: -.04em;
+            letter-spacing: -.055em;
 
             color: #f5f8f8;
-
-            animation:
-                splashText .8s .08s ease both;
-
         }
 
 
         .splash-subtitle {
 
-            margin-top: 5px;
+            margin-top: 4px;
 
-            color: #cbd9dc;
+            color: rgba(245,248,248,.68);
 
-            font-size: 13px;
+            font-size: 12px;
 
-            animation:
-                splashText .8s .15s ease both;
-
+            letter-spacing: .04em;
         }
 
 
         .splash-loading {
 
-            width: 100px;
+            width: 130px;
+
             height: 3px;
 
-            margin: 25px auto 0;
+            margin: 28px auto 0;
 
             overflow: hidden;
 
-            border-radius: 99px;
+            border-radius: 999px;
 
-            background:
-                rgba(255,255,255,.12);
-
+            background: rgba(255,255,255,.12);
         }
 
 
@@ -384,99 +380,76 @@
             display: block;
 
             width: 45%;
+
             height: 100%;
 
             border-radius: inherit;
 
-            background: #e4c783;
+            background: var(--gold);
 
             animation:
                 splashLoading 1.1s ease-in-out infinite;
-
         }
 
 
         @keyframes splashLogo {
 
             from {
-
                 opacity: 0;
-                transform: translateY(15px) scale(.9);
-
+                transform: translateY(12px) scale(.92);
             }
 
             to {
-
                 opacity: 1;
                 transform: translateY(0) scale(1);
-
             }
-
-        }
-
-
-        @keyframes splashText {
-
-            from {
-
-                opacity: 0;
-                transform: translateY(8px);
-
-            }
-
-            to {
-
-                opacity: 1;
-                transform: translateY(0);
-
-            }
-
         }
 
 
         @keyframes splashLoading {
 
             0% {
-
                 transform: translateX(-120%);
-
             }
 
             100% {
-
-                transform: translateX(330%);
-
+                transform: translateX(300%);
             }
-
         }
 
 
-        /* =================================================
-           APP SHELL
-           ================================================= */
+        /* =========================================================
+           APP
+           ========================================================= */
 
-        #appShell {
+        #app {
 
-            min-height: 100vh;
+            min-height: 100dvh;
 
             opacity: 0;
 
-            transition:
-                opacity .35s ease;
-
+            transition: opacity .25s ease;
         }
 
 
-        #appShell.ready {
-
+        #app.ready {
             opacity: 1;
-
         }
 
 
-        /* =================================================
-           HEADER
-           ================================================= */
+        .app-shell {
+
+            width: 100%;
+
+            min-height: 100dvh;
+
+            position: relative;
+        }
+
+
+        /* =========================================================
+           TOP BAR
+           ========================================================= */
 
         .topbar {
 
@@ -486,7 +459,7 @@
 
             z-index: 500;
 
-            height: 66px;
+            height: 70px;
 
             display: flex;
 
@@ -495,117 +468,57 @@
             justify-content: space-between;
 
             padding:
-                0 18px;
+                0 max(18px, env(safe-area-inset-right))
+                0 max(18px, env(safe-area-inset-left));
 
             background:
-                rgba(16,37,54,.88);
+                rgba(16,37,54,.82);
+
+            border-bottom:
+                1px solid rgba(213,236,236,.08);
 
             backdrop-filter:
                 blur(18px);
 
             -webkit-backdrop-filter:
                 blur(18px);
-
-            border-bottom:
-                1px solid var(--border);
-
         }
 
 
         body.light-mode .topbar {
 
             background:
-                rgba(255,255,255,.88);
+                rgba(255,255,255,.86);
 
-        }
-
-
-        .brand-mini {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 10px;
-
-        }
-
-
-        .brand-mark {
-
-            width: 36px;
-            height: 36px;
-
-            display: flex;
-
-            align-items: center;
-            justify-content: center;
-
-            border-radius: 11px;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    var(--gold),
-                    var(--kai-red)
-                );
-
-            color: var(--navy-deep);
-
-            font-family:
-                "Manrope",
-                sans-serif;
-
-            font-size: 13px;
-            font-weight: 800;
-
-        }
-
-
-        .brand-name {
-
-            font-family:
-                "Manrope",
-                sans-serif;
-
-            font-size: 14px;
-            font-weight: 800;
-
-            letter-spacing: -.025em;
-
-        }
-
-
-        .brand-sub {
-
-            color: var(--text-muted);
-
-            font-size: 10px;
-
+            border-bottom:
+                1px solid rgba(23,56,75,.08);
         }
 
 
         .menu-button {
 
-            width: 42px;
-            height: 42px;
+            width: 44px;
+
+            height: 44px;
 
             display: flex;
 
             align-items: center;
+
             justify-content: center;
 
-            border-radius: 13px;
+            border-radius: 14px;
 
-            color: var(--text);
+            cursor: pointer;
+
+            color: var(--white);
 
             background:
                 rgba(255,255,255,.06);
 
             transition:
-                transform .2s ease,
-                background .2s ease;
-
+                transform var(--transition),
+                background var(--transition);
         }
 
 
@@ -614,65 +527,110 @@
             background:
                 rgba(255,255,255,.10);
 
+            transform: translateY(-1px);
         }
 
 
         .menu-button:active {
 
             transform: scale(.94);
-
         }
 
 
         .menu-button svg {
 
             width: 21px;
+
             height: 21px;
-
         }
 
 
-        /* =================================================
+        .topbar-brand {
+
+            position: absolute;
+
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            text-align: center;
+
+            white-space: nowrap;
+        }
+
+
+        .topbar-brand-title {
+
+            display: block;
+
+            font-family: "Manrope", sans-serif;
+
+            font-size: 16px;
+
+            font-weight: 800;
+
+            letter-spacing: -.035em;
+        }
+
+
+        .topbar-brand-subtitle {
+
+            display: block;
+
+            margin-top: -1px;
+
+            font-size: 9px;
+
+            color: var(--muted);
+
+            letter-spacing: .055em;
+
+            text-transform: uppercase;
+        }
+
+
+        .topbar-version {
+
+            min-width: 44px;
+
+            text-align: right;
+
+            color: var(--muted);
+
+            font-size: 10px;
+
+            font-weight: 600;
+        }
+
+
+        /* =========================================================
            MAIN
-           ================================================= */
+           ========================================================= */
 
-        .main-container {
+        main {
 
-            width: min(
-                100% - 32px,
-                920px
-            );
+            width: 100%;
 
-            margin:
-                0 auto;
+            max-width: 980px;
+
+            margin: 0 auto;
 
             padding:
-                45px 0 80px;
-
+                46px 18px
+                calc(50px + env(safe-area-inset-bottom));
         }
 
 
-        /* =================================================
-           HOME
-           ================================================= */
+        .home-hero {
 
-        .home-page {
-
-            animation:
-                pageIn .45s ease both;
-
-        }
-
-
-        .hero {
+            text-align: center;
 
             padding:
-                30px 0 25px;
-
+                16px 0 36px;
         }
 
 
-        .eyebrow {
+        .hero-eyebrow {
 
             display: inline-flex;
 
@@ -681,161 +639,161 @@
             gap: 7px;
 
             padding:
-                6px 11px;
+                7px 12px;
+
+            margin-bottom: 18px;
 
             border:
                 1px solid var(--orange-border);
 
-            border-radius: 99px;
+            border-radius: 999px;
+
+            background:
+                rgba(228,199,131,.055);
 
             color: var(--gold);
 
-            background:
-                rgba(228,199,131,.06);
+            font-size: 10px;
 
-            font-size: 11px;
             font-weight: 700;
 
-            letter-spacing: .03em;
+            letter-spacing: .08em;
 
             text-transform: uppercase;
-
         }
 
 
-        .eyebrow-dot {
+        .hero-eyebrow-dot {
 
             width: 6px;
+
             height: 6px;
 
             border-radius: 50%;
 
-            background:
-                var(--kai-green);
+            background: var(--kai-green);
 
             box-shadow:
                 0 0 0 4px rgba(111,167,131,.10);
-
         }
 
 
-        .hero h1 {
+        .home-title {
 
-            margin-top: 18px;
+            margin: 0;
 
-            font-family:
-                "Manrope",
-                sans-serif;
+            font-family: "Manrope", sans-serif;
 
             font-size:
-                clamp(
-                    30px,
-                    8vw,
-                    48px
-                );
+                clamp(30px, 8vw, 48px);
 
             line-height: 1.02;
 
             font-weight: 800;
 
             letter-spacing: -.045em;
-
         }
 
 
-        .hero h1 span {
+        .home-title span {
 
             color: var(--gold);
-
         }
 
 
-        .hero p {
+        .home-subtitle {
 
-            max-width: 620px;
+            max-width: 560px;
 
-            margin-top: 15px;
+            margin:
+                14px auto 0;
 
-            color: var(--text-soft);
+            color: var(--muted);
 
-            font-size: 15px;
+            font-size:
+                clamp(13px, 3.2vw, 15px);
 
+            line-height: 1.6;
         }
 
 
-        /* =================================================
+        /* =========================================================
            SEARCH CARD
-           ================================================= */
+           ========================================================= */
 
         .search-card {
 
             position: relative;
 
-            padding: 22px;
+            overflow: visible;
+
+            padding: 20px;
 
             border:
                 1px solid var(--border);
 
-            border-radius: 24px;
+            border-radius: var(--radius-xl);
 
             background:
                 linear-gradient(
                     145deg,
-                    rgba(33,83,106,.94),
-                    rgba(27,64,83,.94)
+                    rgba(27,64,83,.96),
+                    rgba(20,51,68,.96)
                 );
 
-            box-shadow:
-                var(--shadow);
+            box-shadow: var(--shadow);
 
-            overflow: visible;
-
+            isolation: isolate;
         }
 
 
         body.light-mode .search-card {
 
-            background:
-                linear-gradient(
-                    145deg,
-                    #ffffff,
-                    #edf3f4
-                );
+            background: #ffffff;
 
+            box-shadow:
+                0 20px 55px rgba(23,56,75,.10);
         }
 
 
-        .search-label {
+        .search-card::before {
 
-            display: block;
+            content: "";
 
-            margin-bottom: 8px;
+            position: absolute;
 
-            color: var(--text-muted);
+            top: 0;
 
-            font-size: 11px;
-            font-weight: 700;
+            left: 12%;
 
-            letter-spacing: .04em;
+            right: 12%;
 
-            text-transform: uppercase;
+            height: 1px;
 
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(228,199,131,.55),
+                    transparent
+                );
         }
 
 
         .station-row {
 
+            position: relative;
+
             display: grid;
 
             grid-template-columns:
-                1fr
+                minmax(0,1fr)
                 48px
-                1fr;
-
-            gap: 10px;
+                minmax(0,1fr);
 
             align-items: end;
 
+            gap: 10px;
         }
 
 
@@ -843,6 +801,32 @@
 
             position: relative;
 
+            min-width: 0;
+        }
+
+
+        .station-label {
+
+            display: block;
+
+            margin:
+                0 0 8px 4px;
+
+            color: var(--muted);
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+            letter-spacing: .08em;
+
+            text-transform: uppercase;
+        }
+
+
+        .station-input-wrap {
+
+            position: relative;
         }
 
 
@@ -850,48 +834,50 @@
 
             width: 100%;
 
-            height: 54px;
+            height: 56px;
 
             padding:
-                0 15px;
+                0 16px;
 
             border:
                 1px solid var(--border);
 
-            border-radius: 15px;
-
             outline: none;
 
-            background:
-                rgba(0,0,0,.12);
+            border-radius: 16px;
 
-            color: var(--text);
+            color: var(--white);
+
+            background:
+                rgba(6,25,37,.30);
 
             font-size: 14px;
+
             font-weight: 600;
 
             transition:
-                border .2s ease,
-                box-shadow .2s ease;
-
+                border var(--transition),
+                background var(--transition),
+                box-shadow var(--transition);
         }
 
 
         body.light-mode .station-input {
 
-            background:
-                rgba(23,56,75,.04);
+            color: #17384b;
 
+            background: #f3f7f7;
+
+            border-color:
+                rgba(23,56,75,.10);
         }
 
 
         .station-input::placeholder {
 
-            color:
-                var(--text-muted);
+            color: var(--muted);
 
-            font-weight: 500;
-
+            font-weight: 400;
         }
 
 
@@ -900,60 +886,84 @@
             border-color:
                 rgba(228,199,131,.55);
 
-            box-shadow:
-                0 0 0 4px
-                rgba(228,199,131,.08);
+            background:
+                rgba(6,25,37,.44);
 
+            box-shadow:
+                0 0 0 4px rgba(228,199,131,.07);
         }
 
 
-        .swap-button {
+        body.light-mode .station-input:focus {
 
-            width: 48px;
-            height: 48px;
+            background: #ffffff;
+        }
 
-            margin-bottom: 3px;
+
+        .swap-wrapper {
 
             display: flex;
 
             align-items: center;
+
             justify-content: center;
 
-            border-radius: 15px;
+            padding-bottom: 6px;
+        }
 
-            background:
-                rgba(228,199,131,.10);
+
+        #swapBtn {
+
+            width: 44px;
+
+            height: 44px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
 
             border:
-                1px solid
-                rgba(228,199,131,.20);
+                1px solid var(--border);
 
-            color:
-                var(--gold);
+            border-radius: 50%;
+
+            cursor: pointer;
+
+            color: var(--gold);
+
+            background:
+                rgba(228,199,131,.07);
 
             transition:
                 transform .25s ease,
-                background .2s ease;
-
+                background var(--transition);
         }
 
 
-        .swap-button:hover {
-
-            transform:
-                rotate(180deg);
+        #swapBtn:hover {
 
             background:
-                rgba(228,199,131,.15);
+                rgba(228,199,131,.13);
 
+            transform: rotate(180deg);
         }
 
 
-        .swap-button svg {
+        #swapBtn:active {
 
-            width: 19px;
-            height: 19px;
+            transform:
+                rotate(180deg)
+                scale(.91);
+        }
 
+
+        #swapBtn svg {
+
+            width: 18px;
+
+            height: 18px;
         }
 
 
@@ -961,351 +971,332 @@
 
             width: 100%;
 
-            height: 54px;
+            height: 56px;
 
             margin-top: 14px;
 
             display: flex;
 
             align-items: center;
+
             justify-content: center;
 
             gap: 9px;
 
-            border-radius: 15px;
+            border-radius: 16px;
+
+            cursor: pointer;
+
+            color: #102536;
 
             background:
                 linear-gradient(
                     135deg,
-                    var(--gold),
-                    var(--amber)
+                    #e4c783,
+                    #d8b66a
                 );
 
-            color:
-                #17384b;
+            font-size: 13px;
 
-            font-size: 14px;
             font-weight: 800;
 
+            letter-spacing: .015em;
+
             box-shadow:
-                0 10px 25px
-                rgba(216,182,106,.13);
+                0 10px 25px rgba(216,182,106,.16);
 
             transition:
-                transform .2s ease,
-                box-shadow .2s ease;
-
+                transform var(--transition),
+                box-shadow var(--transition);
         }
 
 
         .search-button:hover {
 
-            transform:
-                translateY(-1px);
+            transform: translateY(-1px);
 
             box-shadow:
-                0 13px 30px
-                rgba(216,182,106,.20);
-
+                0 13px 30px rgba(216,182,106,.23);
         }
 
 
         .search-button:active {
 
-            transform:
-                translateY(1px)
-                scale(.99);
-
+            transform: scale(.985);
         }
 
 
         .search-button svg {
 
             width: 18px;
-            height: 18px;
 
+            height: 18px;
         }
 
 
-        /* =================================================
+        /* =========================================================
            AUTOCOMPLETE
-           ================================================= */
+           ========================================================= */
 
         .suggestions {
 
             position: absolute;
 
-            top: calc(100% + 7px);
-
             left: 0;
+
             right: 0;
 
-            z-index: 1000;
+            top: calc(100% + 7px);
 
-            max-height: 230px;
+            z-index: 2000;
+
+            max-height: 250px;
 
             overflow-y: auto;
+
+            padding: 5px;
 
             border:
                 1px solid var(--border);
 
-            border-radius: 14px;
+            border-radius: 15px;
 
             background:
-                var(--card);
+                #17384b;
 
             box-shadow:
-                0 18px 45px
-                rgba(0,0,0,.25);
+                0 18px 45px rgba(0,0,0,.30);
+        }
 
+
+        body.light-mode .suggestions {
+
+            background: #ffffff;
+
+            box-shadow:
+                0 18px 45px rgba(23,56,75,.16);
         }
 
 
         .suggestion-item {
 
             padding:
-                11px 14px;
+                11px 12px;
 
-            color:
-                var(--text);
+            border-radius: 10px;
 
             cursor: pointer;
 
-            font-size: 13px;
+            color: var(--white);
 
-            border-bottom:
-                1px solid var(--border);
+            font-size: 12px;
 
-        }
-
-
-        .suggestion-item:last-child {
-
-            border-bottom: 0;
-
+            transition:
+                background var(--transition);
         }
 
 
         .suggestion-item:hover {
 
             background:
-                rgba(228,199,131,.08);
-
+                rgba(228,199,131,.10);
         }
 
 
-        /* =================================================
+        /* =========================================================
            STATUS
-           ================================================= */
+           ========================================================= */
 
         #status {
 
-            margin-top: 15px;
-
             min-height: 22px;
 
-            color:
-                var(--text-muted);
+            margin:
+                14px 4px 0;
 
-            font-size: 12px;
+            color: var(--muted);
+
+            font-size: 11px;
 
             text-align: center;
-
         }
 
 
-        /* =================================================
+        /* =========================================================
            RESULTS
-           ================================================= */
+           ========================================================= */
 
         #results {
 
-            margin-top: 22px;
-
+            margin-top: 30px;
         }
 
 
-        /* =================================================
-           PAGE
-           ================================================= */
+        .results-header {
 
-        .page {
+            display: flex;
 
-            display: none;
+            align-items: center;
 
-            animation:
-                pageIn .35s ease both;
+            justify-content: space-between;
 
+            gap: 12px;
+
+            margin-bottom: 14px;
         }
 
 
-        .page.active {
+        .results-title {
 
-            display: block;
+            margin: 0;
 
-        }
+            font-family: "Manrope", sans-serif;
 
-
-        .page-title {
-
-            font-family:
-                "Manrope",
-                sans-serif;
-
-            font-size:
-                clamp(
-                    27px,
-                    7vw,
-                    38px
-                );
-
-            line-height: 1.08;
+            font-size: 18px;
 
             font-weight: 800;
 
-            letter-spacing: -.038em;
-
+            letter-spacing: -.03em;
         }
 
 
-        .page-title span {
+        .results-subtitle {
 
-            color:
-                var(--gold);
+            color: var(--muted);
 
+            font-size: 11px;
         }
 
 
-        .page-description {
-
-            margin-top: 12px;
-
-            max-width: 650px;
-
-            color:
-                var(--text-soft);
-
-            font-size: 14px;
-
-        }
-
+        /* =========================================================
+           EMPTY / INFORMATION
+           ========================================================= */
 
         .info-card {
 
-            margin-top: 22px;
+            padding: 24px;
 
-            padding: 21px;
+            text-align: center;
 
             border:
                 1px solid var(--border);
 
-            border-radius: 20px;
+            border-radius: var(--radius-lg);
 
             background:
-                var(--card);
+                rgba(255,255,255,.025);
+        }
 
-            box-shadow:
-                var(--shadow);
 
+        .info-icon {
+
+            width: 48px;
+
+            height: 48px;
+
+            margin: 0 auto 12px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 16px;
+
+            color: var(--gold);
+
+            background:
+                rgba(228,199,131,.08);
+        }
+
+
+        .info-icon svg {
+
+            width: 22px;
+
+            height: 22px;
         }
 
 
         .info-card h3 {
 
-            font-family:
-                "Manrope",
-                sans-serif;
+            margin:
+                0 0 6px;
 
-            font-size: 16px;
+            font-family: "Manrope", sans-serif;
+
+            font-size: 15px;
+
             font-weight: 800;
-
-            letter-spacing: -.025em;
-
         }
 
 
         .info-card p {
 
-            margin-top: 8px;
+            max-width: 480px;
 
-            color:
-                var(--text-soft);
+            margin: 0 auto;
 
-            font-size: 13px;
+            color: var(--muted);
 
+            font-size: 12px;
+
+            line-height: 1.6;
         }
 
 
-        .info-card + .info-card {
+        /* =========================================================
+           FOOTER
+           ========================================================= */
 
-            margin-top: 12px;
-
-        }
-
-
-        /* =================================================
-           BUTTON LINK
-           ================================================= */
-
-        .action-button {
-
-            width: 100%;
-
-            min-height: 50px;
-
-            margin-top: 14px;
+        .app-footer {
 
             padding:
-                12px 16px;
+                30px 10px
+                calc(25px + env(safe-area-inset-bottom));
 
-            display: flex;
+            text-align: center;
 
-            align-items: center;
-            justify-content: center;
+            color: var(--muted);
 
-            border-radius: 14px;
+            font-size: 10px;
+        }
 
-            background:
-                rgba(228,199,131,.10);
 
-            border:
-                1px solid
-                rgba(228,199,131,.20);
+        .footer-brand {
 
-            color:
-                var(--gold);
+            margin-bottom: 4px;
 
-            font-size: 13px;
-            font-weight: 700;
+            color: var(--soft);
+
+            font-family: "Manrope", sans-serif;
+
+            font-weight: 800;
+
+            letter-spacing: .02em;
+        }
+
+
+        .footer-email {
+
+            color: var(--muted);
 
             transition:
-                background .2s ease,
-                transform .2s ease;
-
+                color var(--transition);
         }
 
 
-        .action-button:hover {
-
-            background:
-                rgba(228,199,131,.15);
-
+        .footer-email:hover {
+            color: var(--gold);
         }
 
 
-        .action-button:active {
+        /* =========================================================
+           DRAWER OVERLAY
+           ========================================================= */
 
-            transform:
-                scale(.985);
-
-        }
-
-
-        /* =================================================
-           DRAWER
-           ================================================= */
-
-        .drawer-overlay {
+        #drawerOverlay {
 
             position: fixed;
 
@@ -1314,41 +1305,56 @@
             z-index: 9000;
 
             background:
-                rgba(0,0,0,.48);
+                rgba(3,14,22,.58);
 
             opacity: 0;
 
             visibility: hidden;
 
-            transition:
-                opacity .28s ease,
-                visibility .28s ease;
+            pointer-events: none;
 
+            transition:
+                opacity .25s ease,
+                visibility .25s ease;
+
+            backdrop-filter:
+                blur(3px);
+
+            -webkit-backdrop-filter:
+                blur(3px);
         }
 
 
-        .drawer-overlay.active {
+        #drawerOverlay.open {
 
             opacity: 1;
+
             visibility: visible;
 
+            pointer-events: auto;
         }
 
 
-        .drawer {
+        /* =========================================================
+           DRAWER
+           ========================================================= */
+
+        #sideDrawer {
 
             position: fixed;
 
             top: 0;
-            left: 0;
+
             bottom: 0;
 
-            z-index: 9100;
+            left: 0;
+
+            z-index: 10000;
 
             width:
                 min(
-                    310px,
-                    86vw
+                    var(--drawer-width),
+                    88vw
                 );
 
             display: flex;
@@ -1356,33 +1362,48 @@
             flex-direction: column;
 
             padding:
-                20px 15px;
+                env(safe-area-inset-top)
+                16px
+                env(safe-area-inset-bottom);
 
             background:
-                var(--card);
+                linear-gradient(
+                    180deg,
+                    #132f40,
+                    #102536
+                );
 
             border-right:
                 1px solid var(--border);
 
             box-shadow:
-                18px 0 50px
-                rgba(0,0,0,.18);
+                20px 0 60px rgba(0,0,0,.25);
 
             transform:
                 translateX(-105%);
 
             transition:
-                transform .32s
-                cubic-bezier(.22,.61,.36,1);
+                transform .28s cubic-bezier(.2,.8,.2,1);
 
+            overflow-y: auto;
         }
 
 
-        .drawer.active {
+        body.light-mode #sideDrawer {
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #ffffff,
+                    #eef4f5
+                );
+        }
+
+
+        #sideDrawer.open {
 
             transform:
                 translateX(0);
-
         }
 
 
@@ -1391,11 +1412,11 @@
             display: flex;
 
             align-items: center;
+
             justify-content: space-between;
 
             padding:
-                4px 6px 20px;
-
+                12px 5px 20px;
         }
 
 
@@ -1406,109 +1427,123 @@
             align-items: center;
 
             gap: 11px;
-
         }
 
 
-        .drawer-brand-mark {
+        .drawer-logo {
 
-            width: 40px;
-            height: 40px;
+            width: 42px;
+
+            height: 42px;
 
             display: flex;
 
             align-items: center;
+
             justify-content: center;
 
-            border-radius: 12px;
+            border-radius: 13px;
+
+            color: #102536;
 
             background:
                 linear-gradient(
                     145deg,
-                    var(--gold),
-                    var(--kai-red)
+                    #e4c783,
+                    #c76568
                 );
+        }
 
-            color:
-                var(--navy-deep);
 
-            font-family:
-                "Manrope",
-                sans-serif;
+        .drawer-logo svg {
 
-            font-size: 13px;
-            font-weight: 800;
+            width: 24px;
 
+            height: 24px;
         }
 
 
         .drawer-brand-title {
 
-            font-family:
-                "Manrope",
-                sans-serif;
+            margin: 0;
 
-            font-size: 15px;
+            font-family: "Manrope", sans-serif;
+
+            font-size: 16px;
+
             font-weight: 800;
 
+            letter-spacing: -.035em;
         }
 
 
-        .drawer-brand-sub {
+        .drawer-brand-subtitle {
 
-            color:
-                var(--text-muted);
+            margin-top: -1px;
 
-            font-size: 10px;
+            color: var(--muted);
 
+            font-size: 9px;
+
+            letter-spacing: .04em;
         }
 
 
-        .drawer-close {
+        #drawerClose {
 
             width: 38px;
+
             height: 38px;
 
             display: flex;
 
             align-items: center;
+
             justify-content: center;
 
-            border-radius: 11px;
+            border-radius: 12px;
 
-            color:
-                var(--text-muted);
+            cursor: pointer;
+
+            color: var(--muted);
 
             background:
-                rgba(255,255,255,.04);
+                rgba(255,255,255,.045);
+        }
 
+
+        #drawerClose svg {
+
+            width: 18px;
+
+            height: 18px;
+        }
+
+
+        .drawer-section-label {
+
+            padding:
+                13px 9px 7px;
+
+            color: var(--muted);
+
+            font-size: 9px;
+
+            font-weight: 800;
+
+            letter-spacing: .1em;
+
+            text-transform: uppercase;
         }
 
 
         .drawer-nav {
 
-            overflow-y: auto;
+            display: flex;
 
-            padding-right: 2px;
+            flex-direction: column;
 
-        }
-
-
-        .drawer-section-title {
-
-            margin:
-                9px 8px 7px;
-
-            color:
-                var(--text-muted);
-
-            font-size: 10px;
-            font-weight: 800;
-
-            letter-spacing: .08em;
-
-            text-transform: uppercase;
-
+            gap: 3px;
         }
 
 
@@ -1516,63 +1551,56 @@
 
             width: 100%;
 
-            min-height: 48px;
-
-            margin-bottom: 4px;
-
-            padding:
-                8px 10px;
-
             display: flex;
 
             align-items: center;
 
-            gap: 11px;
+            gap: 12px;
 
-            border-radius: 13px;
+            padding:
+                11px 10px;
 
-            background: transparent;
+            border-radius: 14px;
 
-            color:
-                var(--text-soft);
+            cursor: pointer;
 
             text-align: left;
 
-            font-size: 13px;
-            font-weight: 600;
+            color: var(--soft);
+
+            background: transparent;
 
             transition:
-                background .2s ease,
-                color .2s ease;
-
+                background var(--transition),
+                color var(--transition),
+                transform var(--transition);
         }
 
 
         .drawer-item:hover {
 
+            color: var(--white);
+
             background:
-                rgba(228,199,131,.07);
+                rgba(255,255,255,.055);
 
-            color:
-                var(--text);
-
+            transform: translateX(2px);
         }
 
 
         .drawer-item.active {
 
+            color: var(--gold);
+
             background:
-                rgba(228,199,131,.10);
-
-            color:
-                var(--gold);
-
+                rgba(228,199,131,.085);
         }
 
 
         .drawer-item-icon {
 
             width: 34px;
+
             height: 34px;
 
             flex: 0 0 34px;
@@ -1580,21 +1608,33 @@
             display: flex;
 
             align-items: center;
+
             justify-content: center;
 
             border-radius: 10px;
 
-            background:
-                rgba(255,255,255,.04);
+            color: var(--muted);
 
+            background:
+                rgba(255,255,255,.045);
+        }
+
+
+        .drawer-item.active
+        .drawer-item-icon {
+
+            color: var(--gold);
+
+            background:
+                rgba(228,199,131,.09);
         }
 
 
         .drawer-item-icon svg {
 
             width: 17px;
-            height: 17px;
 
+            height: 17px;
         }
 
 
@@ -1602,81 +1642,353 @@
 
             flex: 1;
 
+            font-size: 12px;
+
+            font-weight: 600;
+        }
+
+
+        .drawer-footer {
+
+            margin-top: auto;
+
+            padding-top: 16px;
         }
 
 
         .drawer-exit-section {
 
-            margin-top: auto;
+            margin-top: 12px;
 
             padding-top: 14px;
 
             border-top:
                 1px solid var(--border);
-
         }
 
 
         .drawer-exit {
 
-            color:
-                var(--text-muted);
+            color: var(--muted);
 
             opacity: .82;
-
-            margin-bottom: 0;
-
         }
 
 
-        .drawer-exit .drawer-item-icon {
+        .drawer-exit
+        .drawer-item-icon {
 
-            color:
-                var(--kai-red);
+            color: var(--kai-red);
 
             background:
                 rgba(199,101,104,.07);
-
         }
 
 
         .drawer-exit:hover {
 
-            color:
-                var(--kai-red);
-
+            color: var(--kai-red);
         }
 
 
-        /* =================================================
-           TOGGLE
-           ================================================= */
+        .drawer-version {
 
-        .theme-toggle-row {
+            padding:
+                15px 9px 4px;
+
+            color: var(--muted);
+
+            font-size: 9px;
+
+            line-height: 1.5;
+        }
+
+
+        /* =========================================================
+           PAGE SYSTEM
+           ========================================================= */
+
+        .page {
+
+            display: none;
+
+            animation:
+                pageIn .25s ease both;
+        }
+
+
+        .page.active {
+
+            display: block;
+        }
+
+
+        @keyframes pageIn {
+
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+
+        .page-heading {
+
+            padding:
+                18px 0 26px;
+        }
+
+
+        .page-kicker {
+
+            margin-bottom: 8px;
+
+            color: var(--gold);
+
+            font-size: 10px;
+
+            font-weight: 800;
+
+            letter-spacing: .09em;
+
+            text-transform: uppercase;
+        }
+
+
+        .page-title {
+
+            margin: 0;
+
+            font-family: "Manrope", sans-serif;
+
+            font-size:
+                clamp(27px, 7vw, 38px);
+
+            line-height: 1.05;
+
+            font-weight: 800;
+
+            letter-spacing: -.038em;
+        }
+
+
+        .page-description {
+
+            max-width: 650px;
+
+            margin-top: 11px;
+
+            color: var(--muted);
+
+            font-size: 13px;
+
+            line-height: 1.65;
+        }
+
+
+        .content-card {
+
+            margin-bottom: 12px;
+
+            padding: 20px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: var(--radius-lg);
+
+            background:
+                rgba(255,255,255,.025);
+        }
+
+
+        body.light-mode .content-card {
+
+            background: rgba(255,255,255,.82);
+        }
+
+
+        .content-card h3 {
+
+            margin:
+                0 0 8px;
+
+            font-family: "Manrope", sans-serif;
+
+            font-size: 15px;
+
+            font-weight: 800;
+
+            letter-spacing: -.02em;
+        }
+
+
+        .content-card p {
+
+            margin:
+                0 0 9px;
+
+            color: var(--soft);
+
+            font-size: 12px;
+
+            line-height: 1.7;
+        }
+
+
+        .content-card p:last-child {
+            margin-bottom: 0;
+        }
+
+
+        .content-list {
+
+            margin: 0;
+
+            padding-left: 19px;
+
+            color: var(--soft);
+
+            font-size: 12px;
+
+            line-height: 1.8;
+        }
+
+
+        .content-list li + li {
+            margin-top: 5px;
+        }
+
+
+        /* =========================================================
+           ACTION BUTTON
+           ========================================================= */
+
+        .action-button {
+
+            width: 100%;
+
+            min-height: 48px;
 
             display: flex;
 
             align-items: center;
+
+            justify-content: center;
+
+            gap: 8px;
+
+            margin-top: 12px;
+
+            padding: 10px 16px;
+
+            border-radius: 14px;
+
+            cursor: pointer;
+
+            color: #102536;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #e4c783,
+                    #d8b66a
+                );
+
+            font-size: 12px;
+
+            font-weight: 800;
+        }
+
+
+        .action-button.secondary {
+
+            color: var(--white);
+
+            background:
+                rgba(255,255,255,.06);
+
+            border:
+                1px solid var(--border);
+        }
+
+
+        .action-button svg {
+
+            width: 17px;
+
+            height: 17px;
+        }
+
+
+        /* =========================================================
+           SETTINGS
+           ========================================================= */
+
+        .setting-row {
+
+            display: flex;
+
+            align-items: center;
+
             justify-content: space-between;
 
+            gap: 15px;
+
+            padding: 14px 0;
+
+            border-bottom:
+                1px solid var(--border);
+        }
+
+
+        .setting-row:last-child {
+            border-bottom: 0;
+        }
+
+
+        .setting-info strong {
+
+            display: block;
+
+            margin-bottom: 2px;
+
+            font-size: 12px;
+        }
+
+
+        .setting-info span {
+
+            color: var(--muted);
+
+            font-size: 10px;
         }
 
 
         .theme-toggle {
 
-            width: 46px;
-            height: 25px;
-
             position: relative;
 
-            border-radius: 99px;
+            width: 48px;
+
+            height: 27px;
+
+            flex: 0 0 48px;
+
+            border-radius: 999px;
+
+            cursor: pointer;
 
             background:
                 rgba(255,255,255,.12);
 
-            border:
-                1px solid var(--border);
-
+            transition:
+                background .2s ease;
         }
 
 
@@ -1686,34 +1998,41 @@
 
             position: absolute;
 
-            top: 3px;
-            left: 3px;
+            top: 4px;
 
-            width: 17px;
-            height: 17px;
+            left: 4px;
+
+            width: 19px;
+
+            height: 19px;
 
             border-radius: 50%;
 
-            background:
-                var(--gold);
+            background: var(--gold);
 
             transition:
-                transform .25s ease;
-
+                transform .22s ease;
         }
 
 
-        body.light-mode .theme-toggle::after {
+        body.light-mode .theme-toggle {
+
+            background:
+                rgba(23,56,75,.12);
+        }
+
+
+        body.light-mode
+        .theme-toggle::after {
 
             transform:
-                translateX(20px);
-
+                translateX(21px);
         }
 
 
-        /* =================================================
+        /* =========================================================
            TOAST
-           ================================================= */
+           ========================================================= */
 
         #tarsusToast {
 
@@ -1727,46 +2046,42 @@
                     env(safe-area-inset-bottom)
                 );
 
-            z-index: 99999;
+            z-index: 20000;
 
             max-width:
-                calc(
-                    100% - 32px
-                );
+                calc(100vw - 36px);
 
             padding:
-                11px 15px;
-
-            border-radius: 13px;
-
-            background:
-                #17384b;
+                10px 15px;
 
             border:
-                1px solid
-                rgba(228,199,131,.20);
+                1px solid var(--border);
 
-            color:
-                #f5f8f8;
+            border-radius: 999px;
 
-            font-size: 12px;
-            font-weight: 600;
+            color: var(--white);
+
+            background:
+                rgba(16,37,54,.94);
 
             box-shadow:
-                0 15px 35px
-                rgba(0,0,0,.25);
+                0 15px 40px rgba(0,0,0,.24);
+
+            font-size: 11px;
+
+            font-weight: 600;
 
             opacity: 0;
 
-            pointer-events: none;
+            visibility: hidden;
 
             transform:
-                translate(-50%, 15px);
+                translate(-50%, 12px);
 
             transition:
-                opacity .25s ease,
-                transform .25s ease;
-
+                opacity .2s ease,
+                transform .2s ease,
+                visibility .2s ease;
         }
 
 
@@ -1774,176 +2089,112 @@
 
             opacity: 1;
 
+            visibility: visible;
+
             transform:
                 translate(-50%, 0);
-
         }
 
 
-        /* =================================================
-           FOOTER
-           ================================================= */
-
-        .app-footer {
-
-            padding:
-                35px 0 5px;
-
-            color:
-                var(--text-muted);
-
-            text-align: center;
-
-            font-size: 11px;
-
-        }
-
-
-        .app-footer strong {
-
-            color:
-                var(--text-soft);
-
-            font-weight: 700;
-
-        }
-
-
-        /* =================================================
-           ANIMATION
-           ================================================= */
-
-        @keyframes pageIn {
-
-            from {
-
-                opacity: 0;
-                transform:
-                    translateY(8px);
-
-            }
-
-            to {
-
-                opacity: 1;
-                transform:
-                    translateY(0);
-
-            }
-
-        }
-
-
-        /* =================================================
-           MOBILE
-           ================================================= */
+        /* =========================================================
+           RESPONSIVE
+           ========================================================= */
 
         @media (max-width: 680px) {
 
             .topbar {
-
-                height: 62px;
-
-                padding:
-                    0 14px;
-
+                height: 64px;
             }
 
-
-            .main-container {
-
-                width:
-                    min(
-                        100% - 24px,
-                        920px
-                    );
-
-                padding:
-                    27px 0 65px;
-
+            main {
+                padding-top: 34px;
             }
 
-
-            .hero {
-
-                padding:
-                    18px 0 21px;
-
+            .home-hero {
+                padding-bottom: 28px;
             }
-
-
-            .hero h1 {
-
-                font-size:
-                    clamp(
-                        30px,
-                        10vw,
-                        42px
-                    );
-
-            }
-
-
-            .hero p {
-
-                font-size: 13px;
-
-            }
-
 
             .search-card {
-
-                padding: 16px;
-
-                border-radius: 20px;
-
+                padding: 15px;
+                border-radius: 22px;
             }
-
 
             .station-row {
-
-                grid-template-columns:
-                    1fr;
-
-                gap: 9px;
-
+                grid-template-columns: 1fr;
+                gap: 11px;
             }
 
-
-            .swap-button {
-
-                width: 100%;
-                height: 39px;
-
-                margin: 0;
-
+            .swap-wrapper {
+                position: absolute;
+                right: 9px;
+                top: 50%;
+                z-index: 10;
+                padding: 0;
+                transform: translateY(-50%);
             }
 
-
-            .swap-button svg {
-
-                transform:
-                    rotate(90deg);
-
+            #swapBtn {
+                width: 38px;
+                height: 38px;
+                background: var(--navy-card);
+                box-shadow: 0 5px 16px rgba(0,0,0,.18);
             }
 
+            .station-input {
+                height: 54px;
+                padding-right: 54px;
+            }
 
-            .drawer {
+            .search-button {
+                height: 54px;
+            }
 
-                width:
-                    min(
-                        310px,
-                        88vw
-                    );
-
+            .page-heading {
+                padding-top: 8px;
             }
 
         }
 
 
-        /* =================================================
-           REDUCED MOTION
-           ================================================= */
+        @media (max-width: 380px) {
+
+            main {
+                padding-left: 13px;
+                padding-right: 13px;
+            }
+
+            .topbar {
+                padding-left: 13px;
+                padding-right: 13px;
+            }
+
+            .home-title {
+                font-size: 31px;
+            }
+
+            .topbar-brand-title {
+                font-size: 14px;
+            }
+
+            .topbar-brand-subtitle {
+                display: none;
+            }
+
+        }
+
+
+        @media (min-width: 681px) {
+
+            .search-card {
+                padding: 26px;
+            }
+
+            .home-hero {
+                padding-top: 35px;
+            }
+
+        }
+
 
         @media (prefers-reduced-motion: reduce) {
 
@@ -1951,21 +2202,16 @@
             *::before,
             *::after {
 
-                animation-duration:
-                    .01ms !important;
+                scroll-behavior: auto !important;
 
-                animation-iteration-count:
-                    1 !important;
+                animation-duration: .01ms !important;
 
-                transition-duration:
-                    .01ms !important;
+                animation-iteration-count: 1 !important;
 
-                scroll-behavior:
-                    auto !important;
-
+                transition-duration: .01ms !important;
             }
-
         }
+
 
     </style>
 
@@ -1975,25 +2221,35 @@
 <body>
 
 
-    <!-- =================================================
+    <!-- =========================================================
          SPLASH
-         ================================================= -->
+         ========================================================= -->
 
     <div id="splashScreen">
 
         <div class="splash-content">
 
             <div class="splash-logo">
-                T
+
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <path d="M3 5.5A2.5 2.5 0 0 1 5.5 3h13A2.5 2.5 0 0 1 21 5.5v8A2.5 2.5 0 0 1 18.5 16H18l1.5 2h-2l-1.5-2H8l-1.5 2h-2L6 16h-.5A2.5 2.5 0 0 1 3 13.5v-8Zm3 1v5h12v-5H6Zm1 8.5a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5Zm10 0a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5ZM8 8h10v2H8V8Z"/>
+                </svg>
+
             </div>
 
-            <div class="splash-title">
-                TARSUS FINDER
-            </div>
+
+            <h1 class="splash-brand">
+                TARSUS
+            </h1>
+
 
             <div class="splash-subtitle">
                 Tarif Khusus Perjalanan Kereta Api
             </div>
+
 
             <div class="splash-loading"></div>
 
@@ -2003,33 +2259,41 @@
 
 
 
-    <!-- =================================================
+    <!-- =========================================================
          DRAWER OVERLAY
-         ================================================= -->
+         ========================================================= -->
 
     <div
-        class="drawer-overlay"
         id="drawerOverlay"
+        aria-hidden="true"
     ></div>
 
 
 
-    <!-- =================================================
-         DRAWER
-         ================================================= -->
+    <!-- =========================================================
+         SIDE DRAWER
+         ========================================================= -->
 
     <aside
-        class="drawer"
         id="sideDrawer"
+        aria-hidden="true"
     >
 
         <div class="drawer-header">
 
             <div class="drawer-brand">
 
-                <div class="drawer-brand-mark">
-                    T
+                <div class="drawer-logo">
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <path d="M3 5.5A2.5 2.5 0 0 1 5.5 3h13A2.5 2.5 0 0 1 21 5.5v8A2.5 2.5 0 0 1 18.5 16H18l1.5 2h-2l-1.5-2H8l-1.5 2h-2L6 16h-.5A2.5 2.5 0 0 1 3 13.5v-8Zm3 1v5h12v-5H6Zm1 8.5a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5Zm10 0a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5ZM8 8h10v2H8V8Z"/>
+                    </svg>
+
                 </div>
+
 
                 <div>
 
@@ -2037,7 +2301,7 @@
                         TARSUS
                     </div>
 
-                    <div class="drawer-brand-sub">
+                    <div class="drawer-brand-subtitle">
                         KAI 121
                     </div>
 
@@ -2047,7 +2311,6 @@
 
 
             <button
-                class="drawer-close"
                 id="drawerClose"
                 type="button"
                 aria-label="Tutup menu"
@@ -2059,11 +2322,9 @@
                     stroke="currentColor"
                     stroke-width="2"
                 >
-
                     <path
-                        d="M18 6L6 18M6 6l12 12"
+                        d="M6 6l12 12M18 6L6 18"
                     />
-
                 </svg>
 
             </button>
@@ -2072,17 +2333,18 @@
 
 
 
-        <nav class="drawer-nav">
+        <div class="drawer-section-label">
+            Menu
+        </div>
 
-            <div class="drawer-section-title">
-                Menu Utama
-            </div>
+
+        <nav class="drawer-nav">
 
 
             <button
                 class="drawer-item active"
-                data-page="home"
                 type="button"
+                data-page="home"
             >
 
                 <span class="drawer-item-icon">
@@ -2091,21 +2353,11 @@
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        stroke-width="2"
+                        stroke-width="1.8"
                     >
-
-                        <path
-                            d="M3 10.5L12 3l9 7.5"
-                        />
-
-                        <path
-                            d="M5 9.5V21h14V9.5"
-                        />
-
-                        <path
-                            d="M9 21v-6h6v6"
-                        />
-
+                        <path d="m3 10 9-7 9 7"/>
+                        <path d="M5 9v11h14V9"/>
+                        <path d="M9 20v-6h6v6"/>
                     </svg>
 
                 </span>
@@ -2117,10 +2369,11 @@
             </button>
 
 
+
             <button
                 class="drawer-item"
-                data-page="search"
                 type="button"
+                data-page="search"
             >
 
                 <span class="drawer-item-icon">
@@ -2129,19 +2382,10 @@
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        stroke-width="2"
+                        stroke-width="1.8"
                     >
-
-                        <circle
-                            cx="11"
-                            cy="11"
-                            r="7"
-                        />
-
-                        <path
-                            d="M20 20l-4-4"
-                        />
-
+                        <circle cx="11" cy="11" r="6.5"/>
+                        <path d="m16 16 5 5"/>
                     </svg>
 
                 </span>
@@ -2156,8 +2400,8 @@
 
             <button
                 class="drawer-item"
-                data-page="guide"
                 type="button"
+                data-page="guide"
             >
 
                 <span class="drawer-item-icon">
@@ -2166,23 +2410,11 @@
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        stroke-width="2"
+                        stroke-width="1.8"
                     >
-
-                        <circle
-                            cx="12"
-                            cy="12"
-                            r="9"
-                        />
-
-                        <path
-                            d="M12 11v5"
-                        />
-
-                        <path
-                            d="M12 8h.01"
-                        />
-
+                        <circle cx="12" cy="12" r="9"/>
+                        <path d="M12 10v6"/>
+                        <path d="M12 7.2v.1"/>
                     </svg>
 
                 </span>
@@ -2195,15 +2427,10 @@
 
 
 
-            <div class="drawer-section-title">
-                Informasi
-            </div>
-
-
             <button
                 class="drawer-item"
-                data-page="about"
                 type="button"
+                data-page="about"
             >
 
                 <span class="drawer-item-icon">
@@ -2212,23 +2439,11 @@
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        stroke-width="2"
+                        stroke-width="1.8"
                     >
-
-                        <circle
-                            cx="12"
-                            cy="12"
-                            r="9"
-                        />
-
-                        <path
-                            d="M12 10v6"
-                        />
-
-                        <path
-                            d="M12 7h.01"
-                        />
-
+                        <circle cx="12" cy="12" r="9"/>
+                        <path d="M12 10v6"/>
+                        <path d="M12 7.2v.1"/>
                     </svg>
 
                 </span>
@@ -2240,10 +2455,11 @@
             </button>
 
 
+
             <button
                 class="drawer-item"
-                data-page="help"
                 type="button"
+                data-page="help"
             >
 
                 <span class="drawer-item-icon">
@@ -2252,17 +2468,10 @@
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        stroke-width="2"
+                        stroke-width="1.8"
                     >
-
-                        <path
-                            d="M4 5h16v12H8l-4 4V5z"
-                        />
-
-                        <path
-                            d="M8 9h8M8 13h5"
-                        />
-
+                        <path d="M21 11.5a8.5 8.5 0 0 1-9 8.5 9.6 9.6 0 0 1-4-.9L3 21l1.5-4A8.5 8.5 0 1 1 21 11.5Z"/>
+                        <path d="M8 11.5h.01M12 11.5h.01M16 11.5h.01"/>
                     </svg>
 
                 </span>
@@ -2274,10 +2483,11 @@
             </button>
 
 
+
             <button
                 class="drawer-item"
-                data-page="terms"
                 type="button"
+                data-page="terms"
             >
 
                 <span class="drawer-item-icon">
@@ -2286,17 +2496,11 @@
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        stroke-width="2"
+                        stroke-width="1.8"
                     >
-
-                        <path
-                            d="M6 3h12v18H6z"
-                        />
-
-                        <path
-                            d="M9 7h6M9 11h6M9 15h4"
-                        />
-
+                        <path d="M6 3h9l3 3v15H6z"/>
+                        <path d="M14 3v4h4"/>
+                        <path d="M9 12h6M9 15h6"/>
                     </svg>
 
                 </span>
@@ -2308,44 +2512,11 @@
             </button>
 
 
+
             <button
                 class="drawer-item"
-                data-page="support"
                 type="button"
-            >
-
-                <span class="drawer-item-icon">
-
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
-
-                        <path
-                            d="M12 21s-7-4.35-7-10V5l7-3 7 3v6c0 5.65-7 10-7 10z"
-                        />
-
-                        <path
-                            d="M9 12l2 2 4-4"
-                        />
-
-                    </svg>
-
-                </span>
-
-                <span class="drawer-item-text">
-                    Dukung & Beri Rating
-                </span>
-
-            </button>
-
-
-            <button
-                class="drawer-item"
                 data-page="instagram"
-                type="button"
             >
 
                 <span class="drawer-item-icon">
@@ -2354,9 +2525,8 @@
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        stroke-width="2"
+                        stroke-width="1.8"
                     >
-
                         <rect
                             x="3"
                             y="3"
@@ -2364,17 +2534,8 @@
                             height="18"
                             rx="5"
                         />
-
-                        <circle
-                            cx="12"
-                            cy="12"
-                            r="4"
-                        />
-
-                        <path
-                            d="M17.5 6.5h.01"
-                        />
-
+                        <circle cx="12" cy="12" r="4"/>
+                        <path d="M17.5 6.5h.01"/>
                     </svg>
 
                 </span>
@@ -2387,15 +2548,10 @@
 
 
 
-            <div class="drawer-section-title">
-                Pengaturan
-            </div>
-
-
             <button
                 class="drawer-item"
-                data-page="settings"
                 type="button"
+                data-page="support"
             >
 
                 <span class="drawer-item-icon">
@@ -2404,19 +2560,38 @@
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        stroke-width="2"
+                        stroke-width="1.8"
                     >
+                        <path d="M12 3v18"/>
+                        <path d="M17 7.5c-.8-1.3-2.3-2-4.2-2-2.4 0-4.1 1.2-4.1 3s1.5 2.6 4.1 3.1c2.7.5 4.2 1.3 4.2 3.1s-1.7 3.1-4.3 3.1c-2.1 0-3.7-.8-4.7-2.2"/>
+                    </svg>
 
-                        <circle
-                            cx="12"
-                            cy="12"
-                            r="3"
-                        />
+                </span>
 
-                        <path
-                            d="M19.4 15a1.8 1.8 0 0 0 .36 2l.05.05-1.4 1.4-.05-.05a1.8 1.8 0 0 0-2-.36 1.8 1.8 0 0 0-1.1 1.66V20h-2v-.3a1.8 1.8 0 0 0-1.1-1.66 1.8 1.8 0 0 0-2 .36l-.05.05-1.4-1.4.05-.05a1.8 1.8 0 0 0 .36-2 1.8 1.8 0 0 0-1.66-1.1H5v-2h.3a1.8 1.8 0 0 0 1.66-1.1 1.8 1.8 0 0 0-.36-2l-.05-.05 1.4-1.4.05.05a1.8 1.8 0 0 0 2 .36 1.8 1.8 0 0 0 1.1-1.66V4h2v.3a1.8 1.8 0 0 0 1.1 1.66 1.8 1.8 0 0 0 2-.36l.05-.05 1.4 1.4-.05.05a1.8 1.8 0 0 0-.36 2 1.8 1.8 0 0 0 1.66 1.1H20v2h-.3a1.8 1.8 0 0 0-1.66 1.1z"
-                        />
+                <span class="drawer-item-text">
+                    Dukung & Beri Rating
+                </span>
 
+            </button>
+
+
+
+            <button
+                class="drawer-item"
+                type="button"
+                data-page="settings"
+            >
+
+                <span class="drawer-item-icon">
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                    >
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-2.6V20a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1-1.8-1.8.1-.1A1.7 1.7 0 0 0 8 15a1.7 1.7 0 0 0-1.6-1H6v-2.6h.2A1.7 1.7 0 0 0 8 10a1.7 1.7 0 0 0-.3-1.9l-.1-.1 1.8-1.8.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6v-.2H15V5a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.8 1.8-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2V14H21a1.7 1.7 0 0 0-1.6 1Z"/>
                     </svg>
 
                 </span>
@@ -2427,48 +2602,50 @@
 
             </button>
 
+
         </nav>
 
 
 
-        <div class="drawer-exit-section">
+        <div class="drawer-footer">
 
-            <button
-                class="drawer-item drawer-exit"
-                id="exitAppButton"
-                type="button"
-            >
+            <div class="drawer-exit-section">
 
-                <span class="drawer-item-icon">
+                <button
+                    class="drawer-item drawer-exit"
+                    id="exitAppButton"
+                    type="button"
+                >
 
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
+                    <span class="drawer-item-icon">
 
-                        <path
-                            d="M10 17l5-5-5-5"
-                        />
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                        >
+                            <path d="M10 17l5-5-5-5"/>
+                            <path d="M15 12H3"/>
+                            <path d="M20 4v16"/>
+                        </svg>
 
-                        <path
-                            d="M15 12H3"
-                        />
+                    </span>
 
-                        <path
-                            d="M21 19V5a2 2 0 0 0-2-2h-6"
-                        />
+                    <span class="drawer-item-text">
+                        Keluar Aplikasi
+                    </span>
 
-                    </svg>
+                </button>
 
-                </span>
+            </div>
 
-                <span class="drawer-item-text">
-                    Keluar Aplikasi
-                </span>
 
-            </button>
+            <div class="drawer-version">
+
+                TARSUS Finder • Versi v1.0.0
+
+            </div>
 
         </div>
 
@@ -2476,90 +2653,85 @@
 
 
 
-    <!-- =================================================
+    <!-- =========================================================
          APP
-         ================================================= -->
+         ========================================================= -->
 
-    <div id="appShell">
+    <div id="app">
 
-
-        <!-- TOPBAR -->
-
-        <header class="topbar">
-
-            <div class="brand-mini">
-
-                <div class="brand-mark">
-                    T
-                </div>
-
-                <div>
-
-                    <div class="brand-name">
-                        TARSUS FINDER
-                    </div>
-
-                    <div class="brand-sub">
-                        KAI 121
-                    </div>
-
-                </div>
-
-            </div>
+        <div class="app-shell">
 
 
-            <button
-                class="menu-button"
-                id="menuButton"
-                type="button"
-                aria-label="Buka menu"
-            >
+            <!-- TOP BAR -->
 
-                <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
+            <header class="topbar">
+
+                <button
+                    class="menu-button"
+                    id="menuButton"
+                    type="button"
+                    aria-label="Buka menu"
                 >
 
-                    <path
-                        d="M4 6h16M4 12h16M4 18h16"
-                    />
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path d="M4 6h16"/>
+                        <path d="M4 12h16"/>
+                        <path d="M4 18h16"/>
+                    </svg>
 
-                </svg>
-
-            </button>
-
-        </header>
+                </button>
 
 
+                <div class="topbar-brand">
 
-        <main class="main-container">
+                    <span class="topbar-brand-title">
+                        TARSUS FINDER
+                    </span>
+
+                    <span class="topbar-brand-subtitle">
+                        KAI 121
+                    </span>
+
+                </div>
 
 
-            <!-- =========================================
-                 HOME
-                 ========================================= -->
+                <div class="topbar-version">
+                    v1.0.0
+                </div>
 
-            <section
-                class="page active"
-                id="page-home"
-            >
+            </header>
 
-                <div class="home-page">
 
-                    <div class="hero">
 
-                        <div class="eyebrow">
+            <main>
 
-                            <span class="eyebrow-dot"></span>
 
-                            Tarif Khusus
+                <!-- =================================================
+                     HOME PAGE
+                     ================================================= -->
+
+                <section
+                    class="page active"
+                    id="page-home"
+                >
+
+                    <div class="home-hero">
+
+                        <div class="hero-eyebrow">
+
+                            <span class="hero-eyebrow-dot"></span>
+
+                            Tarif Khusus KAI
 
                         </div>
 
 
-                        <h1>
+                        <h1 class="home-title">
 
                             TARSUS
                             <span>FINDER</span>
@@ -2567,10 +2739,10 @@
                         </h1>
 
 
-                        <p>
+                        <p class="home-subtitle">
+
                             Temukan informasi tarif khusus perjalanan
-                            kereta api dengan lebih cepat, praktis,
-                            dan sederhana.
+                            kereta api dengan lebih cepat dan praktis.
 
                         </p>
 
@@ -2578,89 +2750,112 @@
 
 
 
-                    <div class="search-card">
+                    <!-- SEARCH -->
+
+                    <div
+                        class="search-card"
+                        id="searchCard"
+                    >
 
                         <div class="station-row">
 
 
+                            <!-- ASAL -->
+
                             <div class="station-field">
 
                                 <label
-                                    class="search-label"
+                                    class="station-label"
                                     for="asal"
                                 >
                                     Stasiun Asal
                                 </label>
 
-                                <input
-                                    type="text"
-                                    id="asal"
-                                    class="station-input"
-                                    placeholder="Contoh: Gambir"
-                                    autocomplete="off"
-                                >
 
-                                <div
-                                    id="asal-suggestions"
-                                    class="suggestions"
-                                ></div>
+                                <div class="station-input-wrap">
+
+                                    <input
+                                        type="text"
+                                        id="asal"
+                                        class="station-input"
+                                        placeholder="Ketik stasiun asal..."
+                                        autocomplete="off"
+                                        spellcheck="false"
+                                    >
+
+
+                                    <div
+                                        id="asal-suggestions"
+                                        class="suggestions hidden"
+                                    ></div>
+
+                                </div>
 
                             </div>
 
 
 
-                            <button
-                                id="swapBtn"
-                                class="swap-button"
-                                type="button"
-                                aria-label="Tukar stasiun"
-                            >
+                            <!-- SWAP -->
 
-                                <svg
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
+                            <div class="swap-wrapper">
+
+                                <button
+                                    id="swapBtn"
+                                    type="button"
+                                    aria-label="Tukar stasiun"
+                                    title="Tukar stasiun"
                                 >
 
-                                    <path
-                                        d="M7 7h12l-3-3"
-                                    />
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
+                                    >
+                                        <path d="M7 7h11l-3-3"/>
+                                        <path d="M18 7l-3 3"/>
+                                        <path d="M17 17H6l3 3"/>
+                                        <path d="M6 17l3-3"/>
+                                    </svg>
 
-                                    <path
-                                        d="M17 17H5l3 3"
-                                    />
+                                </button>
 
-                                </svg>
-
-                            </button>
+                            </div>
 
 
+
+                            <!-- TUJUAN -->
 
                             <div class="station-field">
 
                                 <label
-                                    class="search-label"
+                                    class="station-label"
                                     for="tujuan"
                                 >
                                     Stasiun Tujuan
                                 </label>
 
-                                <input
-                                    type="text"
-                                    id="tujuan"
-                                    class="station-input"
-                                    placeholder="Contoh: Solo Balapan"
-                                    autocomplete="off"
-                                >
 
-                                <div
-                                    id="tujuan-suggestions"
-                                    class="suggestions"
-                                ></div>
+                                <div class="station-input-wrap">
+
+                                    <input
+                                        type="text"
+                                        id="tujuan"
+                                        class="station-input"
+                                        placeholder="Ketik stasiun tujuan..."
+                                        autocomplete="off"
+                                        spellcheck="false"
+                                    >
+
+
+                                    <div
+                                        id="tujuan-suggestions"
+                                        class="suggestions hidden"
+                                    ></div>
+
+                                </div>
 
                             </div>
-
 
                         </div>
 
@@ -2678,17 +2873,12 @@
                                 stroke="currentColor"
                                 stroke-width="2"
                             >
-
                                 <circle
                                     cx="11"
                                     cy="11"
-                                    r="7"
+                                    r="6.5"
                                 />
-
-                                <path
-                                    d="M20 20l-4-4"
-                                />
-
+                                <path d="m16 16 5 5"/>
                             </svg>
 
                             Cari Tarif Khusus
@@ -2696,485 +2886,620 @@
                         </button>
 
 
-                        <div id="status"></div>
+                        <div id="status">
+                            Menghubungkan database...
+                        </div>
 
                     </div>
 
 
+
+                    <!-- RESULTS -->
 
                     <div id="results"></div>
 
 
-                </div>
+                    <footer class="app-footer">
 
-            </section>
-
-
-
-            <!-- =========================================
-                 SEARCH
-                 ========================================= -->
-
-            <section
-                class="page"
-                id="page-search"
-            >
-
-                <h2 class="page-title">
-                    Cari <span>Tarif</span>
-                </h2>
-
-                <p class="page-description">
-                    Gunakan pencarian utama untuk menemukan tarif
-                    khusus berdasarkan stasiun asal dan tujuan.
-                </p>
-
-                <div class="info-card">
-
-                    <h3>
-                        Pencarian tarif khusus
-                    </h3>
-
-                    <p>
-                        Masukkan stasiun asal dan tujuan pada
-                        halaman Beranda. TARSUS akan menampilkan
-                        kereta dan tarif khusus yang sesuai.
-                    </p>
-
-                    <button
-                        class="action-button"
-                        data-go-home
-                        type="button"
-                    >
-                        Buka Pencarian
-                    </button>
-
-                </div>
-
-            </section>
-
-
-
-            <!-- =========================================
-                 GUIDE
-                 ========================================= -->
-
-            <section
-                class="page"
-                id="page-guide"
-            >
-
-                <h2 class="page-title">
-                    <span>Panduan</span> TARSUS
-                </h2>
-
-                <p class="page-description">
-                    Cara menggunakan TARSUS Finder.
-                </p>
-
-
-                <div class="info-card">
-
-                    <h3>
-                        01 · Pilih stasiun
-                    </h3>
-
-                    <p>
-                        Ketik nama stasiun asal dan tujuan.
-                        Pilih stasiun dari daftar yang muncul.
-                    </p>
-
-                </div>
-
-
-                <div class="info-card">
-
-                    <h3>
-                        02 · Cari tarif
-                    </h3>
-
-                    <p>
-                        Tekan tombol Cari Tarif Khusus untuk
-                        menampilkan hasil yang sesuai.
-                    </p>
-
-                </div>
-
-
-                <div class="info-card">
-
-                    <h3>
-                        03 · Periksa detail
-                    </h3>
-
-                    <p>
-                        Perhatikan nama kereta, relasi tarif khusus,
-                        arah perjalanan, serta tarif kelas yang tersedia.
-                    </p>
-
-                </div>
-
-            </section>
-
-
-
-            <!-- =========================================
-                 ABOUT
-                 ========================================= -->
-
-            <section
-                class="page"
-                id="page-about"
-            >
-
-                <h2 class="page-title">
-                    Tentang <span>TARSUS</span>
-                </h2>
-
-                <p class="page-description">
-                    TARSUS Finder dibuat sebagai alat bantu pencarian
-                    informasi tarif khusus perjalanan kereta api.
-                </p>
-
-
-                <div class="info-card">
-
-                    <h3>
-                        TARSUS Finder
-                    </h3>
-
-                    <p>
-                        TARSUS merupakan aplikasi pencarian sederhana
-                        yang dirancang agar informasi tarif khusus
-                        dapat ditemukan dengan lebih cepat dan praktis.
-                    </p>
-
-                </div>
-
-
-                <div class="info-card">
-
-                    <h3>
-                        Data
-                    </h3>
-
-                    <p>
-                        Data tarif dikelola melalui database TARSUS
-                        dan dapat diperbarui sesuai kebutuhan.
-                        Selalu lakukan pengecekan terhadap informasi
-                        resmi sebelum melakukan transaksi.
-                    </p>
-
-                </div>
-
-            </section>
-
-
-
-            <!-- =========================================
-                 HELP
-                 ========================================= -->
-
-            <section
-                class="page"
-                id="page-help"
-            >
-
-                <h2 class="page-title">
-                    Bantuan <span>& Saran</span>
-                </h2>
-
-                <p class="page-description">
-                    Temukan kesalahan, punya saran, atau ingin
-                    memberikan masukan mengenai TARSUS?
-                </p>
-
-
-                <div class="info-card">
-
-                    <h3>
-                        Hubungi pengembang
-                    </h3>
-
-                    <p>
-                        Kirim informasi mengenai kendala, kesalahan
-                        data, atau ide pengembangan melalui email.
-                    </p>
-
-
-                    <a
-                        class="action-button"
-                        href="mailto:primaadis46@gmail.com"
-                    >
-                        Kirim Email
-                    </a>
-
-                </div>
-
-            </section>
-
-
-
-            <!-- =========================================
-                 TERMS
-                 ========================================= -->
-
-            <section
-                class="page"
-                id="page-terms"
-            >
-
-                <h2 class="page-title">
-                    Syarat <span>& Ketentuan</span>
-                </h2>
-
-                <p class="page-description">
-                    Ketentuan penggunaan TARSUS Finder.
-                </p>
-
-
-                <div class="info-card">
-
-                    <h3>
-                        Penggunaan informasi
-                    </h3>
-
-                    <p>
-                        TARSUS merupakan alat bantu pencarian.
-                        Informasi yang ditampilkan dapat berubah
-                        mengikuti pembaruan data.
-                    </p>
-
-                </div>
-
-
-                <div class="info-card">
-
-                    <h3>
-                        Verifikasi
-                    </h3>
-
-                    <p>
-                        Pengguna tetap bertanggung jawab untuk
-                        melakukan verifikasi informasi tarif dan
-                        ketentuan perjalanan melalui sumber resmi
-                        sebelum melakukan pemesanan.
-                    </p>
-
-                </div>
-
-
-                <div class="info-card">
-
-                    <h3>
-                        Pengembangan
-                    </h3>
-
-                    <p>
-                        Fitur dan struktur aplikasi dapat mengalami
-                        perubahan untuk meningkatkan fungsi,
-                        keamanan, dan kenyamanan penggunaan.
-                    </p>
-
-                </div>
-
-            </section>
-
-
-
-            <!-- =========================================
-                 SUPPORT
-                 ========================================= -->
-
-            <section
-                class="page"
-                id="page-support"
-            >
-
-                <h2 class="page-title">
-                    Dukung <span>& Rating</span>
-                </h2>
-
-                <p class="page-description">
-                    Jika TARSUS membantu pekerjaanmu, kamu dapat
-                    memberikan dukungan atau rating.
-                </p>
-
-
-                <div class="info-card">
-
-                    <h3>
-                        Beri Rating
-                    </h3>
-
-                    <p>
-                        Bantu pengembangan TARSUS dengan memberikan
-                        rating ketika tautan rating aplikasi sudah tersedia.
-                    </p>
-
-                    <button
-                        class="action-button"
-                        id="ratingButton"
-                        type="button"
-                    >
-                        Beri Rating
-                    </button>
-
-                </div>
-
-
-                <div class="info-card">
-
-                    <h3>
-                        Dukung Pengembangan
-                    </h3>
-
-                    <p>
-                        Dukungan dapat membantu pengembangan fitur
-                        dan pemeliharaan TARSUS ke depannya.
-                    </p>
-
-                    <button
-                        class="action-button"
-                        id="donateButton"
-                        type="button"
-                    >
-                        Dukung TARSUS
-                    </button>
-
-                </div>
-
-            </section>
-
-
-
-            <!-- =========================================
-                 INSTAGRAM
-                 ========================================= -->
-
-            <section
-                class="page"
-                id="page-instagram"
-            >
-
-                <h2 class="page-title">
-                    <span>Instagram</span>
-                </h2>
-
-                <p class="page-description">
-                    Ikuti informasi dan perkembangan terbaru.
-                </p>
-
-
-                <div class="info-card">
-
-                    <h3>
-                        @prima_adis
-                    </h3>
-
-                    <p>
-                        Kunjungi Instagram untuk informasi lainnya.
-                    </p>
-
-
-                    <a
-                        class="action-button"
-                        href="https://www.instagram.com/prima_adis/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        Buka Instagram
-                    </a>
-
-                </div>
-
-            </section>
-
-
-
-            <!-- =========================================
-                 SETTINGS
-                 ========================================= -->
-
-            <section
-                class="page"
-                id="page-settings"
-            >
-
-                <h2 class="page-title">
-                    <span>Pengaturan</span>
-                </h2>
-
-                <p class="page-description">
-                    Sesuaikan tampilan TARSUS sesuai kenyamananmu.
-                </p>
-
-
-                <div class="info-card">
-
-                    <div class="theme-toggle-row">
-
-                        <div>
-
-                            <h3>
-                                Tampilan
-                            </h3>
-
-                            <p>
-                                Gunakan mode terang atau gelap.
-                            </p>
-
+                        <div class="footer-brand">
+                            TARSUS FINDER — KAI 121
                         </div>
 
+                        <a
+                            class="footer-email"
+                            href="mailto:primaadis46@gmail.com"
+                        >
+                            primaadis46@gmail.com
+                        </a>
 
-                        <button
-                            class="theme-toggle"
-                            id="themeToggle"
-                            type="button"
-                            aria-label="Ubah tema"
-                        ></button>
+                    </footer>
+
+                </section>
+
+
+
+                <!-- =================================================
+                     SEARCH PAGE
+                     ================================================= -->
+
+                <section
+                    class="page"
+                    id="page-search"
+                >
+
+                    <div class="page-heading">
+
+                        <div class="page-kicker">
+                            TARSUS Finder
+                        </div>
+
+                        <h2 class="page-title">
+                            Cari Tarif Khusus
+                        </h2>
+
+                        <p class="page-description">
+                            Gunakan pencarian stasiun untuk melihat
+                            kereta dan tarif khusus yang tersedia.
+                        </p>
 
                     </div>
 
-                </div>
+
+                    <div class="content-card">
+
+                        <h3>
+                            Cara cepat
+                        </h3>
+
+                        <p>
+                            Masukkan stasiun asal dan tujuan,
+                            kemudian tekan tombol
+                            <strong>Cari Tarif Khusus</strong>.
+                        </p>
+
+                        <button
+                            class="action-button"
+                            type="button"
+                            data-go-home="true"
+                        >
+
+                            Mulai Pencarian
+
+                        </button>
+
+                    </div>
+
+                </section>
 
 
-                <div class="info-card">
 
-                    <h3>
-                        Versi Aplikasi
-                    </h3>
+                <!-- =================================================
+                     GUIDE
+                     ================================================= -->
 
-                    <p>
-                        TARSUS Finder • Versi v1.0.0
-                    </p>
+                <section
+                    class="page"
+                    id="page-guide"
+                >
 
-                </div>
+                    <div class="page-heading">
 
-            </section>
+                        <div class="page-kicker">
+                            Panduan
+                        </div>
 
+                        <h2 class="page-title">
+                            Cara Menggunakan TARSUS
+                        </h2>
 
+                        <p class="page-description">
+                            Beberapa langkah sederhana untuk mencari
+                            informasi tarif khusus.
+                        </p>
 
-            <!-- FOOTER -->
-
-            <footer class="app-footer">
-
-                <strong>
-                    TARSUS FINDER
-                </strong>
-
-                <br>
-
-                Tarif Khusus Perjalanan Kereta Api
-
-                <br><br>
-
-                KAI 121
-
-            </footer>
+                    </div>
 
 
-        </main>
+                    <div class="content-card">
+
+                        <h3>
+                            01 — Pilih stasiun
+                        </h3>
+
+                        <p>
+                            Masukkan nama stasiun pada kolom asal
+                            dan tujuan. Pilih nama stasiun yang
+                            muncul pada daftar saran.
+                        </p>
+
+                    </div>
+
+
+                    <div class="content-card">
+
+                        <h3>
+                            02 — Cari tarif
+                        </h3>
+
+                        <p>
+                            Tekan tombol
+                            <strong>Cari Tarif Khusus</strong>
+                            untuk menjalankan pencarian.
+                        </p>
+
+                    </div>
+
+
+                    <div class="content-card">
+
+                        <h3>
+                            03 — Periksa hasil
+                        </h3>
+
+                        <p>
+                            Hasil pencarian menampilkan nama kereta,
+                            relasi tarif khusus dan harga sesuai
+                            kelas yang tersedia.
+                        </p>
+
+                    </div>
+
+
+                    <div class="content-card">
+
+                        <h3>
+                            Catatan
+                        </h3>
+
+                        <p>
+                            Informasi tarif dapat berubah sesuai
+                            ketentuan dan pembaruan data yang
+                            digunakan oleh TARSUS.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =================================================
+                     ABOUT
+                     ================================================= -->
+
+                <section
+                    class="page"
+                    id="page-about"
+                >
+
+                    <div class="page-heading">
+
+                        <div class="page-kicker">
+                            Tentang Aplikasi
+                        </div>
+
+                        <h2 class="page-title">
+                            Tentang TARSUS
+                        </h2>
+
+                        <p class="page-description">
+                            TARSUS dirancang sebagai alat bantu
+                            pencarian informasi tarif khusus
+                            perjalanan kereta api.
+                        </p>
+
+                    </div>
+
+
+                    <div class="content-card">
+
+                        <h3>
+                            TARSUS Finder
+                        </h3>
+
+                        <p>
+                            TARSUS merupakan aplikasi pencarian
+                            sederhana yang dibuat untuk membantu
+                            menemukan informasi tarif khusus
+                            berdasarkan relasi perjalanan.
+                        </p>
+
+                        <p>
+                            Aplikasi ini dibuat dengan pendekatan
+                            ringan agar nyaman digunakan melalui
+                            perangkat komputer maupun smartphone.
+                        </p>
+
+                    </div>
+
+
+                    <div class="content-card">
+
+                        <h3>
+                            Versi
+                        </h3>
+
+                        <p>
+                            TARSUS Finder v1.0.0
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =================================================
+                     HELP
+                     ================================================= -->
+
+                <section
+                    class="page"
+                    id="page-help"
+                >
+
+                    <div class="page-heading">
+
+                        <div class="page-kicker">
+                            Bantuan
+                        </div>
+
+                        <h2 class="page-title">
+                            Bantuan & Saran
+                        </h2>
+
+                        <p class="page-description">
+                            Menemukan masalah atau memiliki saran
+                            untuk pengembangan TARSUS?
+                        </p>
+
+                    </div>
+
+
+                    <div class="content-card">
+
+                        <h3>
+                            Sampaikan kepada kami
+                        </h3>
+
+                        <p>
+                            Kamu dapat mengirimkan laporan masalah,
+                            kesalahan data, saran fitur maupun
+                            masukan mengenai pengalaman menggunakan
+                            TARSUS.
+                        </p>
+
+
+                        <a
+                            class="action-button"
+                            href="mailto:primaadis46@gmail.com?subject=Masukan%20TARSUS%20Finder"
+                        >
+
+                            Kirim Saran / Laporan
+
+                        </a>
+
+                    </div>
+
+
+                    <div class="content-card">
+
+                        <h3>
+                            Saat melaporkan masalah
+                        </h3>
+
+                        <ul class="content-list">
+
+                            <li>
+                                Sebutkan stasiun yang digunakan.
+                            </li>
+
+                            <li>
+                                Jelaskan hasil yang muncul.
+                            </li>
+
+                            <li>
+                                Jika memungkinkan, sertakan
+                                screenshot.
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =================================================
+                     TERMS
+                     ================================================= -->
+
+                <section
+                    class="page"
+                    id="page-terms"
+                >
+
+                    <div class="page-heading">
+
+                        <div class="page-kicker">
+                            Informasi
+                        </div>
+
+                        <h2 class="page-title">
+                            Syarat & Ketentuan
+                        </h2>
+
+                        <p class="page-description">
+                            Ketentuan penggunaan TARSUS Finder.
+                        </p>
+
+                    </div>
+
+
+                    <div class="content-card">
+
+                        <h3>
+                            Penggunaan informasi
+                        </h3>
+
+                        <p>
+                            TARSUS merupakan alat bantu pencarian
+                            informasi. Pengguna tetap perlu melakukan
+                            pengecekan terhadap ketentuan dan
+                            informasi resmi yang berlaku sebelum
+                            melakukan transaksi atau memberikan
+                            informasi kepada pelanggan.
+                        </p>
+
+                    </div>
+
+
+                    <div class="content-card">
+
+                        <h3>
+                            Perubahan data
+                        </h3>
+
+                        <p>
+                            Data tarif dapat diperbarui atau berubah.
+                            TARSUS tidak menjamin bahwa setiap
+                            informasi akan selalu sama dengan kondisi
+                            terbaru pada saat transaksi.
+                        </p>
+
+                    </div>
+
+
+                    <div class="content-card">
+
+                        <h3>
+                            Penggunaan aplikasi
+                        </h3>
+
+                        <p>
+                            Gunakan TARSUS sebagai alat bantu kerja
+                            secara bertanggung jawab dan selalu
+                            ikuti prosedur serta ketentuan resmi
+                            yang berlaku.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =================================================
+                     INSTAGRAM
+                     ================================================= -->
+
+                <section
+                    class="page"
+                    id="page-instagram"
+                >
+
+                    <div class="page-heading">
+
+                        <div class="page-kicker">
+                            Social
+                        </div>
+
+                        <h2 class="page-title">
+                            Instagram
+                        </h2>
+
+                        <p class="page-description">
+                            Ikuti informasi dan perkembangan TARSUS
+                            melalui Instagram.
+                        </p>
+
+                    </div>
+
+
+                    <div class="content-card">
+
+                        <h3>
+                            @prima_adis
+                        </h3>
+
+                        <p>
+                            Kunjungi profil Instagram untuk informasi
+                            dan pembaruan lainnya.
+                        </p>
+
+
+                        <a
+                            class="action-button"
+                            href="https://www.instagram.com/prima_adis/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+
+                            Buka Instagram
+
+                        </a>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =================================================
+                     SUPPORT
+                     ================================================= -->
+
+                <section
+                    class="page"
+                    id="page-support"
+                >
+
+                    <div class="page-heading">
+
+                        <div class="page-kicker">
+                            Dukungan
+                        </div>
+
+                        <h2 class="page-title">
+                            Dukung & Beri Rating
+                        </h2>
+
+                        <p class="page-description">
+                            Jika TARSUS bermanfaat, kamu dapat
+                            memberikan dukungan atau rating.
+                        </p>
+
+                    </div>
+
+
+                    <div class="content-card">
+
+                        <h3>
+                            Beri Rating
+                        </h3>
+
+                        <p>
+                            Bantu pengembangan TARSUS dengan
+                            memberikan rating dan masukan.
+                        </p>
+
+
+                        <button
+                            class="action-button"
+                            id="ratingButton"
+                            type="button"
+                        >
+
+                            Beri Rating
+
+                        </button>
+
+                    </div>
+
+
+                    <div class="content-card">
+
+                        <h3>
+                            Dukung Pengembangan
+                        </h3>
+
+                        <p>
+                            Dukungan kamu dapat membantu
+                            pengembangan fitur dan pemeliharaan
+                            aplikasi TARSUS.
+                        </p>
+
+
+                        <button
+                            class="action-button secondary"
+                            id="donateButton"
+                            type="button"
+                        >
+
+                            Dukung TARSUS
+
+                        </button>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- =================================================
+                     SETTINGS
+                     ================================================= -->
+
+                <section
+                    class="page"
+                    id="page-settings"
+                >
+
+                    <div class="page-heading">
+
+                        <div class="page-kicker">
+                            Pengaturan
+                        </div>
+
+                        <h2 class="page-title">
+                            Pengaturan
+                        </h2>
+
+                        <p class="page-description">
+                            Atur tampilan TARSUS sesuai kenyamananmu.
+                        </p>
+
+                    </div>
+
+
+                    <div class="content-card">
+
+                        <div class="setting-row">
+
+                            <div class="setting-info">
+
+                                <strong>
+                                    Mode Tampilan
+                                </strong>
+
+                                <span>
+                                    Gelap / terang
+                                </span>
+
+                            </div>
+
+
+                            <button
+                                class="theme-toggle"
+                                id="themeToggle"
+                                type="button"
+                                aria-label="Ganti tema"
+                            ></button>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="content-card">
+
+                        <h3>
+                            Informasi Aplikasi
+                        </h3>
+
+                        <p>
+                            TARSUS Finder • Versi v1.0.0
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+            </main>
+
+        </div>
 
     </div>
 
@@ -3186,15 +3511,15 @@
 
 
 
-    <!-- =================================================
-         TARSUS UI
-         ================================================= -->
-
     <script>
 
-        /* =================================================
-           APP LINKS
-           ================================================= */
+        /* =========================================================
+           TARSUS UI
+           ========================================================= */
+
+
+        const TARSUS_VERSION = "1.0.0";
+
 
         const TARSUS_APP_LINKS = {
 
@@ -3205,19 +3530,18 @@
         };
 
 
-
-        /* =================================================
+        /* =========================================================
            ELEMENTS
-           ================================================= */
+           ========================================================= */
 
         const splashScreen =
             document.getElementById(
                 "splashScreen"
             );
 
-        const appShell =
+        const app =
             document.getElementById(
-                "appShell"
+                "app"
             );
 
         const menuButton =
@@ -3240,9 +3564,9 @@
                 "drawerClose"
             );
 
-        const exitAppButton =
+        const toast =
             document.getElementById(
-                "exitAppButton"
+                "tarsusToast"
             );
 
         const themeToggle =
@@ -3250,28 +3574,25 @@
                 "themeToggle"
             );
 
-        const ratingButton =
+        const exitAppButton =
             document.getElementById(
-                "ratingButton"
-            );
-
-        const donateButton =
-            document.getElementById(
-                "donateButton"
-            );
-
-        const toast =
-            document.getElementById(
-                "tarsusToast"
+                "exitAppButton"
             );
 
 
-
-        /* =================================================
+        /* =========================================================
            SPLASH
-           ================================================= */
+           ========================================================= */
 
-        function hideSplash() {
+        function showApp() {
+
+            if (app) {
+
+                app.classList.add(
+                    "ready"
+                );
+
+            }
 
             if (splashScreen) {
 
@@ -3281,97 +3602,94 @@
 
             }
 
-            if (appShell) {
-
-                appShell.classList.add(
-                    "ready"
-                );
-
-            }
-
         }
 
 
-        setTimeout(
-            hideSplash,
-            1800
+        /*
+         * Jangan menunggu data.js.
+         *
+         * Aplikasi tetap dibuka walaupun database
+         * sedang loading atau koneksi sedang lambat.
+         */
+
+        window.setTimeout(
+            showApp,
+            1400
         );
 
 
+        window.addEventListener(
+            "load",
+            function () {
 
-        /* =================================================
-           TOAST
-           ================================================= */
-
-        let toastTimer = null;
-
-
-        function tarsusShowToast(message) {
-
-            if (!toast) {
-                return;
-            }
-
-            toast.textContent =
-                message;
-
-            toast.classList.add(
-                "show"
-            );
-
-            clearTimeout(
-                toastTimer
-            );
-
-            toastTimer =
-                setTimeout(
-                    function () {
-
-                        toast.classList.remove(
-                            "show"
-                        );
-
-                    },
-                    2500
+                window.setTimeout(
+                    showApp,
+                    300
                 );
 
-        }
+            }
+        );
 
 
-
-        /* =================================================
+        /* =========================================================
            DRAWER
-           ================================================= */
+           ========================================================= */
 
         function tarsusOpenDrawer() {
 
+            if (!sideDrawer) {
+                return;
+            }
+
             sideDrawer.classList.add(
-                "active"
+                "open"
             );
 
             drawerOverlay.classList.add(
-                "active"
+                "open"
+            );
+
+            sideDrawer.setAttribute(
+                "aria-hidden",
+                "false"
+            );
+
+            drawerOverlay.setAttribute(
+                "aria-hidden",
+                "false"
             );
 
             document.body.style.overflow =
                 "hidden";
-
         }
 
 
         function tarsusCloseDrawer() {
 
+            if (!sideDrawer) {
+                return;
+            }
+
             sideDrawer.classList.remove(
-                "active"
+                "open"
             );
 
             drawerOverlay.classList.remove(
-                "active"
+                "open"
+            );
+
+            sideDrawer.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+            drawerOverlay.setAttribute(
+                "aria-hidden",
+                "true"
             );
 
             document.body.style.overflow =
                 "";
-
         }
 
 
@@ -3405,10 +3723,9 @@
         }
 
 
-
-        /* =================================================
+        /* =========================================================
            PAGE NAVIGATION
-           ================================================= */
+           ========================================================= */
 
         const drawerItems =
             document.querySelectorAll(
@@ -3416,12 +3733,15 @@
             );
 
 
-        function openPage(pageName) {
+        function openPage(
+            pageName
+        ) {
 
             const pages =
                 document.querySelectorAll(
                     ".page"
                 );
+
 
             pages.forEach(
                 function (page) {
@@ -3446,13 +3766,6 @@
                     "active"
                 );
 
-                window.scrollTo(
-                    {
-                        top: 0,
-                        behavior: "smooth"
-                    }
-                );
-
             }
 
 
@@ -3461,7 +3774,8 @@
 
                     item.classList.toggle(
                         "active",
-                        item.dataset.page === pageName
+                        item.dataset.page ===
+                        pageName
                     );
 
                 }
@@ -3469,6 +3783,12 @@
 
 
             tarsusCloseDrawer();
+
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
 
         }
 
@@ -3491,10 +3811,9 @@
         );
 
 
-
-        /* =================================================
-           HOME BUTTONS
-           ================================================= */
+        /* =========================================================
+           GO HOME
+           ========================================================= */
 
         document
             .querySelectorAll(
@@ -3511,6 +3830,22 @@
                                 "home"
                             );
 
+                            window.setTimeout(
+                                function () {
+
+                                    const asal =
+                                        document.getElementById(
+                                            "asal"
+                                        );
+
+                                    if (asal) {
+                                        asal.focus();
+                                    }
+
+                                },
+                                250
+                            );
+
                         }
                     );
 
@@ -3518,10 +3853,84 @@
             );
 
 
+        /* =========================================================
+           TOAST
+           ========================================================= */
 
-        /* =================================================
+        let toastTimer = null;
+
+
+        function tarsusShowToast(
+            message
+        ) {
+
+            if (!toast) {
+                return;
+            }
+
+
+            toast.textContent =
+                message;
+
+
+            toast.classList.add(
+                "show"
+            );
+
+
+            clearTimeout(
+                toastTimer
+            );
+
+
+            toastTimer =
+                setTimeout(
+                    function () {
+
+                        toast.classList.remove(
+                            "show"
+                        );
+
+                    },
+                    2300
+                );
+
+        }
+
+
+        /* =========================================================
            THEME
-           ================================================= */
+           ========================================================= */
+
+        function applyTheme(
+            theme
+        ) {
+
+            if (
+                theme ===
+                "light"
+            ) {
+
+                document.body.classList.add(
+                    "light-mode"
+                );
+
+            } else {
+
+                document.body.classList.remove(
+                    "light-mode"
+                );
+
+            }
+
+
+            localStorage.setItem(
+                "tarsus-theme",
+                theme
+            );
+
+        }
+
 
         const savedTheme =
             localStorage.getItem(
@@ -3529,10 +3938,16 @@
             );
 
 
-        if (savedTheme === "light") {
+        if (savedTheme) {
 
-            document.body.classList.add(
-                "light-mode"
+            applyTheme(
+                savedTheme
+            );
+
+        } else {
+
+            applyTheme(
+                "dark"
             );
 
         }
@@ -3544,22 +3959,23 @@
                 "click",
                 function () {
 
-                    document.body.classList.toggle(
-                        "light-mode"
-                    );
-
-
                     const isLight =
                         document.body.classList.contains(
                             "light-mode"
                         );
 
 
-                    localStorage.setItem(
-                        "tarsus-theme",
+                    applyTheme(
                         isLight
-                            ? "light"
-                            : "dark"
+                            ? "dark"
+                            : "light"
+                    );
+
+
+                    tarsusShowToast(
+                        isLight
+                            ? "Mode gelap aktif."
+                            : "Mode terang aktif."
                     );
 
                 }
@@ -3568,10 +3984,15 @@
         }
 
 
-
-        /* =================================================
+        /* =========================================================
            RATING
-           ================================================= */
+           ========================================================= */
+
+        const ratingButton =
+            document.getElementById(
+                "ratingButton"
+            );
+
 
         if (ratingButton) {
 
@@ -3603,10 +4024,15 @@
         }
 
 
-
-        /* =================================================
+        /* =========================================================
            DONATE
-           ================================================= */
+           ========================================================= */
+
+        const donateButton =
+            document.getElementById(
+                "donateButton"
+            );
+
 
         if (donateButton) {
 
@@ -3638,10 +4064,9 @@
         }
 
 
-
-        /* =================================================
+        /* =========================================================
            EXIT APP
-           ================================================= */
+           ========================================================= */
 
         if (exitAppButton) {
 
@@ -3651,6 +4076,14 @@
 
                     tarsusCloseDrawer();
 
+
+                    /*
+                     * Pada browser biasa,
+                     * window.close() umumnya diblokir.
+                     *
+                     * Pada beberapa Android wrapper,
+                     * perintah ini dapat ditangani oleh container.
+                     */
 
                     try {
 
@@ -3680,10 +4113,130 @@
         }
 
 
+        /* =========================================================
+           ESC KEY
+           ========================================================= */
 
-        /* =================================================
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key ===
+                    "Escape"
+                ) {
+
+                    tarsusCloseDrawer();
+
+                }
+
+            }
+        );
+
+
+        /* =========================================================
+           SWIPE DRAWER
+           ========================================================= */
+
+        let touchStartX = 0;
+
+        let touchStartY = 0;
+
+
+        document.addEventListener(
+            "touchstart",
+            function (event) {
+
+                if (
+                    event.touches.length !== 1
+                ) {
+                    return;
+                }
+
+                touchStartX =
+                    event.touches[0].clientX;
+
+                touchStartY =
+                    event.touches[0].clientY;
+
+            },
+            {
+                passive: true
+            }
+        );
+
+
+        document.addEventListener(
+            "touchend",
+            function (event) {
+
+                if (
+                    event.changedTouches.length !== 1
+                ) {
+                    return;
+                }
+
+
+                const endX =
+                    event.changedTouches[0].clientX;
+
+                const endY =
+                    event.changedTouches[0].clientY;
+
+
+                const deltaX =
+                    endX - touchStartX;
+
+                const deltaY =
+                    endY - touchStartY;
+
+
+                if (
+                    Math.abs(deltaX) > 70 &&
+                    Math.abs(deltaX) >
+                    Math.abs(deltaY) * 1.3
+                ) {
+
+                    if (
+                        deltaX > 0 &&
+                        touchStartX < 35
+                    ) {
+
+                        tarsusOpenDrawer();
+
+                    }
+
+
+                    if (
+                        deltaX < 0 &&
+                        sideDrawer.classList.contains(
+                            "open"
+                        )
+                    ) {
+
+                        tarsusCloseDrawer();
+
+                    }
+
+                }
+
+            },
+            {
+                passive: true
+            }
+        );
+
+
+        /* =========================================================
            SERVICE WORKER
-           ================================================= */
+           ========================================================= */
+
+        /*
+         * Kita register SW setelah UI tampil.
+         *
+         * Jadi proses service worker tidak pernah
+         * menjadi syarat aplikasi untuk tampil.
+         */
 
         if (
             "serviceWorker" in navigator
@@ -3695,7 +4248,7 @@
 
                     navigator.serviceWorker
                         .register(
-                            "/tarsus-backup/sw.js",
+                            "/tarsus-backup/sw.js?v=3",
                             {
                                 scope:
                                     "/tarsus-backup/"
@@ -3710,6 +4263,20 @@
                                     "TARSUS Service Worker aktif:",
                                     registration.scope
                                 );
+
+
+                                /*
+                                 * Beri tahu SW untuk
+                                 * mengecek versi terbaru.
+                                 */
+
+                                if (
+                                    registration.update
+                                ) {
+
+                                    registration.update();
+
+                                }
 
                             }
                         )
@@ -3731,14 +4298,24 @@
 
         }
 
+
+        /* =========================================================
+           VERSION CHECK
+           ========================================================= */
+
+        console.log(
+            "TARSUS Finder v" +
+            TARSUS_VERSION
+        );
+
     </script>
 
 
 
-    <!-- =================================================
+    <!-- =========================================================
          DATA ENGINE
          JANGAN DIUBAH
-         ================================================= -->
+         ========================================================= -->
 
     <script src="data.js"></script>
 
