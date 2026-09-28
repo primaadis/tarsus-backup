@@ -1,169 +1,328 @@
-const CACHE_NAME = "tarsus-v3";
+/* =========================================================
+   TARSUS FINDER
+   SERVICE WORKER
+   VERSION 4
+========================================================= */
+
+const CACHE_NAME =
+    "tarsus-v4";
+
+
+const BASE =
+    "/tarsus-backup/";
+
 
 const APP_SHELL = [
-    "/tarsus-backup/",
-    "/tarsus-backup/index.html",
-    "/tarsus-backup/data.js",
-    "/tarsus-backup/manifest.json",
-    "/tarsus-backup/icon-192.png",
-    "/tarsus-backup/icon-512.png"
+
+    BASE,
+
+    BASE + "index.html",
+
+    BASE + "data.js",
+
+    BASE + "manifest.json",
+
+    BASE + "icon-192.png",
+
+    BASE + "icon-512.png"
+
 ];
 
 
 /* =========================================================
    INSTALL
-   ========================================================= */
+========================================================= */
 
-self.addEventListener("install", event => {
+self.addEventListener(
+    "install",
+    event => {
 
-    event.waitUntil(
+        event.waitUntil(
 
-        caches.open(CACHE_NAME)
-            .then(cache => {
+            caches
+                .open(
+                    CACHE_NAME
+                )
+                .then(
+                    cache => {
 
-                return cache.addAll(APP_SHELL);
+                        return cache.addAll(
+                            APP_SHELL
+                        );
 
-            })
-            .then(() => {
+                    }
+                )
+                .then(
+                    () => {
 
-                return self.skipWaiting();
+                        return self.skipWaiting();
 
-            })
+                    }
+                )
 
-    );
+        );
 
-});
+    }
+);
 
 
 /* =========================================================
    ACTIVATE
-   ========================================================= */
+========================================================= */
 
-self.addEventListener("activate", event => {
+self.addEventListener(
+    "activate",
+    event => {
 
-    event.waitUntil(
+        event.waitUntil(
 
-        caches.keys()
-            .then(cacheNames => {
+            caches
+                .keys()
+                .then(
+                    cacheNames => {
 
-                return Promise.all(
+                        return Promise.all(
 
-                    cacheNames
-                        .filter(name => name !== CACHE_NAME)
-                        .map(name => caches.delete(name))
+                            cacheNames
+                                .filter(
+                                    name =>
+                                        name !==
+                                        CACHE_NAME
+                                )
+                                .map(
+                                    name =>
+                                        caches.delete(
+                                            name
+                                        )
+                                )
 
-                );
+                        );
 
-            })
-            .then(() => {
+                    }
+                )
+                .then(
+                    () => {
 
-                return self.clients.claim();
+                        return self.clients.claim();
 
-            })
+                    }
+                )
 
-    );
+        );
 
-});
+    }
+);
 
 
 /* =========================================================
    FETCH
-   ========================================================= */
+========================================================= */
 
-self.addEventListener("fetch", event => {
+self.addEventListener(
+    "fetch",
+    event => {
 
-    const request = event.request;
-
-
-    /* Hanya proses GET */
-    if (request.method !== "GET") {
-        return;
-    }
+        const request =
+            event.request;
 
 
-    const url = new URL(request.url);
+        if (
+            request.method !==
+            "GET"
+        ) {
+
+            return;
+
+        }
 
 
-    /* Jangan ganggu request Google Sheets,
-       Google Fonts, atau website eksternal */
-
-    if (url.origin !== self.location.origin) {
-        return;
-    }
+        const url =
+            new URL(
+                request.url
+            );
 
 
-    event.respondWith(
+        /*
+           Hanya URL milik TARSUS.
+        */
 
-        caches.match(request)
-            .then(cachedResponse => {
+        if (
+            url.origin !==
+            self.location.origin
+        ) {
+
+            return;
+
+        }
 
 
-                /* -----------------------------------------
-                   Ambil versi terbaru dari internet
-                   di background
-                   ----------------------------------------- */
+        /*
+           INDEX + DATA.JS
+           ----------------
+           Network First
 
-                const networkUpdate = fetch(request)
-                    .then(response => {
+           Supaya ketika kita update
+           GitHub, versi baru lebih
+           cepat digunakan.
+        */
+
+        const isCriticalFile =
+
+            url.pathname ===
+                BASE ||
+
+            url.pathname ===
+                BASE + "index.html" ||
+
+            url.pathname ===
+                BASE + "data.js";
+
+
+        if (
+            isCriticalFile
+        ) {
+
+            event.respondWith(
+
+                fetch(
+                    request,
+                    {
+                        cache:
+                            "no-store"
+                    }
+                )
+                .then(
+                    response => {
 
                         if (
                             response &&
                             response.ok
                         ) {
 
-                            const responseClone =
+                            const clone =
                                 response.clone();
+
 
                             event.waitUntil(
 
-                                caches.open(CACHE_NAME)
-                                    .then(cache => {
+                                caches
+                                    .open(
+                                        CACHE_NAME
+                                    )
+                                    .then(
+                                        cache => {
 
-                                        return cache.put(
-                                            request,
-                                            responseClone
-                                        );
+                                            return cache.put(
+                                                request,
+                                                clone
+                                            );
 
-                                    })
+                                        }
+                                    )
 
                             );
 
                         }
 
+
                         return response;
 
-                    })
-                    .catch(() => {
+                    }
+                )
+                .catch(
+                    () => {
 
-                        return cachedResponse;
+                        return caches.match(
+                            request
+                        );
 
-                    });
+                    }
+                )
 
-
-                /* -----------------------------------------
-                   Jika cache tersedia:
-                   tampilkan langsung agar aplikasi cepat.
-
-                   Internet tetap berjalan di background
-                   untuk memperbarui cache.
-                   ----------------------------------------- */
-
-                if (cachedResponse) {
-
-                    return cachedResponse;
-
-                }
+            );
 
 
-                /* -----------------------------------------
-                   Jika belum ada cache:
-                   gunakan internet.
-                   ----------------------------------------- */
+            return;
 
-                return networkUpdate;
+        }
 
-            })
 
-    );
+        /*
+           FILE LAIN
+           ----------
+           Cache First
+           + update background
+        */
 
-});
+        event.respondWith(
+
+            caches
+                .match(
+                    request
+                )
+                .then(
+                    cached => {
+
+                        const network =
+                            fetch(
+                                request
+                            )
+                            .then(
+                                response => {
+
+                                    if (
+                                        response &&
+                                        response.ok
+                                    ) {
+
+                                        const clone =
+                                            response.clone();
+
+
+                                        event.waitUntil(
+
+                                            caches
+                                                .open(
+                                                    CACHE_NAME
+                                                )
+                                                .then(
+                                                    cache => {
+
+                                                        return cache.put(
+                                                            request,
+                                                            clone
+                                                        );
+
+                                                    }
+                                                )
+
+                                        );
+
+                                    }
+
+
+                                    return response;
+
+                                }
+                            )
+                            .catch(
+                                () => {
+
+                                    return cached;
+
+                                }
+                            );
+
+
+                        return (
+                            cached ||
+                            network
+                        );
+
+                    }
+                )
+
+        );
+
+    }
+);
