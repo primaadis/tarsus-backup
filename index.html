@@ -58,6 +58,7 @@
 
     <title>TARSUS FINDER — KAI 121</title>
 
+
     <style>
 
         /* =========================================================
@@ -94,6 +95,7 @@
             --page-bg: #102536;
             --surface: #17384b;
             --surface-2: #1b4053;
+
             --text-main: #f4f8f8;
             --text-soft: #cbd9dc;
             --text-muted: #8fa9b1;
@@ -130,14 +132,19 @@
            ========================================================= */
 
         * {
+
             box-sizing: border-box;
+
             -webkit-tap-highlight-color: transparent;
         }
 
 
         html {
+
             scroll-behavior: smooth;
-            background: var(--page-bg);
+
+            background:
+                var(--page-bg);
         }
 
 
@@ -150,6 +157,14 @@
             font-family:
                 "DM Sans",
                 sans-serif;
+
+            font-size: 14px;
+
+            font-weight: 400;
+
+            line-height: 1.55;
+
+            letter-spacing: -.008em;
 
             background:
                 var(--page-bg);
@@ -164,6 +179,12 @@
             overflow-x: hidden;
 
             overscroll-behavior-y: none;
+
+            text-rendering: optimizeLegibility;
+
+            -webkit-font-smoothing: antialiased;
+
+            -moz-osx-font-smoothing: grayscale;
         }
 
 
@@ -171,13 +192,16 @@
         input,
         textarea {
 
-            font-family: inherit;
+            font-family:
+                "DM Sans",
+                sans-serif;
         }
 
 
         button {
 
             border: 0;
+
             cursor: pointer;
         }
 
@@ -185,6 +209,7 @@
         a {
 
             color: inherit;
+
             text-decoration: none;
         }
 
@@ -226,14 +251,17 @@
         #splash.hide {
 
             opacity: 0;
+
             visibility: hidden;
+
             pointer-events: none;
         }
 
 
         .splash-content {
 
-            width: min(88vw, 380px);
+            width:
+                min(88vw, 380px);
 
             text-align: center;
 
@@ -261,6 +289,7 @@
             position: absolute;
 
             width: 94px;
+
             height: 94px;
 
             border-radius: 50%;
@@ -285,7 +314,7 @@
 
             line-height: 1;
 
-            letter-spacing: .12em;
+            letter-spacing: .105em;
 
             font-weight: 800;
 
@@ -297,9 +326,15 @@
 
             margin-top: 2px;
 
-            font-size: 12px;
+            font-family:
+                "DM Sans",
+                sans-serif;
 
-            letter-spacing: .16em;
+            font-size: 11px;
+
+            font-weight: 500;
+
+            letter-spacing: .13em;
 
             text-transform: uppercase;
 
@@ -327,7 +362,9 @@
             position: absolute;
 
             left: 0;
+
             right: 0;
+
             bottom: 7px;
 
             height: 1px;
@@ -379,9 +416,11 @@
             position: absolute;
 
             left: 7px;
+
             top: 6px;
 
             width: 20px;
+
             height: 8px;
 
             border-radius: 3px;
@@ -397,9 +436,11 @@
             position: absolute;
 
             right: 8px;
+
             top: 7px;
 
             width: 7px;
+
             height: 7px;
 
             border-radius: 50%;
@@ -414,11 +455,13 @@
 
         .splash-loading {
 
-            font-size: 12px;
+            font-size: 11px;
+
+            font-weight: 500;
 
             color: #8fa9b1;
 
-            letter-spacing: .02em;
+            letter-spacing: .01em;
         }
 
 
@@ -466,13 +509,21 @@
         @keyframes splashEnter {
 
             from {
+
                 opacity: 0;
-                transform: translateY(15px) scale(.97);
+
+                transform:
+                    translateY(15px)
+                    scale(.97);
             }
 
             to {
+
                 opacity: 1;
-                transform: translateY(0) scale(1);
+
+                transform:
+                    translateY(0)
+                    scale(1);
             }
         }
 
@@ -481,12 +532,16 @@
 
             0%,
             100% {
+
                 transform: scale(.92);
+
                 opacity: .45;
             }
 
             50% {
+
                 transform: scale(1.08);
+
                 opacity: .9;
             }
         }
@@ -496,11 +551,15 @@
 
             0%,
             100% {
-                transform: translateX(-12px);
+
+                transform:
+                    translateX(-12px);
             }
 
             50% {
-                transform: translateX(12px);
+
+                transform:
+                    translateX(12px);
             }
         }
 
@@ -508,11 +567,15 @@
         @keyframes splashProgress {
 
             0% {
-                transform: translateX(-150%);
+
+                transform:
+                    translateX(-150%);
             }
 
             100% {
-                transform: translateX(330%);
+
+                transform:
+                    translateX(330%);
             }
         }
 
@@ -606,6 +669,7 @@
         .icon-button {
 
             width: 42px;
+
             height: 42px;
 
             display: grid;
@@ -631,13 +695,15 @@
 
         .icon-button:active {
 
-            transform: scale(.93);
+            transform:
+                scale(.93);
         }
 
 
         .icon-button svg {
 
             width: 20px;
+
             height: 20px;
         }
 
@@ -650,9 +716,11 @@
 
             font-size: 17px;
 
+            line-height: 1;
+
             font-weight: 800;
 
-            letter-spacing: .12em;
+            letter-spacing: .105em;
 
             color:
                 var(--text-main);
@@ -707,13 +775,19 @@
         @keyframes pageEnter {
 
             from {
+
                 opacity: 0;
-                transform: translateY(8px);
+
+                transform:
+                    translateY(8px);
             }
 
             to {
+
                 opacity: 1;
-                transform: translateY(0);
+
+                transform:
+                    translateY(0);
             }
         }
 
@@ -769,9 +843,11 @@
             position: absolute;
 
             width: 190px;
+
             height: 190px;
 
             right: -80px;
+
             top: -90px;
 
             border-radius: 50%;
@@ -790,9 +866,11 @@
             position: absolute;
 
             width: 110px;
+
             height: 110px;
 
             left: -55px;
+
             bottom: -65px;
 
             border-radius: 50%;
@@ -812,11 +890,13 @@
                 "Manrope",
                 sans-serif;
 
-            font-size: 11px;
+            font-size: 10px;
+
+            line-height: 1.3;
 
             font-weight: 800;
 
-            letter-spacing: .16em;
+            letter-spacing: .15em;
 
             color:
                 var(--gold);
@@ -830,7 +910,7 @@
             position: relative;
 
             margin:
-                10px 0 8px;
+                10px 0 9px;
 
             font-family:
                 "Manrope",
@@ -839,7 +919,7 @@
             font-size:
                 clamp(30px, 8vw, 48px);
 
-            line-height: 1.04;
+            line-height: 1.03;
 
             letter-spacing: -.045em;
 
@@ -865,9 +945,11 @@
 
             margin: 0;
 
-            font-size: 14px;
+            font-size: 13px;
 
-            line-height: 1.7;
+            line-height: 1.72;
+
+            font-weight: 400;
 
             color:
                 var(--text-soft);
@@ -945,6 +1027,7 @@
         .search-icon {
 
             width: 38px;
+
             height: 38px;
 
             display: grid;
@@ -962,7 +1045,9 @@
 
             display: block;
 
-            font-size: 14px;
+            font-size: 13px;
+
+            line-height: 1.25;
 
             font-weight: 700;
         }
@@ -972,9 +1057,13 @@
 
             display: block;
 
-            margin-top: 2px;
+            margin-top: 3px;
 
-            font-size: 11px;
+            font-size: 10px;
+
+            line-height: 1.35;
+
+            font-weight: 500;
 
             opacity: .75;
         }
@@ -983,6 +1072,8 @@
         .home-arrow {
 
             font-size: 21px;
+
+            line-height: 1;
 
             opacity: .9;
         }
@@ -1034,6 +1125,7 @@
         .feature-icon {
 
             width: 32px;
+
             height: 32px;
 
             display: grid;
@@ -1052,11 +1144,23 @@
         }
 
 
+        .feature-icon svg {
+
+            width: 16px;
+
+            height: 16px;
+        }
+
+
         .feature-card strong {
 
             display: block;
 
-            font-size: 12px;
+            font-size: 11px;
+
+            line-height: 1.35;
+
+            font-weight: 700;
 
             color:
                 var(--text-main);
@@ -1072,6 +1176,8 @@
             font-size: 10px;
 
             line-height: 1.5;
+
+            font-weight: 400;
 
             color:
                 var(--text-muted);
@@ -1096,7 +1202,9 @@
                 "Manrope",
                 sans-serif;
 
-            font-size: 10px;
+            font-size: 9px;
+
+            line-height: 1.3;
 
             font-weight: 800;
 
@@ -1120,9 +1228,9 @@
             font-size:
                 clamp(27px, 7vw, 38px);
 
-            line-height: 1.1;
+            line-height: 1.08;
 
-            letter-spacing: -.035em;
+            letter-spacing: -.038em;
 
             font-weight: 800;
 
@@ -1138,9 +1246,11 @@
 
             max-width: 650px;
 
-            font-size: 13px;
+            font-size: 12px;
 
-            line-height: 1.7;
+            line-height: 1.72;
+
+            font-weight: 400;
 
             color:
                 var(--text-muted);
@@ -1180,7 +1290,11 @@
                 "Manrope",
                 sans-serif;
 
-            font-size: 16px;
+            font-size: 14px;
+
+            line-height: 1.35;
+
+            font-weight: 700;
 
             color:
                 var(--text-main);
@@ -1192,9 +1306,11 @@
             margin:
                 0;
 
-            font-size: 13px;
+            font-size: 12px;
 
             line-height: 1.75;
+
+            font-weight: 400;
 
             color:
                 var(--text-soft);
@@ -1257,7 +1373,9 @@
             margin:
                 0 0 7px 3px;
 
-            font-size: 10px;
+            font-size: 9px;
+
+            line-height: 1.3;
 
             font-weight: 700;
 
@@ -1292,7 +1410,7 @@
             color:
                 var(--text-main);
 
-            font-size: 13px;
+            font-size: 12px;
 
             font-weight: 600;
 
@@ -1325,6 +1443,7 @@
         .swap-button {
 
             width: 42px;
+
             height: 42px;
 
             align-self: end;
@@ -1362,13 +1481,15 @@
         .swap-button:active {
 
             transform:
-                rotate(180deg) scale(.92);
+                rotate(180deg)
+                scale(.92);
         }
 
 
         .swap-button svg {
 
             width: 18px;
+
             height: 18px;
         }
 
@@ -1378,9 +1499,11 @@
             position: absolute;
 
             left: 0;
+
             right: 0;
 
-            top: calc(100% + 6px);
+            top:
+                calc(100% + 6px);
 
             z-index: 100;
 
@@ -1428,7 +1551,7 @@
                     #b8585d
                 );
 
-            font-size: 13px;
+            font-size: 12px;
 
             font-weight: 700;
 
@@ -1455,6 +1578,7 @@
         .search-action svg {
 
             width: 18px;
+
             height: 18px;
         }
 
@@ -1466,9 +1590,11 @@
             margin:
                 13px 2px 0;
 
-            font-size: 11px;
+            font-size: 10px;
 
             line-height: 1.5;
+
+            font-weight: 500;
 
             color:
                 var(--text-muted);
@@ -1518,6 +1644,7 @@
                 0 0 30px;
 
             width: 30px;
+
             height: 30px;
 
             display: grid;
@@ -1536,7 +1663,9 @@
                 "Manrope",
                 sans-serif;
 
-            font-size: 12px;
+            font-size: 9px;
+
+            line-height: 1;
 
             font-weight: 800;
         }
@@ -1548,7 +1677,11 @@
 
             margin-bottom: 3px;
 
-            font-size: 13px;
+            font-size: 12px;
+
+            line-height: 1.4;
+
+            font-weight: 700;
 
             color:
                 var(--text-main);
@@ -1573,6 +1706,7 @@
         .community-icon {
 
             width: 58px;
+
             height: 58px;
 
             display: grid;
@@ -1597,6 +1731,7 @@
         .community-icon svg {
 
             width: 26px;
+
             height: 26px;
         }
 
@@ -1655,6 +1790,7 @@
         .contact-mini-icon {
 
             width: 36px;
+
             height: 36px;
 
             display: grid;
@@ -1674,6 +1810,7 @@
         .contact-mini-icon svg {
 
             width: 18px;
+
             height: 18px;
         }
 
@@ -1682,7 +1819,11 @@
 
             display: block;
 
-            font-size: 12px;
+            font-size: 11px;
+
+            line-height: 1.35;
+
+            font-weight: 700;
         }
 
 
@@ -1692,7 +1833,11 @@
 
             margin-top: 2px;
 
-            font-size: 10px;
+            font-size: 9px;
+
+            line-height: 1.4;
+
+            font-weight: 500;
 
             color:
                 var(--text-muted);
@@ -1777,6 +1922,7 @@
         .action-card-icon {
 
             width: 42px;
+
             height: 42px;
 
             flex:
@@ -1799,6 +1945,7 @@
         .action-card-icon svg {
 
             width: 20px;
+
             height: 20px;
         }
 
@@ -1807,7 +1954,11 @@
 
             display: block;
 
-            font-size: 13px;
+            font-size: 12px;
+
+            line-height: 1.35;
+
+            font-weight: 700;
         }
 
 
@@ -1817,7 +1968,11 @@
 
             margin-top: 3px;
 
-            font-size: 10px;
+            font-size: 9px;
+
+            line-height: 1.4;
+
+            font-weight: 500;
 
             color:
                 var(--text-muted);
@@ -1827,6 +1982,8 @@
         .action-arrow {
 
             font-size: 17px;
+
+            line-height: 1;
 
             color:
                 var(--text-muted);
@@ -1897,6 +2054,7 @@
         .theme-option-icon {
 
             width: 38px;
+
             height: 38px;
 
             display: grid;
@@ -1918,6 +2076,7 @@
         .theme-option-icon svg {
 
             width: 20px;
+
             height: 20px;
         }
 
@@ -1926,7 +2085,11 @@
 
             display: block;
 
-            font-size: 12px;
+            font-size: 11px;
+
+            line-height: 1.35;
+
+            font-weight: 700;
         }
 
 
@@ -1936,7 +2099,11 @@
 
             margin-top: 3px;
 
-            font-size: 10px;
+            font-size: 9px;
+
+            line-height: 1.4;
+
+            font-weight: 500;
 
             color:
                 var(--text-muted);
@@ -1948,9 +2115,11 @@
             position: absolute;
 
             top: 12px;
+
             right: 12px;
 
             width: 18px;
+
             height: 18px;
 
             display: grid;
@@ -1998,7 +2167,11 @@
             color:
                 var(--text-muted);
 
-            font-size: 10px;
+            font-size: 9px;
+
+            line-height: 1.4;
+
+            font-weight: 500;
 
             letter-spacing: .04em;
         }
@@ -2015,6 +2188,7 @@
             z-index: 99990;
 
             width: 30px;
+
             height: 30px;
 
             border-radius: 50%;
@@ -2028,14 +2202,20 @@
                 scale(0);
 
             background:
-                var(--theme-transition-bg, #102536);
+                var(
+                    --theme-transition-bg,
+                    #102536
+                );
 
             transition:
                 transform .75s cubic-bezier(.76, 0, .24, 1),
                 opacity .2s ease;
 
-            left: var(--theme-x, 50%);
-            top: var(--theme-y, 50%);
+            left:
+                var(--theme-x, 50%);
+
+            top:
+                var(--theme-y, 50%);
         }
 
 
@@ -2095,11 +2275,17 @@
             z-index: 800;
 
             left: 0;
+
             top: 0;
+
             bottom: 0;
 
             width:
                 min(88vw, 340px);
+
+            display: flex;
+
+            flex-direction: column;
 
             padding:
                 max(18px, env(safe-area-inset-top))
@@ -2156,9 +2342,11 @@
 
             font-size: 21px;
 
+            line-height: 1;
+
             font-weight: 800;
 
-            letter-spacing: .1em;
+            letter-spacing: .095em;
         }
 
 
@@ -2172,6 +2360,7 @@
         .drawer-close {
 
             width: 38px;
+
             height: 38px;
 
             display: grid;
@@ -2194,6 +2383,7 @@
         .drawer-close svg {
 
             width: 18px;
+
             height: 18px;
         }
 
@@ -2209,7 +2399,9 @@
             padding:
                 0 10px 8px;
 
-            font-size: 9px;
+            font-size: 8px;
+
+            line-height: 1.4;
 
             font-weight: 800;
 
@@ -2276,6 +2468,7 @@
         .drawer-item-icon {
 
             width: 31px;
+
             height: 31px;
 
             flex:
@@ -2302,6 +2495,7 @@
         .drawer-item-icon svg {
 
             width: 16px;
+
             height: 16px;
         }
 
@@ -2310,7 +2504,9 @@
 
             flex: 1;
 
-            font-size: 12px;
+            font-size: 11px;
+
+            line-height: 1.35;
 
             font-weight: 600;
         }
@@ -2326,6 +2522,49 @@
 
 
         /* =========================================================
+           EXIT APP
+           ========================================================= */
+
+        .drawer-exit-section {
+
+            margin-top: auto;
+
+            padding-top: 14px;
+
+            border-top:
+                1px solid var(--border);
+        }
+
+
+        .drawer-exit {
+
+            color:
+                var(--text-muted);
+
+            opacity: .82;
+
+            margin-bottom: 0;
+        }
+
+
+        .drawer-exit .drawer-item-icon {
+
+            color:
+                var(--kai-red);
+
+            background:
+                rgba(199,101,104,.07);
+        }
+
+
+        .drawer-exit:hover {
+
+            color:
+                var(--kai-red);
+        }
+
+
+        /* =========================================================
            TOAST
            ========================================================= */
 
@@ -2336,7 +2575,10 @@
             left: 50%;
 
             bottom:
-                calc(22px + env(safe-area-inset-bottom));
+                calc(
+                    22px +
+                    env(safe-area-inset-bottom)
+                );
 
             z-index: 99998;
 
@@ -2360,7 +2602,11 @@
             box-shadow:
                 0 15px 35px rgba(0,0,0,.22);
 
-            font-size: 11px;
+            font-size: 10px;
+
+            line-height: 1.45;
+
+            font-weight: 500;
 
             text-align: center;
 
@@ -2399,12 +2645,14 @@
 
             text-align: center;
 
-            font-size: 10px;
+            font-size: 9px;
+
+            line-height: 1.6;
+
+            font-weight: 500;
 
             color:
                 var(--text-muted);
-
-            line-height: 1.6;
         }
 
 
@@ -2417,6 +2665,7 @@
             main {
 
                 padding-left: 14px;
+
                 padding-right: 14px;
             }
 
@@ -2475,6 +2724,7 @@
                 height: 50px;
 
                 padding-left: 11px;
+
                 padding-right: 11px;
 
                 font-size: 12px;
@@ -2484,7 +2734,15 @@
             .swap-button {
 
                 width: 38px;
+
                 height: 38px;
+            }
+
+
+            .page-title {
+
+                letter-spacing:
+                    -.032em;
             }
         }
 
@@ -2531,13 +2789,17 @@
             *::before,
             *::after {
 
-                animation-duration: .01ms !important;
+                animation-duration:
+                    .01ms !important;
 
-                animation-iteration-count: 1 !important;
+                animation-iteration-count:
+                    1 !important;
 
-                scroll-behavior: auto !important;
+                scroll-behavior:
+                    auto !important;
 
-                transition-duration: .01ms !important;
+                transition-duration:
+                    .01ms !important;
             }
         }
 
@@ -2567,9 +2829,11 @@
 
             </div>
 
+
             <div class="splash-subtitle">
                 Tarif Khusus Kereta Api
             </div>
+
 
             <div class="splash-train">
 
@@ -2579,9 +2843,11 @@
 
             </div>
 
+
             <div class="splash-loading">
                 Menyiapkan TARSUS...
             </div>
+
 
             <div class="splash-progress"></div>
 
@@ -2617,11 +2883,13 @@
 
         <aside id="drawer">
 
+
             <div class="drawer-header">
 
                 <div class="drawer-brand">
                     TAR<span>SUS</span>
                 </div>
+
 
                 <button
                     class="drawer-close"
@@ -2637,8 +2905,11 @@
                         stroke-width="2"
                         stroke-linecap="round"
                     >
+
                         <path d="M6 6l12 12"></path>
+
                         <path d="M18 6L6 18"></path>
+
                     </svg>
 
                 </button>
@@ -2671,12 +2942,17 @@
                             stroke-linecap="round"
                             stroke-linejoin="round"
                         >
+
                             <path d="M3 10.5L12 3l9 7.5"></path>
+
                             <path d="M5.5 9.5V21h13V9.5"></path>
+
                             <path d="M9.5 21v-6h5v6"></path>
+
                         </svg>
 
                     </span>
+
 
                     <span class="drawer-item-text">
                         Beranda
@@ -2700,6 +2976,7 @@
                             stroke-width="1.8"
                             stroke-linecap="round"
                         >
+
                             <circle
                                 cx="11"
                                 cy="11"
@@ -2713,6 +2990,7 @@
                         </svg>
 
                     </span>
+
 
                     <span class="drawer-item-text">
                         Cari Tarif Khusus
@@ -2736,6 +3014,7 @@
                             stroke-width="1.8"
                             stroke-linecap="round"
                         >
+
                             <circle
                                 cx="12"
                                 cy="12"
@@ -2753,6 +3032,7 @@
                         </svg>
 
                     </span>
+
 
                     <span class="drawer-item-text">
                         Panduan
@@ -2787,6 +3067,7 @@
                             stroke-width="1.8"
                             stroke-linecap="round"
                         >
+
                             <circle
                                 cx="12"
                                 cy="12"
@@ -2804,6 +3085,7 @@
                         </svg>
 
                     </span>
+
 
                     <span class="drawer-item-text">
                         Tentang TARSUS
@@ -2828,6 +3110,7 @@
                             stroke-linecap="round"
                             stroke-linejoin="round"
                         >
+
                             <rect
                                 x="3"
                                 y="5"
@@ -2843,6 +3126,7 @@
                         </svg>
 
                     </span>
+
 
                     <span class="drawer-item-text">
                         Bantuan & Saran
@@ -2866,6 +3150,7 @@
                             stroke-width="1.8"
                             stroke-linecap="round"
                         >
+
                             <path
                                 d="M6 4h12v16H6z"
                             ></path>
@@ -2885,6 +3170,7 @@
                         </svg>
 
                     </span>
+
 
                     <span class="drawer-item-text">
                         Syarat & Ketentuan
@@ -2920,6 +3206,7 @@
                             stroke="currentColor"
                             stroke-width="1.8"
                         >
+
                             <rect
                                 x="3"
                                 y="3"
@@ -2946,9 +3233,11 @@
 
                     </span>
 
+
                     <span class="drawer-item-text">
                         Instagram
                     </span>
+
 
                     <span class="external-arrow">
                         ↗
@@ -2973,6 +3262,7 @@
                             stroke-linecap="round"
                             stroke-linejoin="round"
                         >
+
                             <path
                                 d="M20.8 8.7c0 5.2-8.8 10.1-8.8 10.1S3.2 13.9 3.2 8.7A4.7 4.7 0 0 1 12 6.2a4.7 4.7 0 0 1 8.8 2.5z"
                             ></path>
@@ -2980,6 +3270,7 @@
                         </svg>
 
                     </span>
+
 
                     <span class="drawer-item-text">
                         Dukung & Beri Rating
@@ -3015,6 +3306,7 @@
                             stroke-linecap="round"
                             stroke-linejoin="round"
                         >
+
                             <circle
                                 cx="12"
                                 cy="12"
@@ -3029,8 +3321,58 @@
 
                     </span>
 
+
                     <span class="drawer-item-text">
                         Pengaturan
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <!-- =================================================
+                 KELUAR APLIKASI
+                 ================================================= -->
+
+            <div class="drawer-exit-section">
+
+                <button
+                    class="drawer-item drawer-exit"
+                    id="exitAppButton"
+                    type="button"
+                >
+
+                    <span class="drawer-item-icon">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+
+                            <path
+                                d="M10 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H10"
+                            ></path>
+
+                            <path
+                                d="M14 8l4 4-4 4"
+                            ></path>
+
+                            <path
+                                d="M18 12H9"
+                            ></path>
+
+                        </svg>
+
+                    </span>
+
+
+                    <span class="drawer-item-text">
+                        Keluar Aplikasi
                     </span>
 
                 </button>
@@ -3062,9 +3404,13 @@
                         stroke-width="2"
                         stroke-linecap="round"
                     >
+
                         <path d="M4 7h16"></path>
+
                         <path d="M4 12h16"></path>
+
                         <path d="M4 17h16"></path>
+
                     </svg>
 
                 </button>
@@ -3094,9 +3440,19 @@
                         stroke-linecap="round"
                         stroke-linejoin="round"
                     >
-                        <path d="M3 10.5L12 3l9 7.5"></path>
-                        <path d="M5.5 9.5V21h13V9.5"></path>
-                        <path d="M9.5 21v-6h5v6"></path>
+
+                        <path
+                            d="M3 10.5L12 3l9 7.5"
+                        ></path>
+
+                        <path
+                            d="M5.5 9.5V21h13V9.5"
+                        ></path>
+
+                        <path
+                            d="M9.5 21v-6h5v6"
+                        ></path>
+
                     </svg>
 
                 </button>
@@ -3128,9 +3484,11 @@
                         KAI 121 • TOOL
                     </div>
 
+
                     <h1 class="home-title">
                         TARSUS <span>FINDER</span>
                     </h1>
+
 
                     <p class="home-description">
                         Alat bantu pencarian tarif khusus perjalanan
@@ -3156,6 +3514,7 @@
                                     stroke-width="2"
                                     stroke-linecap="round"
                                 >
+
                                     <circle
                                         cx="11"
                                         cy="11"
@@ -3169,6 +3528,7 @@
                                 </svg>
 
                             </span>
+
 
                             <span>
 
@@ -3206,6 +3566,7 @@
                                 stroke="currentColor"
                                 stroke-width="1.8"
                             >
+
                                 <circle
                                     cx="12"
                                     cy="12"
@@ -3219,6 +3580,7 @@
                             </svg>
 
                         </div>
+
 
                         <div>
 
@@ -3246,6 +3608,7 @@
                                 stroke-width="1.8"
                                 stroke-linecap="round"
                             >
+
                                 <path
                                     d="M4 7h16"
                                 ></path>
@@ -3261,6 +3624,7 @@
                             </svg>
 
                         </div>
+
 
                         <div>
 
@@ -3288,6 +3652,7 @@
                                 stroke-width="1.8"
                                 stroke-linecap="round"
                             >
+
                                 <path
                                     d="M4 18h16"
                                 ></path>
@@ -3303,6 +3668,7 @@
                             </svg>
 
                         </div>
+
 
                         <div>
 
@@ -3362,8 +3728,6 @@
                     <div class="station-row">
 
 
-                        <!-- ASAL -->
-
                         <div class="station-field">
 
                             <label
@@ -3373,6 +3737,7 @@
                                 Stasiun Asal
                             </label>
 
+
                             <input
                                 type="text"
                                 id="asal"
@@ -3381,6 +3746,7 @@
                                 autocomplete="off"
                             >
 
+
                             <div
                                 id="asal-suggestions"
                                 class="suggestions"
@@ -3388,8 +3754,6 @@
 
                         </div>
 
-
-                        <!-- SWAP -->
 
                         <button
                             id="swapBtn"
@@ -3406,6 +3770,7 @@
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
                             >
+
                                 <path
                                     d="M7 7h11l-3-3"
                                 ></path>
@@ -3427,8 +3792,6 @@
                         </button>
 
 
-                        <!-- TUJUAN -->
-
                         <div class="station-field">
 
                             <label
@@ -3438,6 +3801,7 @@
                                 Stasiun Tujuan
                             </label>
 
+
                             <input
                                 type="text"
                                 id="tujuan"
@@ -3445,6 +3809,7 @@
                                 placeholder="Pilih stasiun tujuan"
                                 autocomplete="off"
                             >
+
 
                             <div
                                 id="tujuan-suggestions"
@@ -3469,6 +3834,7 @@
                             stroke-width="2"
                             stroke-linecap="round"
                         >
+
                             <circle
                                 cx="11"
                                 cy="11"
@@ -3543,11 +3909,13 @@
                                 01
                             </div>
 
+
                             <div>
 
                                 <strong>
                                     Pilih stasiun asal
                                 </strong>
+
 
                                 <p>
                                     Ketik nama stasiun pada kolom
@@ -3566,11 +3934,13 @@
                                 02
                             </div>
 
+
                             <div>
 
                                 <strong>
                                     Pilih stasiun tujuan
                                 </strong>
+
 
                                 <p>
                                     Masukkan stasiun tujuan dengan
@@ -3588,11 +3958,13 @@
                                 03
                             </div>
 
+
                             <div>
 
                                 <strong>
                                     Tekan Cari Tarif
                                 </strong>
+
 
                                 <p>
                                     TARSUS akan mencari data tarif
@@ -3611,11 +3983,13 @@
                                 04
                             </div>
 
+
                             <div>
 
                                 <strong>
                                     Periksa hasil
                                 </strong>
+
 
                                 <p>
                                     Hasil akan menampilkan nama KA,
@@ -3634,11 +4008,13 @@
                                 05
                             </div>
 
+
                             <div>
 
                                 <strong>
                                     Gunakan informasi dengan tepat
                                 </strong>
+
 
                                 <p>
                                     Pastikan informasi tarif yang
@@ -3696,6 +4072,7 @@
                             stroke-width="1.7"
                             stroke-linecap="round"
                         >
+
                             <circle
                                 cx="12"
                                 cy="12"
@@ -3714,9 +4091,11 @@
 
                     </div>
 
+
                     <h3>
                         TARSUS Finder
                     </h3>
+
 
                     <p>
                         TARSUS Finder adalah alat bantu pencarian
@@ -3735,6 +4114,7 @@
                     <h3>
                         Tujuan pengembangan
                     </h3>
+
 
                     <p>
                         TARSUS dibuat sebagai alat bantu untuk
@@ -3787,6 +4167,7 @@
                             stroke-linecap="round"
                             stroke-linejoin="round"
                         >
+
                             <rect
                                 x="3"
                                 y="5"
@@ -3803,9 +4184,11 @@
 
                     </div>
 
+
                     <h3>
                         Hubungi Pengembang
                     </h3>
+
 
                     <p>
                         Silakan kirim pertanyaan, laporan kendala,
@@ -3831,6 +4214,7 @@
                                     stroke-linecap="round"
                                     stroke-linejoin="round"
                                 >
+
                                     <rect
                                         x="3"
                                         y="5"
@@ -3846,6 +4230,7 @@
                                 </svg>
 
                             </span>
+
 
                             <span>
 
@@ -3910,11 +4295,13 @@
                                 01
                             </div>
 
+
                             <div>
 
                                 <strong>
                                     Fungsi aplikasi
                                 </strong>
+
 
                                 <p>
                                     TARSUS merupakan alat bantu
@@ -3934,11 +4321,13 @@
                                 02
                             </div>
 
+
                             <div>
 
                                 <strong>
                                     Perubahan tarif
                                 </strong>
+
 
                                 <p>
                                     Informasi tarif dapat mengalami
@@ -3957,11 +4346,13 @@
                                 03
                             </div>
 
+
                             <div>
 
                                 <strong>
                                     Verifikasi informasi
                                 </strong>
+
 
                                 <p>
                                     Untuk keperluan pelayanan,
@@ -3981,11 +4372,13 @@
                                 04
                             </div>
 
+
                             <div>
 
                                 <strong>
                                     Penggunaan yang bertanggung jawab
                                 </strong>
+
 
                                 <p>
                                     Gunakan informasi yang tersedia
@@ -4004,11 +4397,13 @@
                                 05
                             </div>
 
+
                             <div>
 
                                 <strong>
                                     Pembaruan aplikasi
                                 </strong>
+
 
                                 <p>
                                     TARSUS dapat mengalami perubahan,
@@ -4068,6 +4463,7 @@
                             stroke-linecap="round"
                             stroke-linejoin="round"
                         >
+
                             <path
                                 d="M20.8 8.7c0 5.2-8.8 10.1-8.8 10.1S3.2 13.9 3.2 8.7A4.7 4.7 0 0 1 12 6.2a4.7 4.7 0 0 1 8.8 2.5z"
                             ></path>
@@ -4076,9 +4472,11 @@
 
                     </div>
 
+
                     <h3>
                         Bantu TARSUS berkembang
                     </h3>
+
 
                     <p>
                         Jika TARSUS membantu pekerjaanmu, kamu dapat
@@ -4109,6 +4507,7 @@
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
                                     >
+
                                         <path
                                             d="M12 3.8l2.5 5.1 5.6.8-4 4 1 5.6-5.1-2.7-5.1 2.7 1-5.6-4-4 5.6-.8L12 3.8z"
                                         ></path>
@@ -4116,6 +4515,7 @@
                                     </svg>
 
                                 </span>
+
 
                                 <span>
 
@@ -4158,6 +4558,7 @@
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
                                     >
+
                                         <path
                                             d="M20.8 8.7c0 5.2-8.8 10.1-8.8 10.1S3.2 13.9 3.2 8.7A4.7 4.7 0 0 1 12 6.2a4.7 4.7 0 0 1 8.8 2.5z"
                                         ></path>
@@ -4165,6 +4566,7 @@
                                     </svg>
 
                                 </span>
+
 
                                 <span>
 
@@ -4199,6 +4601,7 @@
                     <h3>
                         Terima kasih
                     </h3>
+
 
                     <p>
                         Dukungan tidak harus berupa materi. Laporan
@@ -4243,6 +4646,7 @@
                         Tampilan
                     </h3>
 
+
                     <p>
                         Pilih mode tampilan yang paling nyaman
                         digunakan.
@@ -4251,8 +4655,6 @@
 
                     <div class="theme-options">
 
-
-                        <!-- LIGHT -->
 
                         <button
                             class="theme-option"
@@ -4269,6 +4671,7 @@
                                     stroke-width="1.7"
                                     stroke-linecap="round"
                                 >
+
                                     <circle
                                         cx="12"
                                         cy="12"
@@ -4311,13 +4714,16 @@
 
                             </span>
 
+
                             <strong>
                                 Mode Siang
                             </strong>
 
+
                             <small>
                                 Terang dan bersih
                             </small>
+
 
                             <span class="theme-check">
                                 ✓
@@ -4325,8 +4731,6 @@
 
                         </button>
 
-
-                        <!-- DARK -->
 
                         <button
                             class="theme-option"
@@ -4343,6 +4747,7 @@
                                     stroke-width="1.7"
                                     stroke-linecap="round"
                                 >
+
                                     <path
                                         d="M20.5 15.2A8.8 8.8 0 0 1 8.8 3.5 8.8 8.8 0 1 0 20.5 15.2z"
                                     ></path>
@@ -4351,13 +4756,16 @@
 
                             </span>
 
+
                             <strong>
                                 Mode Malam
                             </strong>
 
+
                             <small>
                                 Nyaman untuk malam hari
                             </small>
+
 
                             <span class="theme-check">
                                 ✓
@@ -4370,8 +4778,6 @@
 
                 </div>
 
-
-                <!-- VERSION ONLY HERE -->
 
                 <div class="settings-version">
                     TARSUS Finder • Versi v1.0.0
@@ -4413,8 +4819,7 @@
 
         /* =========================================================
            SPLASH
-           IMPORTANT:
-           Tidak menunggu database.
+           Tidak menunggu database
            ========================================================= */
 
         (function () {
@@ -4426,8 +4831,11 @@
                 document.getElementById("appShell");
 
             if (!splash || !appShell) {
+
                 return;
+
             }
+
 
             setTimeout(function () {
 
@@ -4448,37 +4856,61 @@
             document.getElementById("drawer");
 
         const tarsusDrawerOverlay =
-            document.getElementById("drawerOverlay");
+            document.getElementById(
+                "drawerOverlay"
+            );
 
         const tarsusMenuBtn =
             document.getElementById("menuBtn");
 
         const tarsusDrawerClose =
-            document.getElementById("drawerClose");
+            document.getElementById(
+                "drawerClose"
+            );
 
 
         function tarsusOpenDrawer() {
 
-            if (!tarsusDrawer) return;
+            if (!tarsusDrawer) {
 
-            tarsusDrawer.classList.add("open");
+                return;
 
-            tarsusDrawerOverlay.classList.add("open");
+            }
 
-            document.body.style.overflow = "hidden";
+
+            tarsusDrawer.classList.add(
+                "open"
+            );
+
+            tarsusDrawerOverlay.classList.add(
+                "open"
+            );
+
+            document.body.style.overflow =
+                "hidden";
 
         }
 
 
         function tarsusCloseDrawer() {
 
-            if (!tarsusDrawer) return;
+            if (!tarsusDrawer) {
 
-            tarsusDrawer.classList.remove("open");
+                return;
 
-            tarsusDrawerOverlay.classList.remove("open");
+            }
 
-            document.body.style.overflow = "";
+
+            tarsusDrawer.classList.remove(
+                "open"
+            );
+
+            tarsusDrawerOverlay.classList.remove(
+                "open"
+            );
+
+            document.body.style.overflow =
+                "";
 
         }
 
@@ -4520,11 +4952,16 @@
         function tarsusShowPage(pageName) {
 
             const pages =
-                document.querySelectorAll(".page");
+                document.querySelectorAll(
+                    ".page"
+                );
+
 
             pages.forEach(function (page) {
 
-                page.classList.remove("active");
+                page.classList.remove(
+                    "active"
+                );
 
             });
 
@@ -4536,35 +4973,49 @@
 
 
             if (!target) {
+
                 return;
+
             }
 
 
-            target.classList.add("active");
+            target.classList.add(
+                "active"
+            );
+
 
             tarsusCloseDrawer();
 
 
             window.scrollTo({
+
                 top: 0,
+
                 behavior: "smooth"
+
             });
 
 
             if (pageName === "search") {
 
-                setTimeout(function () {
+                setTimeout(
+                    function () {
 
-                    const asal =
-                        document.getElementById("asal");
+                        const asal =
+                            document.getElementById(
+                                "asal"
+                            );
 
-                    if (asal) {
 
-                        asal.focus();
+                        if (asal) {
 
-                    }
+                            asal.focus();
 
-                }, 350);
+                        }
+
+                    },
+                    350
+                );
 
             }
 
@@ -4572,24 +5023,31 @@
 
 
         document
-            .querySelectorAll("[data-page]")
-            .forEach(function (button) {
+            .querySelectorAll(
+                "[data-page]"
+            )
+            .forEach(
+                function (button) {
 
-                button.addEventListener(
-                    "click",
-                    function () {
+                    button.addEventListener(
+                        "click",
+                        function () {
 
-                        const page =
-                            button.getAttribute(
-                                "data-page"
+                            const page =
+                                button.getAttribute(
+                                    "data-page"
+                                );
+
+
+                            tarsusShowPage(
+                                page
                             );
 
-                        tarsusShowPage(page);
+                        }
+                    );
 
-                    }
-                );
-
-            });
+                }
+            );
 
 
         /* =========================================================
@@ -4608,7 +5066,9 @@
                 "click",
                 function () {
 
-                    tarsusShowPage("search");
+                    tarsusShowPage(
+                        "search"
+                    );
 
                 }
             );
@@ -4632,7 +5092,9 @@
                 "click",
                 function () {
 
-                    tarsusShowPage("home");
+                    tarsusShowPage(
+                        "home"
+                    );
 
                 }
             );
@@ -4647,27 +5109,48 @@
         let tarsusToastTimer = null;
 
 
-        function tarsusShowToast(message) {
+        function tarsusShowToast(
+            message
+        ) {
 
             const toast =
-                document.getElementById("toast");
-
-            if (!toast) return;
-
-            toast.textContent = message;
-
-            toast.classList.add("show");
+                document.getElementById(
+                    "toast"
+                );
 
 
-            clearTimeout(tarsusToastTimer);
+            if (!toast) {
+
+                return;
+
+            }
+
+
+            toast.textContent =
+                message;
+
+
+            toast.classList.add(
+                "show"
+            );
+
+
+            clearTimeout(
+                tarsusToastTimer
+            );
 
 
             tarsusToastTimer =
-                setTimeout(function () {
+                setTimeout(
+                    function () {
 
-                    toast.classList.remove("show");
+                        toast.classList.remove(
+                            "show"
+                        );
 
-                }, 2500);
+                    },
+                    2500
+                );
 
         }
 
@@ -4753,6 +5236,61 @@
 
 
         /* =========================================================
+           EXIT APPLICATION
+           ========================================================= */
+
+        const exitAppButton =
+            document.getElementById(
+                "exitAppButton"
+            );
+
+
+        if (exitAppButton) {
+
+            exitAppButton.addEventListener(
+                "click",
+                function () {
+
+                    tarsusCloseDrawer();
+
+
+                    /*
+                     * Untuk Android App Wrapper,
+                     * beberapa wrapper mengizinkan window.close().
+                     *
+                     * Pada browser biasa, browser akan
+                     * menolak perintah ini demi keamanan.
+                     */
+
+                    try {
+
+                        window.close();
+
+                    } catch (error) {
+
+                        /* silent */
+
+                    }
+
+
+                    setTimeout(
+                        function () {
+
+                            tarsusShowToast(
+                                "Aplikasi siap ditutup."
+                            );
+
+                        },
+                        250
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =========================================================
            THEME
            ========================================================= */
 
@@ -4760,6 +5298,7 @@
             document.querySelectorAll(
                 "[data-theme-choice]"
             );
+
 
         const themeTransition =
             document.getElementById(
@@ -4774,6 +5313,7 @@
                     "tarsus-theme"
                 );
 
+
             if (
                 saved === "light" ||
                 saved === "dark"
@@ -4782,6 +5322,7 @@
                 return saved;
 
             }
+
 
             return "dark";
 
@@ -4805,12 +5346,10 @@
             }
 
 
-            if (animate && themeTransition) {
-
-                const oldTheme =
-                    document.documentElement
-                        .getAttribute("data-theme");
-
+            if (
+                animate &&
+                themeTransition
+            ) {
 
                 const transitionColor =
                     theme === "light"
@@ -4828,14 +5367,20 @@
                 themeTransition.style
                     .setProperty(
                         "--theme-x",
-                        (originX || window.innerWidth / 2) + "px"
+                        (
+                            originX ||
+                            window.innerWidth / 2
+                        ) + "px"
                     );
 
 
                 themeTransition.style
                     .setProperty(
                         "--theme-y",
-                        (originY || window.innerHeight / 2) + "px"
+                        (
+                            originY ||
+                            window.innerHeight / 2
+                        ) + "px"
                     );
 
 
@@ -4844,36 +5389,45 @@
                 );
 
 
-                setTimeout(function () {
+                setTimeout(
+                    function () {
 
-                    document.documentElement
-                        .setAttribute(
-                            "data-theme",
-                            theme
+                        document.documentElement
+                            .setAttribute(
+                                "data-theme",
+                                theme
+                            );
+
+
+                        document
+                            .querySelector(
+                                'meta[name="theme-color"]'
+                            )
+                            ?.setAttribute(
+                                "content",
+                                theme === "light"
+                                    ? "#f3f7f7"
+                                    : "#102536"
+                            );
+
+
+                        tarsusUpdateThemeButtons();
+
+
+                        setTimeout(
+                            function () {
+
+                                themeTransition.classList.remove(
+                                    "active"
+                                );
+
+                            },
+                            180
                         );
 
-                    document
-                        .querySelector('meta[name="theme-color"]')
-                        ?.setAttribute(
-                            "content",
-                            theme === "light"
-                                ? "#f3f7f7"
-                                : "#102536"
-                        );
-
-
-                    tarsusUpdateThemeButtons();
-
-
-                    setTimeout(function () {
-
-                        themeTransition.classList.remove(
-                            "active"
-                        );
-
-                    }, 180);
-
-                }, 270);
+                    },
+                    270
+                );
 
 
             } else {
@@ -4886,7 +5440,9 @@
 
 
                 document
-                    .querySelector('meta[name="theme-color"]')
+                    .querySelector(
+                        'meta[name="theme-color"]'
+                    )
                     ?.setAttribute(
                         "content",
                         theme === "light"
@@ -4925,9 +5481,11 @@
                             "data-theme-choice"
                         );
 
+
                     button.classList.toggle(
                         "active",
-                        choice === currentTheme
+                        choice ===
+                        currentTheme
                     );
 
                 }
@@ -5000,10 +5558,16 @@
                         ) {
 
                             tarsusShowToast(
-                                selectedTheme === "light"
+
+                                selectedTheme ===
+                                "light"
+
                                     ? "Mode siang sudah aktif."
+
                                     : "Mode malam sudah aktif."
+
                             );
+
 
                             return;
 
@@ -5011,10 +5575,15 @@
 
 
                         tarsusApplyTheme(
+
                             selectedTheme,
+
                             true,
+
                             x,
+
                             y
+
                         );
 
 
@@ -5022,9 +5591,14 @@
                             function () {
 
                                 tarsusShowToast(
-                                    selectedTheme === "light"
+
+                                    selectedTheme ===
+                                    "light"
+
                                         ? "Mode siang aktif ☀️"
+
                                         : "Mode malam aktif 🌙"
+
                                 );
 
                             },
@@ -5046,7 +5620,10 @@
             "keydown",
             function (event) {
 
-                if (event.key === "Escape") {
+                if (
+                    event.key ===
+                    "Escape"
+                ) {
 
                     tarsusCloseDrawer();
 
@@ -5061,7 +5638,9 @@
            Tidak menghambat UI.
            ========================================================= */
 
-        if ("serviceWorker" in navigator) {
+        if (
+            "serviceWorker" in navigator
+        ) {
 
             window.addEventListener(
                 "load",
@@ -5091,8 +5670,7 @@
 
     <!-- =========================================================
          DATA ENGINE
-         PENTING:
-         data.js TIDAK PERLU DIUBAH
+         JANGAN DIUBAH
          ========================================================= -->
 
     <script
