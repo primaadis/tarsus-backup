@@ -26,15 +26,10 @@
 const SHEET_ID =
     "1a4Ln_wASazV35F2M3MKZcJHEmiAV8G-0WmkMmU4Csls";
 
-
 const SHEETS = {
-
     ka: "MASTER_KA",
-
     tarif: "MASTER_TARIF",
-
     stasiun: "MASTER_STASIUN"
-
 };
 
 
@@ -72,9 +67,7 @@ const resultsEl =
 ========================================================= */
 
 let MASTER_KA = [];
-
 let MASTER_TARIF = [];
-
 let MASTER_STASIUN = [];
 
 
@@ -82,10 +75,6 @@ let MASTER_STASIUN = [];
    UTILITY
 ========================================================= */
 
-
-/*
-   Membersihkan teks
-*/
 function clean(value) {
 
     return String(value ?? "")
@@ -95,9 +84,6 @@ function clean(value) {
 }
 
 
-/*
-   Normalisasi untuk pencarian
-*/
 function normalize(value) {
 
     return clean(value)
@@ -107,9 +93,6 @@ function normalize(value) {
 }
 
 
-/*
-   Escape HTML
-*/
 function escapeHTML(value) {
 
     return String(value ?? "")
@@ -122,9 +105,6 @@ function escapeHTML(value) {
 }
 
 
-/*
-   Escape untuk atribut HTML
-*/
 function escapeAttr(value) {
 
     return escapeHTML(value);
@@ -141,29 +121,26 @@ function parseCSV(text) {
     const rows = [];
 
     let row = [];
-
     let cell = "";
-
     let insideQuotes = false;
-
 
     for (let i = 0; i < text.length; i++) {
 
         const char = text[i];
-
         const next = text[i + 1];
 
-
-        if (char === '"' && insideQuotes && next === '"') {
+        if (
+            char === '"' &&
+            insideQuotes &&
+            next === '"'
+        ) {
 
             cell += '"';
-
             i++;
 
             continue;
 
         }
-
 
         if (char === '"') {
 
@@ -173,34 +150,34 @@ function parseCSV(text) {
 
         }
 
-
-        if (char === "," && !insideQuotes) {
+        if (
+            char === "," &&
+            !insideQuotes
+        ) {
 
             row.push(cell);
-
             cell = "";
 
             continue;
 
         }
 
-
         if (
             (char === "\n" || char === "\r") &&
             !insideQuotes
         ) {
 
-            if (char === "\r" && next === "\n") {
+            if (
+                char === "\r" &&
+                next === "\n"
+            ) {
 
                 i++;
 
             }
 
-
             row.push(cell);
-
             cell = "";
-
 
             if (
                 row.some(
@@ -212,21 +189,17 @@ function parseCSV(text) {
 
             }
 
-
             row = [];
 
             continue;
 
         }
 
-
         cell += char;
 
     }
 
-
     row.push(cell);
-
 
     if (
         row.some(
@@ -237,7 +210,6 @@ function parseCSV(text) {
         rows.push(row);
 
     }
-
 
     return rows;
 
@@ -256,10 +228,8 @@ async function loadSheet(sheetName) {
         "/gviz/tq?tqx=out:csv&sheet=" +
         encodeURIComponent(sheetName);
 
-
     const response =
         await fetch(url);
-
 
     if (!response.ok) {
 
@@ -269,7 +239,6 @@ async function loadSheet(sheetName) {
         );
 
     }
-
 
     return await response.text();
 
@@ -282,18 +251,19 @@ async function loadSheet(sheetName) {
 
 function rowsToObjects(rows) {
 
-    if (!rows || rows.length === 0) {
+    if (
+        !rows ||
+        rows.length === 0
+    ) {
 
         return [];
 
     }
 
-
     const headers =
         rows[0].map(
             header => clean(header)
         );
-
 
     return rows
         .slice(1)
@@ -301,16 +271,16 @@ function rowsToObjects(rows) {
 
             const obj = {};
 
-
             headers.forEach(
                 (header, index) => {
 
                     obj[header] =
-                        clean(row[index] ?? "");
+                        clean(
+                            row[index] ?? ""
+                        );
 
                 }
             );
-
 
             return obj;
 
@@ -328,10 +298,8 @@ function parseMasterKA(csv) {
     const rows =
         parseCSV(csv);
 
-
     const objects =
         rowsToObjects(rows);
-
 
     return objects
         .filter(row => {
@@ -370,10 +338,8 @@ function parseMasterStasiun(csv) {
     const rows =
         parseCSV(csv);
 
-
     const objects =
         rowsToObjects(rows);
-
 
     return objects
         .filter(row => {
@@ -419,10 +385,8 @@ function parseMasterTarif(csv) {
     const rows =
         parseCSV(csv);
 
-
     const objects =
         rowsToObjects(rows);
-
 
     return objects
         .filter(row => {
@@ -435,14 +399,7 @@ function parseMasterTarif(csv) {
         })
         .map(row => {
 
-
             const stations = [];
-
-
-            /*
-               MASTER_TARIF menggunakan
-               STASIUN_1 sampai STASIUN_15
-            */
 
             for (
                 let i = 1;
@@ -455,15 +412,15 @@ function parseMasterTarif(csv) {
                         row["STASIUN_" + i]
                     );
 
-
-                if (station !== "") {
+                if (
+                    station !== ""
+                ) {
 
                     stations.push(station);
 
                 }
 
             }
-
 
             return {
 
@@ -474,10 +431,14 @@ function parseMasterTarif(csv) {
                     clean(row.ID_KA),
 
                 arah:
-                    clean(row.ARAH).toUpperCase(),
+                    clean(
+                        row.ARAH
+                    ).toUpperCase(),
 
                 polaRelasi:
-                    clean(row.POLA_RELASI),
+                    clean(
+                        row.POLA_RELASI
+                    ),
 
                 stations,
 
@@ -509,11 +470,6 @@ function parseFare(value) {
     const raw =
         clean(value);
 
-
-    /*
-       -, kosong, — dianggap tidak tersedia
-    */
-
     if (
         raw === "" ||
         raw === "-" ||
@@ -525,11 +481,6 @@ function parseFare(value) {
 
     }
 
-
-    /*
-       Hapus Rp dan karakter non angka
-    */
-
     const numberText =
         raw
             .replace(/rp/gi, "")
@@ -537,10 +488,8 @@ function parseFare(value) {
             .replace(/\./g, "")
             .replace(/,/g, "");
 
-
     const number =
         Number(numberText);
-
 
     if (
         !Number.isFinite(number)
@@ -549,7 +498,6 @@ function parseFare(value) {
         return null;
 
     }
-
 
     return number;
 
@@ -572,17 +520,18 @@ function formatRupiah(value) {
 
     }
 
-
-    return "Rp " +
+    return (
+        "Rp " +
         new Intl.NumberFormat(
             "id-ID"
-        ).format(value);
+        ).format(value)
+    );
 
 }
 
 
 /* =========================================================
-   GET LOWEST FARE
+   LOWEST FARE
 ========================================================= */
 
 function getLowestFare(tarif) {
@@ -590,9 +539,7 @@ function getLowestFare(tarif) {
     const fares = [
 
         tarif.eks,
-
         tarif.bis,
-
         tarif.eko
 
     ].filter(
@@ -601,13 +548,13 @@ function getLowestFare(tarif) {
             Number.isFinite(value)
     );
 
-
-    if (fares.length === 0) {
+    if (
+        fares.length === 0
+    ) {
 
         return Infinity;
 
     }
-
 
     return Math.min(...fares);
 
@@ -615,14 +562,13 @@ function getLowestFare(tarif) {
 
 
 /* =========================================================
-   GET REFERENCE ROUTE
+   REFERENCE ROUTE
 ========================================================= */
 
 function getReferenceRoute(tarif) {
 
     const stations =
         tarif.stations;
-
 
     if (
         !stations ||
@@ -633,27 +579,13 @@ function getReferenceRoute(tarif) {
 
     }
 
-
-    /*
-       Acuan tarif khusus menggunakan
-       batas awal dan batas akhir relasi.
-
-       Contoh:
-
-       Gambir
-       Jatinegara
-       Bekasi
-
-       menjadi:
-
-       Gambir → Bekasi
-    */
-
     return [
 
         stations[0],
 
-        stations[stations.length - 1]
+        stations[
+            stations.length - 1
+        ]
 
     ];
 
@@ -674,7 +606,6 @@ function relationHTML(stations) {
         return "—";
 
     }
-
 
     return stations
         .map(
@@ -701,7 +632,6 @@ function routeIsCovered(
     const stations =
         tarif.stations;
 
-
     if (
         !stations ||
         stations.length < 2
@@ -711,13 +641,11 @@ function routeIsCovered(
 
     }
 
-
     const asalNorm =
         normalize(asal);
 
     const tujuanNorm =
         normalize(tujuan);
-
 
     const stationNorms =
         stations.map(
@@ -725,22 +653,15 @@ function routeIsCovered(
                 normalize(station)
         );
 
-
     const asalIndex =
         stationNorms.indexOf(
             asalNorm
         );
 
-
     const tujuanIndex =
         stationNorms.indexOf(
             tujuanNorm
         );
-
-
-    /*
-       Kedua stasiun harus ada
-    */
 
     if (
         asalIndex === -1 ||
@@ -751,9 +672,8 @@ function routeIsCovered(
 
     }
 
-
     /*
-       PP = kedua arah diperbolehkan
+       PP = dua arah
     */
 
     if (
@@ -764,13 +684,15 @@ function routeIsCovered(
 
     }
 
-
     /*
-       Untuk arah selain PP,
-       mengikuti urutan stasiun.
+       Arah berangkat:
+       mengikuti urutan STASIUN_1 → STASIUN_15
     */
 
-    return asalIndex < tujuanIndex;
+    return (
+        asalIndex <
+        tujuanIndex
+    );
 
 }
 
@@ -788,13 +710,11 @@ function getNamaKA(idKA) {
                 normalize(idKA)
         );
 
-
     if (!ka) {
 
         return idKA;
 
     }
-
 
     return (
         clean(ka.namaKA) ||
@@ -817,40 +737,30 @@ function isKAActive(idKA) {
                 normalize(idKA)
         );
 
-
-    /*
-       Jika KA tidak ditemukan,
-       jangan langsung membuang data.
-    */
-
     if (!ka) {
 
         return true;
 
     }
 
-
     const status =
         normalize(ka.aktif);
 
-
-    /*
-       Jika AKTIF kosong,
-       tetap dianggap bisa digunakan.
-    */
-
-    if (status === "") {
+    if (
+        status === ""
+    ) {
 
         return true;
 
     }
 
-
     return (
+
         status === "ya" ||
         status === "aktif" ||
         status === "yes" ||
         status === "1"
+
     );
 
 }
@@ -865,27 +775,29 @@ function isTarifActive(tarif) {
     const status =
         normalize(tarif.status);
 
-
-    if (status === "") {
+    if (
+        status === ""
+    ) {
 
         return true;
 
     }
 
-
     return (
+
         status === "aktif" ||
         status === "ya" ||
         status === "active" ||
         status === "yes" ||
         status === "1"
+
     );
 
 }
 
 
 /* =========================================================
-   CREATE FARE ITEM
+   FARE ITEM
 ========================================================= */
 
 function fareItem(
@@ -897,36 +809,40 @@ function fareItem(
         value === null ||
         value === undefined;
 
-
     return `
-        <div class="fare-item">
 
-            <span class="fare-class">
+        <div class="tarsus-fare-item">
+
+            <span class="tarsus-fare-label">
                 ${escapeHTML(label)}
             </span>
 
-            <span class="fare-price ${
-                unavailable
-                    ? "fare-unavailable"
-                    : ""
-            }">
+            <span class="
+                tarsus-fare-price
+                ${
+                    unavailable
+                        ? "is-unavailable"
+                        : ""
+                }
+            ">
 
                 ${
                     unavailable
-                        ? "—"
+                        ? "Tidak tersedia"
                         : formatRupiah(value)
                 }
 
             </span>
 
         </div>
+
     `;
 
 }
 
 
 /* =========================================================
-   GET UNIQUE ID
+   SAFE ID
 ========================================================= */
 
 function makeSafeId(value) {
@@ -941,6 +857,8 @@ function makeSafeId(value) {
 
 /* =========================================================
    CREATE TARIF DETAIL
+   ---------------------------------------------------------
+   BAGIAN INI DISESUAIKAN DENGAN UI INDEX.HTML BARU
 ========================================================= */
 
 function createTarifDetail(
@@ -952,36 +870,60 @@ function createTarifDetail(
     const reference =
         getReferenceRoute(tarif);
 
-
     const referenceHTML =
         relationHTML(reference);
-
 
     const title =
         isMain
             ? "TARIF UTAMA"
             : "TARIF KHUSUS ALTERNATIF";
 
+    const arahLabel =
+        tarif.arah === "PP"
+            ? "Pulang • Pergi"
+            : (
+                tarif.arah === "BERANGKAT"
+                    ? "Searah"
+                    : clean(tarif.arah)
+            );
 
     return `
-        <div
-            class="tariff-detail ${
+
+        <div class="
+            tarsus-tariff-detail
+            ${
                 isMain
-                    ? "tariff-main"
-                    : "tariff-alternative"
-            }"
-        >
+                    ? "tarsus-main-tariff"
+                    : "tarsus-alternative-tariff"
+            }
+        ">
 
-            <div class="reference-box">
+            <div class="tarsus-tariff-header">
 
-                <div class="reference-label">
+                <div class="tarsus-tariff-title">
 
-                    ${title}
+                    <span class="tarsus-tariff-dot"></span>
+
+                    <span>
+                        ${title}
+                    </span>
 
                 </div>
 
+                <span class="tarsus-direction">
+                    ${escapeHTML(arahLabel)}
+                </span>
 
-                <div class="reference-route">
+            </div>
+
+
+            <div class="tarsus-reference">
+
+                <div class="tarsus-reference-label">
+                    RELASI TARIF KHUSUS
+                </div>
+
+                <div class="tarsus-reference-route">
 
                     ${referenceHTML}
 
@@ -990,26 +932,27 @@ function createTarifDetail(
             </div>
 
 
-            <div class="fare-list">
+            <div class="tarsus-fare-grid">
 
                 ${fareItem(
-                    "EKS",
+                    "EKSEKUTIF",
                     tarif.eks
                 )}
 
                 ${fareItem(
-                    "BIS",
+                    "BISNIS",
                     tarif.bis
                 )}
 
                 ${fareItem(
-                    "EKO",
+                    "EKONOMI",
                     tarif.eko
                 )}
 
             </div>
 
         </div>
+
     `;
 
 }
@@ -1017,6 +960,8 @@ function createTarifDetail(
 
 /* =========================================================
    CREATE GROUPED KA CARD
+   ---------------------------------------------------------
+   SATU NAMA KA = SATU CARD
 ========================================================= */
 
 function createKAGroupCard(
@@ -1033,47 +978,71 @@ function createKAGroupCard(
         "-" +
         index;
 
-
-    /*
-       Tarif pertama = tarif utama
-       karena sebelumnya sudah diurutkan
-       dari tarif termurah.
-    */
-
     const mainTarif =
         group[0];
-
 
     const alternativeTarif =
         group.slice(1);
 
+    const lowestFare =
+        getLowestFare(
+            mainTarif
+        );
+
+    const lowestFareHTML =
+        Number.isFinite(lowestFare)
+            ? formatRupiah(lowestFare)
+            : "Tarif tidak tersedia";
 
     const actualJourney = `
-        <div class="journey">
 
-            <span>
-                ${escapeHTML(asal)}
-            </span>
+        <div class="tarsus-journey">
 
-            <span class="journey-arrow">
-                →
-            </span>
+            <div class="tarsus-journey-station">
 
-            <span>
-                ${escapeHTML(tujuan)}
-            </span>
+                <span class="tarsus-journey-label">
+                    ASAL
+                </span>
+
+                <strong>
+                    ${escapeHTML(asal)}
+                </strong>
+
+            </div>
+
+
+            <div class="tarsus-journey-line">
+
+                <span class="tarsus-train-dot"></span>
+
+                <span class="tarsus-journey-arrow">
+                    →
+                </span>
+
+                <span class="tarsus-train-dot"></span>
+
+            </div>
+
+
+            <div class="tarsus-journey-station right">
+
+                <span class="tarsus-journey-label">
+                    TUJUAN
+                </span>
+
+                <strong>
+                    ${escapeHTML(tujuan)}
+                </strong>
+
+            </div>
 
         </div>
+
     `;
 
 
     let alternativeHTML = "";
 
-
-    /*
-       Jika terdapat tarif alternatif,
-       buat area expandable.
-    */
 
     if (
         alternativeTarif.length > 0
@@ -1095,25 +1064,34 @@ function createKAGroupCard(
         alternativeHTML = `
 
             <details
-                class="tariff-alternatives"
+                class="tarsus-alternatives"
             >
 
                 <summary>
 
-                    <span>
-                        Lihat
-                        ${alternativeTarif.length}
-                        tarif khusus alternatif
+                    <span class="tarsus-alternative-text">
+
+                        <span class="tarsus-alternative-icon">
+                            +
+                        </span>
+
+                        <span>
+                            Lihat
+                            ${alternativeTarif.length}
+                            tarif alternatif
+                        </span>
+
                     </span>
 
-                    <span class="alternative-arrow">
-                        +
+
+                    <span class="tarsus-alternative-chevron">
+                        ›
                     </span>
 
                 </summary>
 
 
-                <div class="alternative-content">
+                <div class="tarsus-alternative-content">
 
                     ${alternativeDetails}
 
@@ -1126,10 +1104,6 @@ function createKAGroupCard(
     }
 
 
-    /*
-       Tarif utama
-    */
-
     const mainHTML =
         createTarifDetail(
             mainTarif,
@@ -1141,13 +1115,49 @@ function createKAGroupCard(
     return `
 
         <article
-            class="result-card grouped-result-card"
+            class="
+                result-card
+                tarsus-result-card
+                grouped-result-card
+            "
             id="${escapeAttr(cardId)}"
         >
 
-            <div class="result-name">
+            <div class="tarsus-result-top">
 
-                ${escapeHTML(namaKA)}
+                <div class="tarsus-train-info">
+
+                    <div class="tarsus-train-icon">
+                        🚆
+                    </div>
+
+
+                    <div>
+
+                        <div class="tarsus-train-caption">
+                            KERETA API
+                        </div>
+
+                        <h3 class="tarsus-train-name">
+                            ${escapeHTML(namaKA)}
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+                <div class="tarsus-lowest-fare">
+
+                    <span>
+                        MULAI DARI
+                    </span>
+
+                    <strong>
+                        ${lowestFareHTML}
+                    </strong>
+
+                </div>
 
             </div>
 
@@ -1182,7 +1192,6 @@ function searchTarif(
     const tujuanNorm =
         normalize(tujuan);
 
-
     if (
         !asalNorm ||
         !tujuanNorm
@@ -1192,7 +1201,6 @@ function searchTarif(
 
     }
 
-
     if (
         asalNorm === tujuanNorm
     ) {
@@ -1201,11 +1209,6 @@ function searchTarif(
 
     }
 
-
-    /*
-       Cari semua relasi tarif
-       yang mencakup rute.
-    */
 
     const matches =
         MASTER_TARIF.filter(
@@ -1219,15 +1222,15 @@ function searchTarif(
 
                 }
 
-
                 if (
-                    !isKAActive(tarif.idKA)
+                    !isKAActive(
+                        tarif.idKA
+                    )
                 ) {
 
                     return false;
 
                 }
-
 
                 return routeIsCovered(
                     tarif,
@@ -1238,20 +1241,6 @@ function searchTarif(
             }
         );
 
-
-    /*
-       Kelompok berdasarkan NAMA KA,
-       bukan ID_KA.
-
-       Jadi:
-
-       KA002 ARGO MURIA
-       KA003 ARGO MURIA
-
-       tetap akan berada dalam
-       satu kelompok ARGO MURIA
-       apabila keduanya cocok.
-    */
 
     const grouped =
         new Map();
@@ -1265,7 +1254,6 @@ function searchTarif(
                     tarif.idKA
                 );
 
-
             const key =
                 normalize(namaKA);
 
@@ -1277,11 +1265,8 @@ function searchTarif(
                 grouped.set(
                     key,
                     {
-
                         namaKA,
-
                         tarif: []
-
                     }
                 );
 
@@ -1296,11 +1281,6 @@ function searchTarif(
         }
     );
 
-
-    /*
-       Urutkan setiap grup:
-       tarif termurah → termahal
-    */
 
     grouped.forEach(
         group => {
@@ -1324,15 +1304,6 @@ function searchTarif(
                     }
 
 
-                    /*
-                       Jika harga sama,
-                       gunakan jumlah stasiun
-                       sebagai pembeda.
-
-                       Relasi lebih pendek
-                       ditaruh lebih dulu.
-                    */
-
                     return (
                         a.stations.length -
                         b.stations.length
@@ -1344,11 +1315,6 @@ function searchTarif(
         }
     );
 
-
-    /*
-       Urutkan nama KA
-       berdasarkan tarif utama termurah.
-    */
 
     const groups =
         Array.from(
@@ -1382,6 +1348,110 @@ function searchTarif(
 
 
 /* =========================================================
+   RESULT HEADER
+========================================================= */
+
+function createResultsHeading(
+    count,
+    asal,
+    tujuan
+) {
+
+    return `
+
+        <div class="tarsus-results-heading">
+
+            <div>
+
+                <span class="tarsus-results-eyebrow">
+                    HASIL PENCARIAN
+                </span>
+
+                <h2>
+                    Tarif Khusus
+                </h2>
+
+            </div>
+
+
+            <div class="tarsus-results-count">
+
+                <strong>
+                    ${count}
+                </strong>
+
+                <span>
+                    KA
+                </span>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+function renderEmptyState(
+    asal,
+    tujuan
+) {
+
+    resultsEl.innerHTML = `
+
+        <div class="
+            empty-state
+            tarsus-empty-state
+        ">
+
+            <div class="tarsus-empty-icon">
+                ×
+            </div>
+
+
+            <h3>
+                Tarif khusus tidak ditemukan
+            </h3>
+
+
+            <p>
+
+                Belum ditemukan tarif khusus
+                untuk perjalanan
+
+                <strong>
+                    ${escapeHTML(asal)}
+                </strong>
+
+                →
+
+                <strong>
+                    ${escapeHTML(tujuan)}
+                </strong>.
+
+            </p>
+
+
+            <div class="tarsus-empty-hint">
+
+                Coba periksa kembali nama stasiun
+                atau gunakan rute lainnya.
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
    RENDER RESULTS
 ========================================================= */
 
@@ -1391,71 +1461,33 @@ function renderResults(
     tujuan
 ) {
 
-    /*
-       Tidak ada hasil
-    */
-
     if (
         !groups ||
         groups.length === 0
     ) {
 
-        resultsEl.innerHTML = `
-
-            <div class="empty-state">
-
-                <div class="empty-symbol">
-                    ⌕
-                </div>
-
-
-                <h3>
-                    Tarif khusus tidak ditemukan
-                </h3>
-
-
-                <p>
-                    Belum ditemukan tarif khusus
-                    untuk perjalanan
-                    ${escapeHTML(asal)}
-                    →
-                    ${escapeHTML(tujuan)}.
-                </p>
-
-            </div>
-
-        `;
+        renderEmptyState(
+            asal,
+            tujuan
+        );
 
         return;
 
     }
 
 
-    /*
-       Heading hasil
-    */
+    let html =
+        createResultsHeading(
+            groups.length,
+            asal,
+            tujuan
+        );
 
-    let html = `
 
-        <div class="results-heading">
-
-            <span>
-                Tarif Ditemukan
-            </span>
-
-            <span>
-                ${groups.length}
-                KA
-            </span>
-
-        </div>
-
+    html += `
+        <div class="tarsus-result-list">
     `;
 
-
-    /*
-       Setiap nama KA = 1 card
-    */
 
     groups.forEach(
         (group, index) => {
@@ -1473,8 +1505,35 @@ function renderResults(
     );
 
 
+    html += `
+        </div>
+    `;
+
+
     resultsEl.innerHTML =
         html;
+
+
+    /*
+       Animasi muncul per card.
+    */
+
+    const cards =
+        resultsEl.querySelectorAll(
+            ".tarsus-result-card"
+        );
+
+
+    cards.forEach(
+        (card, index) => {
+
+            card.style.setProperty(
+                "--result-delay",
+                `${Math.min(index * 45, 240)}ms`
+            );
+
+        }
+    );
 
 }
 
@@ -1492,20 +1551,17 @@ function showSuggestions(
         normalize(input.value);
 
 
-    if (!keyword) {
+    if (
+        !keyword
+    ) {
 
-        container.innerHTML = "";
+        container.innerHTML =
+            "";
 
         return;
 
     }
 
-
-    /*
-       Hanya nama stasiun.
-       Tidak menampilkan DAOP,
-       provinsi, ID, dan data lainnya.
-    */
 
     const matches =
         MASTER_STASIUN
@@ -1522,10 +1578,11 @@ function showSuggestions(
 
                     }
 
-
                     return normalize(
                         station.namaStasiun
-                    ).includes(keyword);
+                    ).includes(
+                        keyword
+                    );
 
                 }
             )
@@ -1536,7 +1593,8 @@ function showSuggestions(
         matches.length === 0
     ) {
 
-        container.innerHTML = "";
+        container.innerHTML =
+            "";
 
         return;
 
@@ -1555,9 +1613,13 @@ function showSuggestions(
                         )}"
                     >
 
-                        ${escapeHTML(
-                            station.namaStasiun
-                        )}
+                        <span class="suggestion-dot"></span>
+
+                        <span>
+                            ${escapeHTML(
+                                station.namaStasiun
+                            )}
+                        </span>
 
                     </div>
 
@@ -1600,11 +1662,23 @@ function showSuggestions(
 
 function closeSuggestions() {
 
-    asalSuggestions.innerHTML =
-        "";
+    if (
+        asalSuggestions
+    ) {
 
-    tujuanSuggestions.innerHTML =
-        "";
+        asalSuggestions.innerHTML =
+            "";
+
+    }
+
+    if (
+        tujuanSuggestions
+    ) {
+
+        tujuanSuggestions.innerHTML =
+            "";
+
+    }
 
 }
 
@@ -1616,18 +1690,18 @@ function closeSuggestions() {
 function performSearch() {
 
     const asal =
-        clean(asalInput.value);
+        clean(
+            asalInput.value
+        );
 
     const tujuan =
-        clean(tujuanInput.value);
+        clean(
+            tujuanInput.value
+        );
 
 
     closeSuggestions();
 
-
-    /*
-       Validasi kosong
-    */
 
     if (
         !asal ||
@@ -1644,10 +1718,6 @@ function performSearch() {
 
     }
 
-
-    /*
-       Validasi stasiun sama
-    */
 
     if (
         normalize(asal) ===
@@ -1670,8 +1740,8 @@ function performSearch() {
 
 
     /*
-       Beri sedikit delay visual
-       agar animasi tetap terasa halus.
+       Sedikit delay supaya transisi
+       tombol/status terasa halus.
     */
 
     setTimeout(
@@ -1733,11 +1803,6 @@ function swapStations() {
     closeSuggestions();
 
 
-    /*
-       Jika kedua field sudah terisi,
-       langsung cari ulang.
-    */
-
     if (
         clean(asalInput.value) &&
         clean(tujuanInput.value)
@@ -1772,15 +1837,27 @@ function handleEnter(event) {
 /* =========================================================
    DYNAMIC CSS
    ---------------------------------------------------------
-   CSS ini hanya untuk bagian baru:
-   - alternatif tarif
-   - tombol buka/tutup
-   - animasi detail
-
-   Tampilan utama index.html tetap dipertahankan.
+   CSS khusus untuk hasil pencarian.
+   Dibuat di data.js supaya tidak perlu
+   mengacak-acak CSS utama index.html.
 ========================================================= */
 
 function injectDynamicStyles() {
+
+    /*
+       Jangan inject dua kali.
+    */
+
+    if (
+        document.getElementById(
+            "tarsus-dynamic-styles"
+        )
+    ) {
+
+        return;
+
+    }
+
 
     const style =
         document.createElement("style");
@@ -1792,245 +1869,1309 @@ function injectDynamicStyles() {
 
     style.textContent = `
 
-        /* ==============================================
-           GROUPED RESULT
-        ============================================== */
+        /* =================================================
+           RESULT AREA
+        ================================================= */
 
-        .grouped-result-card {
-            transition:
-                transform .25s ease,
-                border-color .25s ease,
-                box-shadow .25s ease;
-        }
-
-
-        /* ==============================================
-           TARIFF DETAIL
-        ============================================== */
-
-        .tariff-detail {
-            animation:
-                tariffReveal .35s
-                cubic-bezier(.2,.8,.2,1)
-                both;
-        }
-
-
-        .tariff-detail .reference-box {
-            margin-top: 17px;
-        }
-
-
-        .tariff-detail .fare-list {
-            margin-bottom: 0;
-        }
-
-
-        /* ==============================================
-           MAIN TARIFF
-        ============================================== */
-
-        .tariff-main {
-            position: relative;
-        }
-
-
-        .tariff-main .reference-box {
-            border-color:
-                rgba(255,160,55,.20);
-        }
-
-
-        /* ==============================================
-           ALTERNATIVE DETAILS
-        ============================================== */
-
-        .tariff-alternatives {
-            margin-top: 14px;
-
-            border:
-                1px solid
-                rgba(255,255,255,.055);
-
-            border-radius: 14px;
-
-            overflow: hidden;
-
-            background:
-                rgba(255,255,255,.018);
-        }
-
-
-        .tariff-alternatives summary {
+        .tarsus-results-heading {
 
             display: flex;
 
-            align-items: center;
+            align-items: flex-end;
 
             justify-content: space-between;
 
-            gap: 12px;
+            gap: 16px;
 
-            padding:
-                13px 15px;
+            margin:
+                8px 0 14px;
 
-            list-style: none;
+        }
 
-            cursor: pointer;
+
+        .tarsus-results-eyebrow {
+
+            display: block;
+
+            margin-bottom: 3px;
 
             color:
-                var(--soft);
+                var(--gold, #e4c783);
 
-            font-size: 10px;
+            font-family:
+                "DM Sans",
+                sans-serif;
 
-            font-weight: 700;
+            font-size:
+                9px;
 
-            letter-spacing: .04em;
+            font-weight:
+                800;
+
+            letter-spacing:
+                .14em;
+
+            text-transform:
+                uppercase;
+
+        }
+
+
+        .tarsus-results-heading h2 {
+
+            margin: 0;
+
+            color:
+                var(--white, #f4f8f8);
+
+            font-family:
+                "Manrope",
+                sans-serif;
+
+            font-size:
+                clamp(21px, 5vw, 27px);
+
+            line-height:
+                1.1;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                -.035em;
+
+        }
+
+
+        .tarsus-results-count {
+
+            display: flex;
+
+            align-items: baseline;
+
+            gap: 4px;
+
+            flex-shrink: 0;
+
+            padding:
+                7px 10px;
+
+            border:
+                1px solid
+                rgba(228,199,131,.18);
+
+            border-radius:
+                10px;
+
+            background:
+                rgba(228,199,131,.055);
+
+        }
+
+
+        .tarsus-results-count strong {
+
+            color:
+                var(--gold, #e4c783);
+
+            font-family:
+                "Manrope",
+                sans-serif;
+
+            font-size:
+                15px;
+
+            font-weight:
+                800;
+
+        }
+
+
+        .tarsus-results-count span {
+
+            color:
+                var(--muted, #8fa9b1);
+
+            font-size:
+                9px;
+
+            font-weight:
+                700;
+
+            letter-spacing:
+                .08em;
+
+        }
+
+
+        .tarsus-result-list {
+
+            display:
+                grid;
+
+            gap:
+                13px;
+
+        }
+
+
+        /* =================================================
+           RESULT CARD
+        ================================================= */
+
+        .tarsus-result-card {
+
+            position:
+                relative;
+
+            overflow:
+                hidden;
+
+            padding:
+                16px;
+
+            border:
+                1px solid
+                rgba(213,236,236,.10);
+
+            border-radius:
+                18px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(31,76,96,.74),
+                    rgba(20,52,68,.88)
+                );
+
+            box-shadow:
+                0 10px 28px
+                rgba(0,0,0,.16);
+
+            animation:
+                tarsusResultReveal
+                .42s
+                cubic-bezier(.2,.8,.2,1)
+                both;
+
+            animation-delay:
+                var(--result-delay, 0ms);
+
+        }
+
+
+        .tarsus-result-card::before {
+
+            content: "";
+
+            position:
+                absolute;
+
+            left: 0;
+            top: 0;
+
+            width: 3px;
+            height: 100%;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    var(--gold, #e4c783),
+                    rgba(228,199,131,.18)
+                );
+
+            opacity:
+                .9;
+
+        }
+
+
+        .tarsus-result-card:hover {
+
+            border-color:
+                rgba(228,199,131,.20);
+
+            transform:
+                translateY(-1px);
+
+        }
+
+
+        /* =================================================
+           TRAIN HEADER
+        ================================================= */
+
+        .tarsus-result-top {
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            gap:
+                14px;
+
+            margin-bottom:
+                14px;
+
+        }
+
+
+        .tarsus-train-info {
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            min-width:
+                0;
+
+            gap:
+                10px;
+
+        }
+
+
+        .tarsus-train-icon {
+
+            display:
+                grid;
+
+            place-items:
+                center;
+
+            width:
+                39px;
+
+            height:
+                39px;
+
+            flex:
+                0 0 39px;
+
+            border:
+                1px solid
+                rgba(228,199,131,.18);
+
+            border-radius:
+                12px;
+
+            background:
+                rgba(228,199,131,.07);
+
+            font-size:
+                18px;
+
+        }
+
+
+        .tarsus-train-caption {
+
+            margin-bottom:
+                2px;
+
+            color:
+                var(--muted, #8fa9b1);
+
+            font-size:
+                8px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                .14em;
+
+        }
+
+
+        .tarsus-train-name {
+
+            overflow:
+                hidden;
+
+            margin:
+                0;
+
+            color:
+                var(--white, #f4f8f8);
+
+            font-family:
+                "Manrope",
+                sans-serif;
+
+            font-size:
+                clamp(17px, 4.4vw, 21px);
+
+            line-height:
+                1.12;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                -.025em;
+
+            text-overflow:
+                ellipsis;
+
+            white-space:
+                nowrap;
+
+        }
+
+
+        .tarsus-lowest-fare {
+
+            flex:
+                0 0 auto;
+
+            text-align:
+                right;
+
+        }
+
+
+        .tarsus-lowest-fare span {
+
+            display:
+                block;
+
+            margin-bottom:
+                2px;
+
+            color:
+                var(--muted, #8fa9b1);
+
+            font-size:
+                7px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                .10em;
+
+        }
+
+
+        .tarsus-lowest-fare strong {
+
+            color:
+                var(--gold, #e4c783);
+
+            font-family:
+                "Manrope",
+                sans-serif;
+
+            font-size:
+                13px;
+
+            font-weight:
+                800;
+
+            white-space:
+                nowrap;
+
+        }
+
+
+        /* =================================================
+           JOURNEY
+        ================================================= */
+
+        .tarsus-journey {
+
+            display:
+                grid;
+
+            grid-template-columns:
+                minmax(0, 1fr)
+                auto
+                minmax(0, 1fr);
+
+            align-items:
+                center;
+
+            gap:
+                9px;
+
+            padding:
+                12px 13px;
+
+            margin-bottom:
+                13px;
+
+            border:
+                1px solid
+                rgba(213,236,236,.075);
+
+            border-radius:
+                13px;
+
+            background:
+                rgba(4,20,29,.18);
+
+        }
+
+
+        .tarsus-journey-station {
+
+            min-width:
+                0;
+
+        }
+
+
+        .tarsus-journey-station.right {
+
+            text-align:
+                right;
+
+        }
+
+
+        .tarsus-journey-label {
+
+            display:
+                block;
+
+            margin-bottom:
+                3px;
+
+            color:
+                var(--muted, #8fa9b1);
+
+            font-size:
+                7px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                .12em;
+
+        }
+
+
+        .tarsus-journey-station strong {
+
+            display:
+                block;
+
+            overflow:
+                hidden;
+
+            color:
+                var(--white, #f4f8f8);
+
+            font-family:
+                "DM Sans",
+                sans-serif;
+
+            font-size:
+                12px;
+
+            line-height:
+                1.25;
+
+            font-weight:
+                700;
+
+            text-overflow:
+                ellipsis;
+
+            white-space:
+                nowrap;
+
+        }
+
+
+        .tarsus-journey-line {
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            gap:
+                4px;
+
+            color:
+                var(--gold, #e4c783);
+
+        }
+
+
+        .tarsus-train-dot {
+
+            width:
+                4px;
+
+            height:
+                4px;
+
+            flex:
+                0 0 4px;
+
+            border-radius:
+                50%;
+
+            background:
+                var(--gold, #e4c783);
+
+        }
+
+
+        .tarsus-journey-arrow {
+
+            font-size:
+                13px;
+
+            line-height:
+                1;
+
+        }
+
+
+        /* =================================================
+           TARIFF DETAIL
+        ================================================= */
+
+        .tarsus-tariff-detail {
+
+            overflow:
+                hidden;
+
+            border:
+                1px solid
+                rgba(213,236,236,.08);
+
+            border-radius:
+                14px;
+
+            background:
+                rgba(255,255,255,.022);
+
+            animation:
+                tarsusTariffReveal
+                .35s
+                cubic-bezier(.2,.8,.2,1)
+                both;
+
+        }
+
+
+        .tarsus-main-tariff {
+
+            border-color:
+                rgba(228,199,131,.16);
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(228,199,131,.055),
+                    rgba(255,255,255,.018)
+                );
+
+        }
+
+
+        .tarsus-tariff-header {
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            gap:
+                10px;
+
+            padding:
+                10px 12px;
+
+            border-bottom:
+                1px solid
+                rgba(213,236,236,.065);
+
+        }
+
+
+        .tarsus-tariff-title {
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            gap:
+                7px;
+
+            color:
+                var(--gold, #e4c783);
+
+            font-size:
+                8px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                .12em;
+
+        }
+
+
+        .tarsus-tariff-dot {
+
+            width:
+                6px;
+
+            height:
+                6px;
+
+            flex:
+                0 0 6px;
+
+            border-radius:
+                50%;
+
+            background:
+                var(--gold, #e4c783);
+
+            box-shadow:
+                0 0 0 3px
+                rgba(228,199,131,.08);
+
+        }
+
+
+        .tarsus-alternative-tariff
+        .tarsus-tariff-title {
+
+            color:
+                var(--muted, #8fa9b1);
+
+        }
+
+
+        .tarsus-alternative-tariff
+        .tarsus-tariff-dot {
+
+            background:
+                #71848d;
+
+            box-shadow:
+                none;
+
+        }
+
+
+        .tarsus-direction {
+
+            color:
+                var(--muted, #8fa9b1);
+
+            font-size:
+                8px;
+
+            font-weight:
+                700;
+
+        }
+
+
+        /* =================================================
+           REFERENCE
+        ================================================= */
+
+        .tarsus-reference {
+
+            padding:
+                12px;
+
+        }
+
+
+        .tarsus-reference-label {
+
+            margin-bottom:
+                7px;
+
+            color:
+                var(--muted, #8fa9b1);
+
+            font-size:
+                7px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                .11em;
+
+        }
+
+
+        .tarsus-reference-route {
+
+            display:
+                flex;
+
+            flex-wrap:
+                wrap;
+
+            align-items:
+                center;
+
+            gap:
+                3px 5px;
+
+            color:
+                var(--white, #f4f8f8);
+
+            font-family:
+                "DM Sans",
+                sans-serif;
+
+            font-size:
+                11px;
+
+            line-height:
+                1.45;
+
+            font-weight:
+                600;
+
+        }
+
+
+        .relation-arrow {
+
+            display:
+                inline-block;
+
+            color:
+                var(--gold, #e4c783);
+
+            opacity:
+                .72;
+
+            margin:
+                0 2px;
+
+        }
+
+
+        /* =================================================
+           FARE GRID
+        ================================================= */
+
+        .tarsus-fare-grid {
+
+            display:
+                grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            border-top:
+                1px solid
+                rgba(213,236,236,.065);
+
+        }
+
+
+        .tarsus-fare-item {
+
+            min-width:
+                0;
+
+            padding:
+                11px 8px;
+
+            text-align:
+                center;
+
+        }
+
+
+        .tarsus-fare-item
+        + .tarsus-fare-item {
+
+            border-left:
+                1px solid
+                rgba(213,236,236,.065);
+
+        }
+
+
+        .tarsus-fare-label {
+
+            display:
+                block;
+
+            margin-bottom:
+                4px;
+
+            color:
+                var(--muted, #8fa9b1);
+
+            font-size:
+                7px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                .07em;
+
+        }
+
+
+        .tarsus-fare-price {
+
+            display:
+                block;
+
+            color:
+                var(--white, #f4f8f8);
+
+            font-family:
+                "Manrope",
+                sans-serif;
+
+            font-size:
+                clamp(10px, 2.7vw, 13px);
+
+            line-height:
+                1.2;
+
+            font-weight:
+                800;
+
+            white-space:
+                nowrap;
+
+        }
+
+
+        .tarsus-main-tariff
+        .tarsus-fare-item:first-child
+        .tarsus-fare-price {
+
+            color:
+                var(--gold, #e4c783);
+
+        }
+
+
+        .tarsus-fare-price.is-unavailable {
+
+            color:
+                #667b83;
+
+            font-weight:
+                600;
+
+        }
+
+
+        /* =================================================
+           ALTERNATIVE
+        ================================================= */
+
+        .tarsus-alternatives {
+
+            margin-top:
+                10px;
+
+            overflow:
+                hidden;
+
+            border:
+                1px solid
+                rgba(213,236,236,.07);
+
+            border-radius:
+                13px;
+
+            background:
+                rgba(255,255,255,.015);
+
+        }
+
+
+        .tarsus-alternatives summary {
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            gap:
+                10px;
+
+            padding:
+                11px 12px;
+
+            list-style:
+                none;
+
+            cursor:
+                pointer;
+
+            color:
+                var(--soft, #cbd9dc);
 
             transition:
                 background .2s ease,
                 color .2s ease;
+
         }
 
 
-        .tariff-alternatives summary::-webkit-details-marker {
-            display: none;
+        .tarsus-alternatives summary::-webkit-details-marker {
+
+            display:
+                none;
+
         }
 
 
-        .tariff-alternatives summary:hover {
+        .tarsus-alternatives summary:hover {
 
             color:
-                var(--gold);
+                var(--gold, #e4c783);
 
             background:
-                rgba(255,157,49,.045);
+                rgba(228,199,131,.035);
+
         }
 
 
-        .alternative-arrow {
+        .tarsus-alternative-text {
 
-            display: grid;
+            display:
+                flex;
 
-            place-items: center;
+            align-items:
+                center;
 
-            width: 24px;
-            height: 24px;
+            gap:
+                7px;
 
-            flex-shrink: 0;
+            min-width:
+                0;
+
+            font-size:
+                9px;
+
+            font-weight:
+                700;
+
+        }
+
+
+        .tarsus-alternative-icon {
+
+            display:
+                grid;
+
+            place-items:
+                center;
+
+            width:
+                21px;
+
+            height:
+                21px;
+
+            flex:
+                0 0 21px;
 
             border:
                 1px solid
-                rgba(255,157,49,.16);
+                rgba(228,199,131,.15);
 
-            border-radius: 8px;
+            border-radius:
+                7px;
 
             color:
-                var(--gold);
+                var(--gold, #e4c783);
 
-            font-size: 15px;
+            font-size:
+                14px;
 
-            line-height: 1;
+            line-height:
+                1;
+
+        }
+
+
+        .tarsus-alternative-chevron {
+
+            color:
+                var(--gold, #e4c783);
+
+            font-size:
+                19px;
+
+            line-height:
+                1;
 
             transition:
-                transform .25s ease,
-                background .2s ease;
+                transform .25s ease;
+
         }
 
 
-        .tariff-alternatives[open]
-        .alternative-arrow {
+        .tarsus-alternatives[open]
+        .tarsus-alternative-chevron {
 
             transform:
-                rotate(45deg);
+                rotate(90deg);
 
-            background:
-                rgba(255,157,49,.07);
         }
 
 
-        .alternative-content {
+        .tarsus-alternative-content {
+
+            display:
+                grid;
+
+            gap:
+                9px;
 
             padding:
-                0 14px 14px;
+                0 9px 9px;
+
         }
 
 
-        .alternative-content
-        .tariff-detail {
-
-            padding-top: 1px;
-
-            border-top:
-                1px solid
-                rgba(255,255,255,.045);
-        }
-
-
-        .alternative-content
-        .tariff-detail:first-child {
-
-            border-top: none;
-        }
-
-
-        .alternative-content
-        .reference-box {
-
-            margin-top: 14px;
+        .tarsus-alternative-content
+        .tarsus-tariff-detail {
 
             border-color:
-                rgba(255,255,255,.065);
+                rgba(213,236,236,.06);
+
+        }
+
+
+        /* =================================================
+           EMPTY STATE
+        ================================================= */
+
+        .tarsus-empty-state {
+
+            padding:
+                30px 20px;
+
+            border:
+                1px solid
+                rgba(213,236,236,.08);
+
+            border-radius:
+                18px;
 
             background:
                 rgba(255,255,255,.018);
+
+            text-align:
+                center;
+
         }
 
 
-        .alternative-content
-        .reference-label {
+        .tarsus-empty-icon {
+
+            display:
+                grid;
+
+            place-items:
+                center;
+
+            width:
+                45px;
+
+            height:
+                45px;
+
+            margin:
+                0 auto 12px;
+
+            border:
+                1px solid
+                rgba(228,199,131,.16);
+
+            border-radius:
+                14px;
 
             color:
-                var(--muted);
-        }
-
-
-        .alternative-content
-        .reference-label::before {
+                var(--gold, #e4c783);
 
             background:
-                #657287;
+                rgba(228,199,131,.05);
 
-            box-shadow: none;
+            font-family:
+                "Manrope",
+                sans-serif;
+
+            font-size:
+                24px;
+
+            font-weight:
+                700;
+
         }
 
 
-        .alternative-content
-        .reference-route {
+        .tarsus-empty-state h3 {
+
+            margin:
+                0 0 7px;
 
             color:
-                #cbd4df;
+                var(--white, #f4f8f8);
+
+            font-family:
+                "Manrope",
+                sans-serif;
+
+            font-size:
+                17px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                -.02em;
+
         }
 
 
-        /* ==============================================
-           ANIMATION
-        ============================================== */
+        .tarsus-empty-state p {
 
-        @keyframes tariffReveal {
+            max-width:
+                440px;
+
+            margin:
+                0 auto;
+
+            color:
+                var(--muted, #8fa9b1);
+
+            font-size:
+                11px;
+
+            line-height:
+                1.6;
+
+        }
+
+
+        .tarsus-empty-state p strong {
+
+            color:
+                var(--soft, #cbd9dc);
+
+            font-weight:
+                700;
+
+        }
+
+
+        .tarsus-empty-hint {
+
+            margin-top:
+                10px;
+
+            color:
+                #718890;
+
+            font-size:
+                9px;
+
+        }
+
+
+        /* =================================================
+           AUTOCOMPLETE
+        ================================================= */
+
+        .suggestion-item {
+
+            display:
+                flex !important;
+
+            align-items:
+                center;
+
+            gap:
+                8px;
+
+        }
+
+
+        .suggestion-dot {
+
+            width:
+                5px;
+
+            height:
+                5px;
+
+            flex:
+                0 0 5px;
+
+            border-radius:
+                50%;
+
+            background:
+                var(--gold, #e4c783);
+
+            opacity:
+                .7;
+
+        }
+
+
+        /* =================================================
+           ANIMATION
+        ================================================= */
+
+        @keyframes tarsusResultReveal {
 
             from {
 
-                opacity: 0;
+                opacity:
+                    0;
 
                 transform:
-                    translateY(6px);
+                    translateY(8px);
 
             }
 
             to {
 
-                opacity: 1;
+                opacity:
+                    1;
 
                 transform:
                     translateY(0);
@@ -2040,16 +3181,155 @@ function injectDynamicStyles() {
         }
 
 
-        /* ==============================================
+        @keyframes tarsusTariffReveal {
+
+            from {
+
+                opacity:
+                    0;
+
+                transform:
+                    translateY(5px);
+
+            }
+
+            to {
+
+                opacity:
+                    1;
+
+                transform:
+                    translateY(0);
+
+            }
+
+        }
+
+
+        /* =================================================
            MOBILE
-        ============================================== */
+        ================================================= */
 
         @media (max-width: 680px) {
 
-            .tariff-alternatives summary {
+            .tarsus-result-card {
 
                 padding:
-                    12px 13px;
+                    13px;
+
+                border-radius:
+                    16px;
+
+            }
+
+
+            .tarsus-result-top {
+
+                align-items:
+                    flex-start;
+
+                gap:
+                    9px;
+
+            }
+
+
+            .tarsus-train-icon {
+
+                width:
+                    35px;
+
+                height:
+                    35px;
+
+                flex-basis:
+                    35px;
+
+                border-radius:
+                    10px;
+
+                font-size:
+                    16px;
+
+            }
+
+
+            .tarsus-train-name {
+
+                font-size:
+                    16px;
+
+            }
+
+
+            .tarsus-lowest-fare span {
+
+                font-size:
+                    6px;
+
+            }
+
+
+            .tarsus-lowest-fare strong {
+
+                font-size:
+                    11px;
+
+            }
+
+
+            .tarsus-journey {
+
+                padding:
+                    10px;
+
+                gap:
+                    6px;
+
+            }
+
+
+            .tarsus-journey-station strong {
+
+                font-size:
+                    10px;
+
+            }
+
+
+            .tarsus-reference {
+
+                padding:
+                    10px;
+
+            }
+
+
+            .tarsus-reference-route {
+
+                font-size:
+                    10px;
+
+            }
+
+
+            .tarsus-fare-item {
+
+                padding:
+                    10px 5px;
+
+            }
+
+
+            .tarsus-fare-label {
+
+                font-size:
+                    6px;
+
+            }
+
+
+            .tarsus-fare-price {
 
                 font-size:
                     9px;
@@ -2057,10 +3337,38 @@ function injectDynamicStyles() {
             }
 
 
-            .alternative-content {
+            .tarsus-results-heading {
 
-                padding:
-                    0 10px 10px;
+                margin-top:
+                    4px;
+
+            }
+
+
+            .tarsus-results-heading h2 {
+
+                font-size:
+                    20px;
+
+            }
+
+        }
+
+
+        /* =================================================
+           REDUCED MOTION
+        ================================================= */
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .tarsus-result-card,
+            .tarsus-tariff-detail {
+
+                animation:
+                    none !important;
+
+                transition:
+                    none !important;
 
             }
 
@@ -2086,10 +3394,6 @@ async function loadData() {
             "Menghubungkan ke database tarif...";
 
 
-        /*
-           Ambil 3 sheet secara bersamaan
-        */
-
         const [
             kaCSV,
             tarifCSV,
@@ -2111,10 +3415,6 @@ async function loadData() {
         ]);
 
 
-        /*
-           Parse database
-        */
-
         MASTER_KA =
             parseMasterKA(
                 kaCSV
@@ -2133,10 +3433,6 @@ async function loadData() {
             );
 
 
-        /*
-           Status siap
-        */
-
         statusEl.textContent =
             "Database tarif siap digunakan.";
 
@@ -2145,18 +3441,15 @@ async function loadData() {
             "TARSUS FINDER — DATABASE LOADED"
         );
 
-
         console.log(
             "MASTER_KA:",
             MASTER_KA.length
         );
 
-
         console.log(
             "MASTER_TARIF:",
             MASTER_TARIF.length
         );
-
 
         console.log(
             "MASTER_STASIUN:",
@@ -2178,9 +3471,12 @@ async function loadData() {
 
         resultsEl.innerHTML = `
 
-            <div class="empty-state">
+            <div class="
+                empty-state
+                tarsus-empty-state
+            ">
 
-                <div class="empty-symbol">
+                <div class="tarsus-empty-icon">
                     !
                 </div>
 
@@ -2213,74 +3509,98 @@ async function loadData() {
    Autocomplete asal
 */
 
-asalInput.addEventListener(
-    "input",
-    () => {
+if (asalInput) {
 
-        showSuggestions(
-            asalInput,
-            asalSuggestions
-        );
+    asalInput.addEventListener(
+        "input",
+        () => {
 
-    }
-);
+            showSuggestions(
+                asalInput,
+                asalSuggestions
+            );
+
+        }
+    );
+
+}
 
 
 /*
    Autocomplete tujuan
 */
 
-tujuanInput.addEventListener(
-    "input",
-    () => {
+if (tujuanInput) {
 
-        showSuggestions(
-            tujuanInput,
-            tujuanSuggestions
-        );
+    tujuanInput.addEventListener(
+        "input",
+        () => {
 
-    }
-);
+            showSuggestions(
+                tujuanInput,
+                tujuanSuggestions
+            );
+
+        }
+    );
+
+}
 
 
 /*
    Enter asal
 */
 
-asalInput.addEventListener(
-    "keydown",
-    handleEnter
-);
+if (asalInput) {
+
+    asalInput.addEventListener(
+        "keydown",
+        handleEnter
+    );
+
+}
 
 
 /*
    Enter tujuan
 */
 
-tujuanInput.addEventListener(
-    "keydown",
-    handleEnter
-);
+if (tujuanInput) {
+
+    tujuanInput.addEventListener(
+        "keydown",
+        handleEnter
+    );
+
+}
 
 
 /*
    Tombol pencarian
 */
 
-searchBtn.addEventListener(
-    "click",
-    performSearch
-);
+if (searchBtn) {
+
+    searchBtn.addEventListener(
+        "click",
+        performSearch
+    );
+
+}
 
 
 /*
    Tombol swap
 */
 
-swapBtn.addEventListener(
-    "click",
-    swapStations
-);
+if (swapBtn) {
+
+    swapBtn.addEventListener(
+        "click",
+        swapStations
+    );
+
+}
 
 
 /*
