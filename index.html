@@ -1,384 +1,1109 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#111827">
-<meta name="description" content="TARSUS Finder — Pencarian Tarif Khusus Kereta Api KAI Contact Center 121.">
-<meta name="application-name" content="TARSUS Finder">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>TARSUS FINDER — KAI 121</title>
+  <meta name="theme-color" content="#101b2d">
+  <meta name="description" content="TARSUS Finder — Aplikasi pencarian tarif khusus kereta api untuk KAI Contact Center 121.">
+  <meta name="application-name" content="TARSUS Finder">
 
-<link rel="manifest" href="/tarsus-backup/manifest.json">
-<link rel="icon" href="/tarsus-backup/icon-192.png" type="image/png">
+  <title>TARSUS Finder — KAI 121</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
 
-<link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <!-- LOADING SCREEN -->
-<div id="app-loading" class="app-loading">
-  <div class="loading-logo">T</div>
-  <div class="loading-name">TARSUS <span>FINDER</span></div>
-  <div class="loading-caption">KAI CONTACT CENTER 121</div>
-  <div class="loading-progress"><div></div></div>
-</div>
 
-<!-- APLIKASI -->
-<div id="app" class="app hidden">
+  <!-- ==========================================
+       CINEMATIC INTRO
+       Animasi pembuka akan diatur melalui CSS
+       ========================================== -->
 
-  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+  <div id="cinematicIntro" class="cinematic-intro" aria-label="TARSUS Finder">
 
-  <!-- SIDEBAR -->
-  <aside id="sidebar" class="sidebar">
+    <div class="intro-atmosphere"></div>
+    <div class="intro-grid"></div>
 
-    <div class="sidebar-brand">
-      <div class="brand-mark">T</div>
-      <div class="brand-text">
-        <strong>TARSUS</strong>
-        <span>FINDER · KAI 121</span>
-      </div>
-      <button id="close-sidebar" class="icon-button close-sidebar" type="button" aria-label="Tutup menu">×</button>
-    </div>
+    <div class="intro-orbit orbit-one"></div>
+    <div class="intro-orbit orbit-two"></div>
 
-    <div class="sidebar-section-label">MENU UTAMA</div>
+    <div class="intro-content">
 
-    <nav class="sidebar-nav">
-      <button class="nav-item active" data-page="search" type="button">
-        <span class="nav-icon">⌕</span>
-        <span>Pencarian Tarif</span>
-      </button>
-
-      <button class="nav-item" data-page="information" type="button">
-        <span class="nav-icon">i</span>
-        <span>Informasi Aplikasi</span>
-      </button>
-
-      <button class="nav-item" data-page="terms" type="button">
-        <span class="nav-icon">≡</span>
-        <span>Syarat & Ketentuan</span>
-      </button>
-
-      <button class="nav-item" data-page="contact" type="button">
-        <span class="nav-icon">✉</span>
-        <span>Hubungi Pengelola</span>
-      </button>
-    </nav>
-
-    <div class="sidebar-bottom">
-      <div class="sidebar-status">
-        <span class="status-dot"></span>
-        <span>Sistem Pencarian Tarif</span>
-      </div>
-      <div class="sidebar-version">TARSUS FINDER <span>v2.0.0</span></div>
-    </div>
-
-  </aside>
-
-  <!-- AREA UTAMA -->
-  <main class="main-area">
-
-    <header class="topbar">
-      <div class="topbar-left">
-
-        <button id="open-sidebar" class="icon-button menu-button" type="button" aria-label="Buka menu">
-          <span></span><span></span><span></span>
-        </button>
-
-        <div class="topbar-title">
-          <span class="eyebrow">KAI CONTACT CENTER 121</span>
-          <strong id="current-page-title">Pencarian Tarif</strong>
-        </div>
+      <div class="intro-mark">
+        <span class="intro-mark-line"></span>
+        <span class="intro-mark-text">T</span>
+        <span class="intro-mark-line"></span>
       </div>
 
-      <div class="topbar-right">
-        <button id="theme-toggle" class="icon-button theme-button" type="button" aria-label="Ubah tema">
-          <span id="theme-icon">◐</span>
-        </button>
-
-        <div class="user-badge">
-          <div class="user-avatar">12</div>
-          <div class="user-info">
-            <strong>TARSUS</strong>
-            <span>Internal Tool</span>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <div class="content-wrapper">
-      <!-- HALAMAN PENCARIAN -->
-<section id="page-search" class="page active">
-
-  <div class="welcome-section">
-    <div class="welcome-copy">
-
-      <div class="section-kicker">
-        <span class="kicker-line"></span>
-        TARIF KHUSUS KERETA API
+      <div class="intro-overline">
+        KAI CONTACT CENTER 121
       </div>
 
-      <h1>Temukan tarif,<br><span>lebih cepat.</span></h1>
+      <h1 class="intro-title">
+        TARSUS<span>.</span>
+      </h1>
 
-      <p>
-        Cari relasi tarif khusus kereta api dengan lebih praktis
-        dan akurat dalam satu tempat.
+      <p class="intro-subtitle">
+        Tarif Khusus Kereta Api
       </p>
+
+      <div class="intro-loader">
+        <span></span>
+      </div>
+
+      <div class="intro-status" id="introStatus">
+        MENYIAPKAN SISTEM
+      </div>
+
     </div>
 
-    <div class="welcome-decoration" aria-hidden="true">
-      <div class="deco-circle deco-circle-one"></div>
-      <div class="deco-circle deco-circle-two"></div>
-      <div class="deco-letter">T</div>
-      <div class="deco-label">PRECISION<br>SEARCH</div>
+    <div class="intro-footer">
+      <span>PRECISION IN EVERY JOURNEY</span>
+      <span>EST. KAI 121</span>
     </div>
+
   </div>
 
-  <!-- FORM PENCARIAN -->
-  <section class="search-card">
 
-    <div class="card-heading">
-      <div class="card-heading-icon">⌕</div>
-      <div>
-        <h2>Pencarian Relasi</h2>
-        <p>Masukkan stasiun keberangkatan dan tujuan.</p>
-      </div>
+  <!-- ==========================================
+       APP SHELL
+       ========================================== -->
+
+  <div id="app" class="app-shell">
+
+    <!-- LAPISAN GELAP UNTUK MENU MOBILE -->
+
+    <div
+      id="sidebarBackdrop"
+      class="sidebar-backdrop"
+      aria-hidden="true">
     </div>
 
-    <form id="search-form" autocomplete="off">
 
-      <div class="station-fields">
+    <!-- ========================================
+         SIDEBAR / NAVIGASI
+         ======================================== -->
 
-        <div class="field-group">
-          <label for="asal">STASIUN ASAL</label>
+    <aside id="sidebar" class="sidebar">
 
-          <div class="input-wrapper">
-            <span class="station-indicator origin-indicator"></span>
+      <div class="sidebar-brand">
 
-            <input id="asal" name="asal" type="text"
-              placeholder="Contoh: Cirebon Kejaksan"
-              autocomplete="off" required>
+        <div class="brand-symbol">
+          <span>T</span>
+        </div>
 
-            <button id="clear-asal" class="clear-input hidden"
-              type="button" aria-label="Hapus stasiun asal">×</button>
+        <div class="brand-copy">
+          <div class="brand-name">
+            TARSUS<span>.</span>
           </div>
 
-          <div id="asal-suggestions" class="suggestion-list"></div>
-        </div>
-
-        <button id="swap-stations" class="swap-button"
-          type="button" aria-label="Tukar stasiun" title="Tukar stasiun">⇅</button>
-
-        <div class="field-group">
-          <label for="tujuan">STASIUN TUJUAN</label>
-
-          <div class="input-wrapper">
-            <span class="station-indicator destination-indicator"></span>
-
-            <input id="tujuan" name="tujuan" type="text"
-              placeholder="Contoh: Solo Balapan"
-              autocomplete="off" required>
-
-            <button id="clear-tujuan" class="clear-input hidden"
-              type="button" aria-label="Hapus stasiun tujuan">×</button>
+          <div class="brand-caption">
+            KAI CONTACT CENTER 121
           </div>
-
-          <div id="tujuan-suggestions" class="suggestion-list"></div>
         </div>
 
-      </div>
-
-      <div class="search-footer">
-        <div class="search-hint">
-          <span class="hint-icon">i</span>
-          <span>Hasil mengikuti relasi dan ketentuan tarif khusus.</span>
-        </div>
-
-        <button id="search-button" class="primary-button" type="submit">
-          <span>Cari Tarif</span>
-          <span class="button-arrow">→</span>
+        <button
+          type="button"
+          id="closeSidebar"
+          class="icon-button sidebar-close"
+          aria-label="Tutup menu">
+          ×
         </button>
+
       </div>
 
-    </form>
-  </section>
 
-  <div id="search-status" class="search-status hidden"
-    role="status" aria-live="polite"></div>
-
-  <!-- HASIL PENCARIAN -->
-  <section id="results-section" class="results-section hidden">
-
-    <div class="results-heading">
-      <div>
-        <div class="section-kicker">HASIL PENCARIAN</div>
-        <h2 id="results-title">Relasi Tarif Khusus</h2>
-        <p id="results-description">
-          Informasi tarif berdasarkan data yang tersedia.
-        </p>
+      <div class="sidebar-section-label">
+        WORKSPACE
       </div>
 
-      <span id="results-count" class="results-count">0 HASIL</span>
-    </div>
+      <nav class="sidebar-nav" aria-label="Navigasi utama">
 
-    <div id="results-container" class="results-container"></div>
-  </section>
+        <button
+          type="button"
+          class="nav-item active"
+          data-page="search">
 
-  <!-- KONDISI AWAL -->
-  <section id="empty-state" class="empty-state">
-    <div class="empty-illustration">
-      <div class="empty-track"></div>
-      <div class="empty-train">T</div>
-    </div>
+          <span class="nav-icon" aria-hidden="true">⌕</span>
 
-    <h3>Siap mencari tarif?</h3>
+          <span class="nav-label">
+            Pencarian Tarif
+          </span>
 
-    <p>
-      Masukkan stasiun asal dan tujuan untuk melihat informasi
-      relasi tarif khusus yang tersedia.
-    </p>
-  </section>
+          <span class="nav-indicator"></span>
+        </button>
 
-  <div class="disclaimer">
-    <span class="disclaimer-icon">ⓘ</span>
-    <p>
-      Gunakan data tarif yang tersedia sebagai referensi.
-      Pastikan informasi akhir sesuai ketentuan dan sistem
-      pemesanan yang berlaku.
-    </p>
-  </div>
 
-    </section>
-    <!-- HALAMAN INFORMASI -->
-<section id="page-information" class="page secondary-page hidden">
+        <button
+          type="button"
+          class="nav-item"
+          data-page="information">
 
-  <div class="page-heading">
-    <div class="section-kicker">TENTANG APLIKASI</div>
-    <h1>Informasi <span>TARSUS.</span></h1>
-    <p>Kenali fungsi dan penggunaan TARSUS Finder.</p>
-  </div>
+          <span class="nav-icon" aria-hidden="true">ⓘ</span>
 
-  <div class="information-card">
-    <div class="information-logo">T</div>
-    <h2>TARSUS FINDER</h2>
-    <p class="information-subtitle">Tarif Khusus Kereta Api</p>
+          <span class="nav-label">
+            Informasi Aplikasi
+          </span>
+        </button>
 
-    <div class="information-divider"></div>
 
-    <p>
-      TARSUS Finder dirancang untuk membantu proses pencarian
-      informasi tarif khusus kereta api berdasarkan relasi,
-      nama kereta, dan ketentuan tarif yang tercatat dalam data.
-    </p>
+        <button
+          type="button"
+          class="nav-item"
+          data-page="guide">
 
-    <div class="information-meta">
-      <span>Versi aplikasi</span>
-      <strong id="information-version">2.0.0</strong>
-    </div>
+          <span class="nav-icon" aria-hidden="true">▤</span>
 
-    <div class="information-meta">
-      <span>Platform</span>
-      <strong>Web Application</strong>
-    </div>
-  </div>
+          <span class="nav-label">
+            Panduan Penggunaan
+          </span>
+        </button>
 
-</section>
+      </nav>
 
-<!-- HALAMAN SYARAT DAN KETENTUAN -->
-<section id="page-terms" class="page secondary-page hidden">
 
-  <div class="page-heading">
-    <div class="section-kicker">PANDUAN PENGGUNAAN</div>
-    <h1>Syarat & <span>Ketentuan.</span></h1>
-    <p>Panduan dasar penggunaan informasi aplikasi.</p>
-  </div>
+      <div class="sidebar-divider"></div>
 
-  <div class="document-card">
 
-    <div class="document-item">
-      <span class="document-number">01</span>
-      <div>
-        <h3>Tujuan penggunaan</h3>
-        <p>Aplikasi digunakan untuk membantu pencarian dan penelusuran data tarif khusus kereta api.</p>
+      <div class="sidebar-section-label">
+        PREFERENSI
       </div>
-    </div>
 
-    <div class="document-item">
-      <span class="document-number">02</span>
-      <div>
-        <h3>Ketepatan relasi</h3>
-        <p>Periksa stasiun asal, tujuan, relasi tarif khusus, dan nama kereta sebelum menggunakan hasil pencarian.</p>
+      <nav class="sidebar-nav" aria-label="Preferensi">
+
+        <button
+          type="button"
+          class="nav-item"
+          data-page="terms">
+
+          <span class="nav-icon" aria-hidden="true">▧</span>
+
+          <span class="nav-label">
+            Syarat & Ketentuan
+          </span>
+        </button>
+
+
+        <button
+          type="button"
+          class="nav-item"
+          data-page="contact">
+
+          <span class="nav-icon" aria-hidden="true">✉</span>
+
+          <span class="nav-label">
+            Hubungi Pengelola
+          </span>
+        </button>
+
+      </nav>
+
+
+      <div class="sidebar-bottom">
+
+        <div class="sidebar-status">
+          <span class="status-dot"></span>
+
+          <div>
+            <div class="status-title">
+              TARSUS WORKSPACE
+            </div>
+
+            <div class="status-caption">
+              Sistem pencarian tarif
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-bottom-line"></div>
+
+        <div class="sidebar-footer">
+          <span>POWERED FOR KAI 121</span>
+          <span>© 2026</span>
+        </div>
+
       </div>
-    </div>
 
-    <div class="document-item">
-      <span class="document-number">03</span>
-      <div>
-        <h3>Pembaruan tarif</h3>
-        <p>Tarif dapat berubah mengikuti ketentuan yang berlaku. Periksa sumber resmi apabila terdapat perbedaan informasi.</p>
-      </div>
-    </div>
+    </aside>
 
-    <div class="document-item">
-      <span class="document-number">04</span>
-      <div>
-        <h3>Penggunaan informasi</h3>
-        <p>Hasil aplikasi merupakan alat bantu pencarian, bukan pengganti prosedur operasional maupun sistem pemesanan resmi.</p>
-      </div>
+
+    <!-- ========================================
+         MAIN APPLICATION
+         ======================================== -->
+
+    <div class="main-shell">
+
+      <!-- TOPBAR -->
+
+      <header class="topbar">
+
+        <div class="topbar-left">
+
+          <button
+            type="button"
+            id="openSidebar"
+            class="icon-button menu-toggle"
+            aria-label="Buka menu">
+
+            <span></span>
+            <span></span>
+            <span></span>
+
+          </button>
+
+          <div class="breadcrumb">
+            <span class="breadcrumb-root">TARSUS</span>
+            <span class="breadcrumb-separator">/</span>
+            <span id="breadcrumbCurrent">Pencarian Tarif</span>
+          </div>
+
+        </div>
+
+
+        <div class="topbar-right">
+
+          <div class="system-indicator">
+            <span class="status-dot"></span>
+            <span>WORKSPACE</span>
+          </div>
+
+          <button
+            type="button"
+            id="themeToggle"
+            class="icon-button theme-toggle"
+            aria-label="Ubah tema"
+            title="Ubah tema">
+
+            <span id="themeIcon">☼</span>
+
+          </button>
+
+          <div class="profile-chip">
+
+            <div class="profile-avatar">
+              T
+            </div>
+
+            <div class="profile-copy">
+              <span class="profile-name">TARSUS</span>
+              <span class="profile-role">KAI 121</span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </header>
+
+
+      <!-- KONTEN UTAMA AKAN DILANJUTKAN PADA PART 2 -->
+      <main class="main-content">
+
+        <!-- ====================================
+             HALAMAN PENCARIAN
+             ==================================== -->
+
+        <section id="page-search" class="page-section active">
+
+          <!-- HERO -->
+
+          <section class="hero-section">
+
+            <div class="hero-background">
+              <div class="hero-glow"></div>
+              <div class="hero-track track-one"></div>
+              <div class="hero-track track-two"></div>
+              <div class="hero-track track-three"></div>
+            </div>
+
+            <div class="hero-content">
+
+              <div class="hero-eyebrow">
+                <span class="eyebrow-line"></span>
+                RAILWAY INTELLIGENCE SYSTEM
+              </div>
+
+              <h1 class="hero-title">
+                Temukan tarif.<br>
+                <span>Pastikan perjalanan.</span>
+              </h1>
+
+              <p class="hero-description">
+                Pencarian tarif khusus kereta api dalam satu ruang kerja.
+                Pilih stasiun, periksa relasi, dan temukan informasi tarif
+                dengan lebih praktis.
+              </p>
+
+              <div class="hero-meta">
+
+                <div class="hero-meta-item">
+                  <span class="meta-symbol">01</span>
+                  <span>PILIH STASIUN</span>
+                </div>
+
+                <span class="meta-divider"></span>
+
+                <div class="hero-meta-item">
+                  <span class="meta-symbol">02</span>
+                  <span>PERIKSA RELASI</span>
+                </div>
+
+                <span class="meta-divider"></span>
+
+                <div class="hero-meta-item">
+                  <span class="meta-symbol">03</span>
+                  <span>LIHAT TARIF</span>
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="hero-index">
+              <span>121</span>
+              <span>PRECISION<br>MATTERS</span>
+            </div>
+
+            <div class="hero-bottom-line"></div>
+
+          </section>
+
+
+          <!-- JUDUL WORKSPACE -->
+
+          <div class="section-heading">
+
+            <div>
+              <div class="section-kicker">
+                SEARCH WORKSPACE
+              </div>
+
+              <h2 class="section-title">
+                Pencarian tarif khusus
+              </h2>
+
+              <p class="section-description">
+                Masukkan stasiun keberangkatan dan tujuan perjalanan.
+              </p>
+            </div>
+
+            <div class="section-badge">
+              <span class="badge-dot"></span>
+              TARIFF LOOKUP
+            </div>
+
+          </div>
+
+
+          <!-- FORM PENCARIAN -->
+
+          <section class="search-panel">
+
+            <div class="panel-topline"></div>
+
+            <div class="search-panel-header">
+
+              <div class="search-panel-heading">
+
+                <div class="search-panel-icon">
+                  <span>↗</span>
+                </div>
+
+                <div>
+                  <h3>Rute perjalanan</h3>
+                  <p>Tentukan pasangan stasiun yang ingin diperiksa.</p>
+                </div>
+
+              </div>
+
+              <div class="form-reference">
+                <span class="reference-dot"></span>
+                TARIF KHUSUS
+              </div>
+
+            </div>
+
+
+            <form id="searchForm" autocomplete="off">
+
+              <div class="station-fields">
+
+                <!-- STASIUN ASAL -->
+
+                <div class="station-field">
+
+                  <label for="origin">
+                    <span class="field-step">01</span>
+                    STASIUN ASAL
+                  </label>
+
+                  <div class="station-input-wrap">
+
+                    <span class="station-marker origin-marker"></span>
+
+                    <input
+                      type="text"
+                      id="origin"
+                      name="origin"
+                      placeholder="Pilih stasiun asal"
+                      autocomplete="off"
+                      autocapitalize="words"
+                      spellcheck="false"
+                      required
+                    >
+
+                    <button
+                      type="button"
+                      class="input-clear"
+                      id="clearOrigin"
+                      aria-label="Hapus stasiun asal"
+                      hidden>
+                      ×
+                    </button>
+
+                  </div>
+
+                  <div
+                    id="originSuggestions"
+                    class="suggestions-list"
+                    role="listbox"
+                    aria-label="Saran stasiun asal"
+                    hidden>
+                  </div>
+
+                  <div class="field-helper">
+                    Stasiun keberangkatan
+                  </div>
+
+                </div>
+
+
+                <!-- TUKAR STASIUN -->
+
+                <div class="swap-field">
+
+                  <button
+                    type="button"
+                    id="swapStations"
+                    class="swap-button"
+                    aria-label="Tukar stasiun asal dan tujuan"
+                    title="Tukar stasiun">
+
+                    <span>⇄</span>
+
+                  </button>
+
+                </div>
+
+
+                <!-- STASIUN TUJUAN -->
+
+                <div class="station-field">
+
+                  <label for="destination">
+                    <span class="field-step">02</span>
+                    STASIUN TUJUAN
+                  </label>
+
+                  <div class="station-input-wrap">
+
+                    <span class="station-marker destination-marker"></span>
+
+                    <input
+                      type="text"
+                      id="destination"
+                      name="destination"
+                      placeholder="Pilih stasiun tujuan"
+                      autocomplete="off"
+                      autocapitalize="words"
+                      spellcheck="false"
+                      required
+                    >
+
+                    <button
+                      type="button"
+                      class="input-clear"
+                      id="clearDestination"
+                      aria-label="Hapus stasiun tujuan"
+                      hidden>
+                      ×
+                    </button>
+
+                  </div>
+
+                  <div
+                    id="destinationSuggestions"
+                    class="suggestions-list"
+                    role="listbox"
+                    aria-label="Saran stasiun tujuan"
+                    hidden>
+                  </div>
+
+                  <div class="field-helper">
+                    Stasiun tujuan perjalanan
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <!-- OPSI PENCARIAN -->
+
+              <div class="search-options">
+
+                <div class="search-option-copy">
+
+                  <span class="option-icon">i</span>
+
+                  <span>
+                    Tarif akan ditampilkan berdasarkan relasi khusus
+                    yang sesuai dengan stasiun pilihan.
+                  </span>
+
+                </div>
+
+                <button
+                  type="button"
+                  id="resetSearch"
+                  class="text-button">
+
+                  <span>↺</span>
+                  Reset
+
+                </button>
+
+              </div>
+
+
+              <!-- TOMBOL CARI -->
+
+              <button
+                type="submit"
+                id="searchButton"
+                class="search-submit">
+
+                <span class="submit-icon">⌕</span>
+
+                <span class="submit-label">
+                  CARI TARIF KHUSUS
+                </span>
+
+                <span class="submit-arrow">→</span>
+
+              </button>
+
+              <div
+                id="searchMessage"
+                class="search-message"
+                role="status"
+                aria-live="polite"
+                hidden>
+              </div>
+
+            </form>
+
+          </section>
+
+
+          <!-- HASIL PENCARIAN -->
+
+          <section id="resultsSection" class="results-section">
+
+            <div class="results-heading">
+
+              <div>
+                <div class="section-kicker">
+                  SEARCH OUTPUT
+                </div>
+
+                <h2 class="section-title">
+                  Hasil pencarian
+                </h2>
+
+                <p class="section-description" id="resultsSummary">
+                  Hasil tarif akan ditampilkan di area ini.
+                </p>
+              </div>
+
+              <div class="results-count" id="resultsCount">
+                <span>—</span>
+                <small>HASIL</small>
+              </div>
+
+            </div>
+
+
+            <!-- STATUS AWAL -->
+
+            <div id="results" class="results-container">
+
+              <div class="results-empty">
+
+                <div class="empty-illustration">
+
+                  <div class="empty-rail empty-rail-one"></div>
+                  <div class="empty-rail empty-rail-two"></div>
+
+                  <div class="empty-station empty-station-one"></div>
+                  <div class="empty-station empty-station-two"></div>
+
+                  <div class="empty-center-mark">
+                    ↗
+                  </div>
+
+                </div>
+
+                <div class="empty-title">
+                  Siap mencari tarif?
+                </div>
+
+                <p class="empty-description">
+                  Pilih stasiun asal dan tujuan, lalu tekan
+                  <strong>Cari Tarif Khusus</strong> untuk melihat
+                  hasil pencarian.
+                </p>
+
+              </div>
+
+            </div>
+
+          </section>
+
+
+          <!-- CATATAN PENGGUNAAN -->
+
+          <section class="notice-panel">
+
+            <div class="notice-symbol">!</div>
+
+            <div class="notice-content">
+
+              <h3>Periksa kembali informasi tarif</h3>
+
+              <p>
+                Gunakan hasil pencarian sebagai referensi kerja.
+                Pastikan relasi, kelas pelayanan, arah perjalanan,
+                dan tarif sesuai dengan data yang berlaku sebelum
+                menyampaikan informasi kepada pelanggan.
+              </p>
+
+            </div>
+
+          </section>
+
+        </section>
+
+
+        <!-- ====================================
+             HALAMAN INFORMASI APLIKASI
+             ==================================== -->
+
+        <section id="page-information" class="page-section">
+
+          <div class="page-hero compact-hero">
+
+            <div class="section-kicker">ABOUT TARSUS</div>
+
+            <h1>Informasi aplikasi</h1>
+
+            <p>
+              Mengenal TARSUS Finder dan tujuan penggunaannya.
+            </p>
+
+          </div>
+
+          <div class="information-grid">
+
+            <article class="information-card information-card-featured">
+
+              <div class="information-card-label">
+                APPLICATION OVERVIEW
+              </div>
+
+              <div class="information-logo">T<span>.</span></div>
+
+              <h2>TARSUS Finder</h2>
+
+              <p>
+                TARSUS Finder dirancang untuk membantu pencarian
+                informasi tarif khusus kereta api melalui antarmuka
+                yang praktis dan mudah digunakan.
+              </p>
+
+              <div class="information-card-footer">
+                KAI CONTACT CENTER 121
+              </div>
+
+            </article>
+
+
+            <article class="information-card">
+
+              <div class="information-card-label">
+                TUJUAN
+              </div>
+
+              <div class="information-card-icon">◎</div>
+
+              <h3>Pencarian terarah</h3>
+
+              <p>
+                Membantu pengguna menemukan informasi tarif berdasarkan
+                stasiun dan relasi tarif khusus yang relevan.
+              </p>
+
+            </article>
+
+
+            <article class="information-card">
+
+              <div class="information-card-label">
+                PRINSIP
+              </div>
+
+              <div class="information-card-icon">◇</div>
+
+              <h3>Ketelitian informasi</h3>
+
+              <p>
+                Menampilkan informasi secara terstruktur agar relasi
+                dan kelas tarif lebih mudah diperiksa.
+              </p>
+
+            </article>
+
+          </div>
+
+
+          <div class="version-panel">
+
+            <div>
+              <div class="section-kicker">APPLICATION BUILD</div>
+              <h3>Versi aplikasi</h3>
+              <p>Informasi versi ditampilkan di bawah ini.</p>
+            </div>
+
+            <span id="appVersion" class="version-value">
+              v1.0.0
+            </span>
+
+          </div>
+
+        </section>
+
+
+        <!-- ====================================
+             HALAMAN PANDUAN
+             ==================================== -->
+
+        <section id="page-guide" class="page-section">
+
+          <div class="page-hero compact-hero">
+
+            <div class="section-kicker">USER GUIDE</div>
+
+            <h1>Panduan penggunaan</h1>
+
+            <p>
+              Langkah dasar menggunakan TARSUS Finder.
+            </p>
+
+          </div>
+
+
+          <div class="guide-list">
+
+            <article class="guide-item">
+
+              <div class="guide-number">01</div>
+
+              <div class="guide-content">
+
+                <h3>Pilih stasiun asal</h3>
+
+                <p>
+                  Masukkan nama stasiun keberangkatan pada kolom
+                  stasiun asal dan pilih saran yang sesuai.
+                </p>
+
+              </div>
+
+            </article>
+
+
+            <article class="guide-item">
+
+              <div class="guide-number">02</div>
+
+              <div class="guide-content">
+
+                <h3>Pilih stasiun tujuan</h3>
+
+                <p>
+                  Masukkan stasiun tujuan. Periksa kembali kedua
+                  stasiun agar tidak tertukar.
+                </p>
+
+              </div>
+
+            </article>
+
+
+            <article class="guide-item">
+
+              <div class="guide-number">03</div>
+
+              <div class="guide-content">
+
+                <h3>Jalankan pencarian</h3>
+
+                <p>
+                  Tekan tombol Cari Tarif Khusus untuk memeriksa
+                  relasi yang sesuai dengan pilihan stasiun.
+                </p>
+
+              </div>
+
+            </article>
+
+
+            <article class="guide-item">
+
+              <div class="guide-number">04</div>
+
+              <div class="guide-content">
+
+                <h3>Periksa hasil</h3>
+
+                <p>
+                  Periksa nama kereta, relasi tarif khusus, kelas
+                  pelayanan, arah perjalanan, dan nominal tarif.
+                </p>
+
+              </div>
+
+            </article>
+
+          </div>
+
+                    </section>
+                    <!-- ====================================
+             HALAMAN SYARAT DAN KETENTUAN
+             ==================================== -->
+
+        <section id="page-terms" class="page-section">
+
+          <div class="page-hero compact-hero">
+
+            <div class="section-kicker">TERMS OF USE</div>
+
+            <h1>Syarat & ketentuan</h1>
+
+            <p>
+              Ketentuan umum penggunaan TARSUS Finder.
+            </p>
+
+          </div>
+
+
+          <article class="document-panel">
+
+            <div class="document-section">
+
+              <div class="document-number">01</div>
+
+              <div>
+                <h3>Tujuan penggunaan</h3>
+
+                <p>
+                  Aplikasi ini disediakan sebagai alat bantu pencarian
+                  informasi tarif khusus kereta api. Pengguna tetap
+                  bertanggung jawab memeriksa kebenaran informasi yang
+                  digunakan dalam pelayanan.
+                </p>
+              </div>
+
+            </div>
+
+
+            <div class="document-section">
+
+              <div class="document-number">02</div>
+
+              <div>
+                <h3>Keakuratan data</h3>
+
+                <p>
+                  Informasi yang ditampilkan bergantung pada sumber
+                  data yang tersedia dan pembaruan yang dilakukan.
+                  Jangan menganggap suatu tarif masih berlaku tanpa
+                  memastikan kesesuaiannya dengan ketentuan resmi.
+                </p>
+              </div>
+
+            </div>
+
+
+            <div class="document-section">
+
+              <div class="document-number">03</div>
+
+              <div>
+                <h3>Penggunaan informasi</h3>
+
+                <p>
+                  Periksa nama kereta, relasi, arah perjalanan, kelas
+                  pelayanan, dan nominal tarif sebelum menyampaikan
+                  informasi kepada pelanggan.
+                </p>
+              </div>
+
+            </div>
+
+
+            <div class="document-section">
+
+              <div class="document-number">04</div>
+
+              <div>
+                <h3>Pembaruan aplikasi</h3>
+
+                <p>
+                  Fitur, tampilan, dan struktur data dapat diperbarui
+                  untuk meningkatkan kemudahan penggunaan dan
+                  keandalan pencarian.
+                </p>
+              </div>
+
+            </div>
+
+          </article>
+
+        </section>
+
+
+        <!-- ====================================
+             HALAMAN KONTAK
+             ==================================== -->
+
+        <section id="page-contact" class="page-section">
+
+          <div class="page-hero compact-hero">
+
+            <div class="section-kicker">CONTACT & SUPPORT</div>
+
+            <h1>Hubungi pengelola</h1>
+
+            <p>
+              Sampaikan masukan, koreksi informasi, atau kendala
+              yang ditemukan saat menggunakan aplikasi.
+            </p>
+
+          </div>
+
+
+          <article class="contact-panel">
+
+            <div class="contact-mark">
+              ✉
+            </div>
+
+            <div class="contact-content">
+
+              <div class="section-kicker">
+                USER FEEDBACK
+              </div>
+
+              <h2>Masukanmu membantu penyempurnaan aplikasi.</h2>
+
+              <p>
+                Jika menemukan tarif yang perlu diverifikasi,
+                stasiun yang belum tersedia, atau masalah pada
+                pencarian, catat detail kendalanya agar lebih
+                mudah ditindaklanjuti.
+              </p>
+
+              <div class="contact-note">
+
+                <span class="contact-note-icon">i</span>
+
+                <span>
+                  Alamat kontak resmi belum dikonfigurasi.
+                  Informasi kontak akan ditambahkan setelah
+                  alamat pengelola ditentukan.
+                </span>
+
+              </div>
+
+            </div>
+
+          </article>
+
+        </section>
+
+
+        <!-- ====================================
+             FOOTER
+             ==================================== -->
+
+        <footer class="app-footer">
+
+          <div class="footer-brand">
+            <span class="footer-brand-mark">T</span>
+
+            <div>
+              <strong>TARSUS FINDER</strong>
+              <span>Tarif Khusus Kereta Api</span>
+            </div>
+          </div>
+
+          <div class="footer-center">
+            BUILT FOR PRECISION · KAI 121
+          </div>
+
+          <div class="footer-version">
+            <span class="footer-status-dot"></span>
+            <span id="footerVersion">v1.0.0</span>
+          </div>
+
+        </footer>
+
+      </main>
+
     </div>
 
   </div>
-</section>
 
-<!-- HALAMAN KONTAK -->
-<section id="page-contact" class="page secondary-page hidden">
 
-  <div class="page-heading">
-    <div class="section-kicker">BANTUAN & MASUKAN</div>
-    <h1>Hubungi <span>Pengelola.</span></h1>
-    <p>Sampaikan kendala, koreksi data, atau saran pengembangan.</p>
+  <!-- ==========================================
+       TOAST / NOTIFIKASI
+       ========================================== -->
+
+  <div
+    id="toastContainer"
+    class="toast-container"
+    aria-live="polite"
+    aria-atomic="true">
   </div>
 
-  <div class="contact-card">
-    <div class="contact-icon">✉</div>
-    <h2>Ada yang perlu diperbaiki?</h2>
 
-    <p>
-      Jika menemukan data tarif yang tidak sesuai, relasi
-      yang belum tersedia, atau kendala penggunaan, hubungi
-      pengelola melalui saluran komunikasi yang telah ditentukan.
-    </p>
+  <!-- ==========================================
+       JAVASCRIPT
+       File dibuat pada tahap berikutnya
+       ========================================== -->
 
-    <div class="contact-note">
-      <strong>Catatan</strong>
-      <span>Kontak pengelola dapat ditambahkan setelah ditentukan.</span>
-    </div>
-  </div>
-
-</section>
-
-<!-- FOOTER -->
-<footer class="app-footer">
-  <div class="footer-brand">
-    <span class="footer-mark">T</span>
-    <span>TARSUS FINDER</span>
-  </div>
-
-  <p>Alat bantu pencarian tarif khusus · KAI 121</p>
-  <span class="footer-version">v2.0.0</span>
-</footer>
-
-</div>
-</main>
-</div>
-
-<!-- JAVASCRIPT -->
-<script src="data.js"></script>
-<script src="app.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
 
 </body>
-    </html>
-    
+</html>
