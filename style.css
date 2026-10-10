@@ -89,12 +89,60 @@ body[data-theme="dark"] .profile-chip,body[data-theme="dark"] .system-indicator{
    Ganti file gambar di folder assets tanpa mengubah data.
    Background: assets/background.jpg | Logo: assets/logo.svg
    ========================================================= */
-.intro-logo{overflow:hidden;padding:10px}
-.intro-logo img{display:block;width:100%;height:100%;object-fit:contain}
-.brand-logo{position:relative;display:grid;place-items:center;overflow:hidden}
-.brand-logo img{position:absolute;inset:5px;width:calc(100% - 10px);height:calc(100% - 10px);object-fit:contain}
-.brand-mark-fallback{position:relative;z-index:0}
-.brand-logo:has(img[src]) .brand-mark-fallback{display:none}
+
+/* =========================================================
+   PERBAIKAN LOGO — TARSUS FINDER
+   Menjaga logo utuh dan proporsional
+   ========================================================= */
+
+/* Logo pada layar pembuka */
+.intro-logo {
+    display: grid;
+    place-items: center;
+    padding: 0;
+    overflow: visible;
+}
+
+.intro-logo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: center;
+}
+
+/* Logo pada sidebar dan area merek */
+.brand-logo {
+    position: relative;
+    display: grid;
+    place-items: center;
+    overflow: visible;
+}
+
+/* Jangan memaksa gambar memenuhi seluruh kotak */
+.brand-logo img {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: center;
+}
+
+/* Logo teks cadangan */
+.brand-mark-fallback {
+    position: relative;
+    z-index: 0;
+}
+
+.brand-logo:has(img[src]) .brand-mark-fallback {
+    display: none;
+}
 
 /* FINAL POLISH: tema stabil, ikon rapi, informasi lebih ringkas */
 :root{color-scheme:dark;--gold:#d8bd83;--gold-soft:#ead9b1;--text:#f1f3f6;--muted:#b0bac7;--subtle:#8c98a7;--surface:rgba(20,29,40,.88);--surface2:rgba(255,255,255,.055);--border:rgba(255,255,255,.13);--shadow:0 12px 34px rgba(0,0,0,.18)}
