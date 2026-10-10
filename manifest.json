@@ -1,0 +1,14 @@
+{
+  "name": "TARSUS Finder — KAI 121",
+  "short_name": "TARSUS",
+  "description": "Pencarian tarif khusus kereta api.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#101b2b",
+  "theme_color": "#101b2b",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
