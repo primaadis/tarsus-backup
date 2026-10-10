@@ -1,484 +1,1647 @@
-/* =========================================
+/* =========================================================
    TARSUS FINDER
-   PART 9/10 — APPLICATION CONTROLLER
-========================================= */
+   APP ENGINE — PART 1/4
+
+   Inisialisasi:
+   - Elemen HTML
+   - Konfigurasi aplikasi
+   - Helper UI
+   - Notifikasi
+   - Tampilan hasil pencarian
+   ========================================================= */
 
 "use strict";
 
-document.addEventListener("DOMContentLoaded", initApp);
 
-function initApp() {
-  const $ = (selector) => document.querySelector(selector);
+/* =========================================================
+   1. CONFIGURATION
+========================================================= */
 
-  const loading = $("#app-loading");
-  const app = $("#app");
+const APP_VERSION = "1.0.0";
 
-  const sidebar = $("#sidebar");
-  const overlay = $("#sidebar-overlay");
+const APP_CONFIG = {
+    introDuration: 2200,
+    suggestionLimit: 8,
+    searchDebounce: 120
+};
 
-  const form = $("#search-form");
-  const asalInput = $("#asal");
-  const tujuanInput = $("#tujuan");
 
-  const resultsSection = $("#results-section");
-  const resultsContainer = $("#results-container");
-  const resultsCount = $("#results-count");
-  const resultsTitle = $("#results-title");
-  const resultsDescription = $("#results-description");
+/* =========================================================
+   2. DOM ELEMENTS
+========================================================= */
 
-  const emptyState = $("#empty-state");
-  const searchStatus = $("#search-status");
-  const searchButton = $("#search-button");
+const $ = (selector, parent = document) =>
+    parent.querySelector(selector);
 
-  let searchSequence = 0;
+const $$ = (selector, parent = document) =>
+    [...parent.querySelectorAll(selector)];
 
-  // Tampilkan aplikasi setelah kerangka HTML siap.
-  window.setTimeout(() => {
-    app.classList.remove("hidden");
 
-    window.setTimeout(() => {
-      loading.classList.add("finished");
-    }, 150);
-  }, 250);
+const DOM = {
+    intro: $("#cinematicIntro"),
 
-  // Tutup splash setelah transisi selesai.
-  window.setTimeout(() => {
-    loading.remove();
-  }, 1000);
+    app: $("#app"),
 
-  // NAVIGASI HALAMAN
-  document.querySelectorAll(".nav-item").forEach((button) => {
-    button.addEventListener("click", () => {
-      const page = button.dataset.page;
-      showPage(page);
-      closeSidebar();
-    });
-  });
+    sidebar: $("#sidebar"),
 
-  function showPage(pageName) {
-    document.querySelectorAll(".page").forEach((page) => {
-      page.classList.add("hidden");
-      page.classList.remove("active");
-    });
+    sidebarBackdrop: $("#sidebarBackdrop"),
 
-    const target = $("#page-" + pageName);
+    openSidebar: $("#openSidebar"),
 
-    if (target) {
-      target.classList.remove("hidden");
-      target.classList.add("active");
+    closeSidebar: $("#closeSidebar"),
+
+    themeToggle: $("#themeToggle"),
+
+    themeIcon: $("#themeIcon"),
+
+    breadcrumbCurrent: $("#breadcrumbCurrent"),
+
+    searchForm: $("#searchForm"),
+
+    origin: $("#origin"),
+
+    destination: $("#destination"),
+
+    originSuggestions: $("#originSuggestions"),
+
+    destinationSuggestions: $("#destinationSuggestions"),
+
+    clearOrigin: $("#clearOrigin"),
+
+    clearDestination: $("#clearDestination"),
+
+    swapStations: $("#swapStations"),
+
+    resetSearch: $("#resetSearch"),
+
+    searchButton: $("#searchButton"),
+
+    searchMessage: $("#searchMessage"),
+
+    resultsSection: $("#resultsSection"),
+
+    results: $("#results"),
+
+    resultsSummary: $("#resultsSummary"),
+
+    resultsCount: $("#resultsCount"),
+
+    appVersion: $("#appVersion"),
+
+    footerVersion: $("#footerVersion"),
+
+    toastContainer: $("#toastContainer")
+};
+
+
+/* =========================================================
+   3. APPLICATION STATE
+========================================================= */
+
+const STATE = {
+    databaseReady: false,
+
+    databaseLoading: false,
+
+    searching: false,
+
+    activePage: "search",
+
+    selectedOrigin: "",
+
+    selectedDestination: "",
+
+    searchRequest: 0,
+
+    suggestionTimers: {},
+
+    toastTimers: new Set()
+};
+
+
+/* =========================================================
+   4. INITIAL VERSION
+========================================================= */
+
+function initializeVersion() {
+    if (DOM.appVersion) {
+        DOM.appVersion.textContent =
+            "v" + APP_VERSION;
     }
 
-    document.querySelectorAll(".nav-item").forEach((button) => {
-      button.classList.toggle(
-        "active",
-        button.dataset.page === pageName
-      );
+    if (DOM.footerVersion) {
+        DOM.footerVersion.textContent =
+            "v" + APP_VERSION;
+    }
+}
+
+
+/* =========================================================
+   5. HTML ESCAPE
+========================================================= */
+
+function safeHTML(value) {
+    if (
+        window.TARSUS_DATA &&
+        typeof window.TARSUS_DATA.escapeHTML === "function"
+    ) {
+        return window.TARSUS_DATA.escapeHTML(value);
+    }
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+/* =========================================================
+   6. NOTIFICATION
+========================================================= */
+
+function showToast(message, type = "info") {
+    if (!DOM.toastContainer) {
+        console.log("[TARSUS]", message);
+        return;
+    }
+
+    const toast = document.createElement("div");
+
+    toast.className = "toast toast-" + type;
+
+    toast.setAttribute("role", "status");
+
+    toast.innerHTML = `
+        <span class="toast-indicator"></span>
+        <span class="toast-message">
+            ${safeHTML(message)}
+        </span>
+        <button
+            type="button"
+            class="toast-close"
+            aria-label="Tutup notifikasi"
+        >×</button>
+    `;
+
+    DOM.toastContainer.appendChild(toast);
+
+    requestAnimationFrame(() => {
+        toast.classList.add("show");
     });
 
-    const titles = {
-      search: "Pencarian Tarif",
-      information: "Informasi Aplikasi",
-      terms: "Syarat & Ketentuan",
-      contact: "Hubungi Pengelola"
+    const removeToast = () => {
+        toast.classList.remove("show");
+
+        window.setTimeout(() => {
+            toast.remove();
+        }, 250);
     };
 
-    $("#current-page-title").textContent =
-      titles[pageName] || "TARSUS Finder";
+    const closeButton = $(".toast-close", toast);
 
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
+    if (closeButton) {
+        closeButton.addEventListener(
+            "click",
+            removeToast
+        );
+    }
 
-  // SIDEBAR
-  $("#open-sidebar").addEventListener("click", openSidebar);
-  $("#close-sidebar").addEventListener("click", closeSidebar);
-  overlay.addEventListener("click", closeSidebar);
+    const timer = window.setTimeout(() => {
+        removeToast();
+        STATE.toastTimers.delete(timer);
+    }, 4000);
 
-  function openSidebar() {
-    sidebar.classList.add("open");
-    overlay.classList.add("visible");
-  }
+    STATE.toastTimers.add(timer);
+}
 
-  function closeSidebar() {
-    sidebar.classList.remove("open");
-    overlay.classList.remove("visible");
-  }
 
-  // TEMA
-  const themeButton = $("#theme-toggle");
-  const themeIcon = $("#theme-icon");
+/* =========================================================
+   7. SEARCH MESSAGE
+========================================================= */
 
-  function applyTheme(theme) {
-    document.body.classList.toggle("dark-mode", theme === "dark");
-    themeIcon.textContent = theme === "dark" ? "☀" : "◐";
-    themeButton.setAttribute(
-      "aria-label",
-      theme === "dark" ? "Aktifkan tema terang" : "Aktifkan tema gelap"
+function setSearchMessage(message, type = "info") {
+    if (!DOM.searchMessage) {
+        return;
+    }
+
+    DOM.searchMessage.textContent = message;
+
+    DOM.searchMessage.className =
+        "search-message message-" + type;
+
+    DOM.searchMessage.hidden = !message;
+}
+
+
+/* =========================================================
+   8. LOADING STATE
+========================================================= */
+
+function setSearchLoading(isLoading) {
+    STATE.searching = isLoading;
+
+    if (!DOM.searchButton) {
+        return;
+    }
+
+    DOM.searchButton.disabled = isLoading;
+
+    const label = $(".submit-label", DOM.searchButton);
+
+    if (label) {
+        label.textContent = isLoading
+            ? "MEMERIKSA TARIF..."
+            : "CARI TARIF KHUSUS";
+    }
+
+    DOM.searchButton.setAttribute(
+        "aria-busy",
+        String(isLoading)
     );
+}
 
-    try {
-      localStorage.setItem("tarsus-theme", theme);
-    } catch (_) {}
-  }
 
-  let savedTheme = "light";
+/* =========================================================
+   9. UPDATE CLEAR BUTTONS
+========================================================= */
 
-  try {
-    savedTheme = localStorage.getItem("tarsus-theme") || "light";
-  } catch (_) {}
-
-  applyTheme(savedTheme);
-
-  themeButton.addEventListener("click", () => {
-    const nextTheme = document.body.classList.contains("dark-mode")
-      ? "light"
-      : "dark";
-
-    applyTheme(nextTheme);
-  });
-
-  // TUKAR STASIUN
-  $("#swap-stations").addEventListener("click", () => {
-    const oldAsal = asalInput.value;
-    asalInput.value = tujuanInput.value;
-    tujuanInput.value = oldAsal;
-
-    hideSuggestions();
-    clearStatus();
-
-    if (asalInput.value) {
-      asalInput.dispatchEvent(new Event("input"));
+function updateClearButtons() {
+    if (DOM.clearOrigin && DOM.origin) {
+        DOM.clearOrigin.hidden =
+            DOM.origin.value.length === 0;
     }
 
-    if (tujuanInput.value) {
-      tujuanInput.dispatchEvent(new Event("input"));
+    if (
+        DOM.clearDestination &&
+        DOM.destination
+    ) {
+        DOM.clearDestination.hidden =
+            DOM.destination.value.length === 0;
     }
-  });
+}
 
-  // TOMBOL HAPUS INPUT
-  bindClearButton(asalInput, $("#clear-asal"));
-  bindClearButton(tujuanInput, $("#clear-tujuan"));
 
-  function bindClearButton(input, button) {
-    const update = () => {
-      button.classList.toggle("hidden", !input.value);
-    };
+/* =========================================================
+   10. EMPTY RESULT
+========================================================= */
 
-    input.addEventListener("input", update);
+function renderEmptyResults(
+    title = "Siap mencari tarif?",
+    description =
+        "Pilih stasiun asal dan tujuan, lalu tekan Cari Tarif Khusus."
+) {
+    if (!DOM.results) {
+        return;
+    }
 
-    button.addEventListener("click", () => {
-      input.value = "";
-      input.focus();
-      update();
-      hideSuggestions();
-      clearStatus();
+    DOM.results.innerHTML = `
+        <div class="results-empty">
+            <div class="empty-illustration">
+                <div class="empty-rail empty-rail-one"></div>
+                <div class="empty-rail empty-rail-two"></div>
+                <div class="empty-station empty-station-one"></div>
+                <div class="empty-station empty-station-two"></div>
+                <div class="empty-center-mark">↗</div>
+            </div>
+
+            <div class="empty-title">
+                ${safeHTML(title)}
+            </div>
+
+            <p class="empty-description">
+                ${safeHTML(description)}
+            </p>
+        </div>
+    `;
+
+    if (DOM.resultsSummary) {
+        DOM.resultsSummary.textContent =
+            "Hasil tarif akan ditampilkan di area ini.";
+    }
+
+    if (DOM.resultsCount) {
+        DOM.resultsCount.innerHTML = `
+            <span>—</span>
+            <small>HASIL</small>
+        `;
+    }
+}
+
+
+/* =========================================================
+   11. RELATION HTML
+========================================================= */
+
+function renderRelation(stations) {
+    if (!Array.isArray(stations) || !stations.length) {
+        return "—";
+    }
+
+    return stations
+        .map(station => safeHTML(station))
+        .join(
+            '<span class="relation-arrow">→</span>'
+        );
+}
+
+
+/* =========================================================
+   12. FORMAT FARE
+========================================================= */
+
+function renderFare(value) {
+    if (
+        value === null ||
+        value === undefined ||
+        !Number.isFinite(value)
+    ) {
+        return "—";
+    }
+
+    if (
+        window.TARSUS_DATA &&
+        typeof window.TARSUS_DATA.formatRupiah === "function"
+    ) {
+        return window.TARSUS_DATA.formatRupiah(value);
+    }
+
+    return "Rp " +
+        new Intl.NumberFormat("id-ID").format(value);
+}
+
+
+/* =========================================================
+   13. FARE ITEMS
+========================================================= */
+
+function renderFareItem(label, value) {
+    const unavailable =
+        value === null ||
+        value === undefined ||
+        !Number.isFinite(value);
+
+    return `
+        <div class="fare-item">
+            <span class="fare-class">
+                ${safeHTML(label)}
+            </span>
+
+            <span class="fare-price ${
+                unavailable ? "fare-unavailable" : ""
+            }">
+                ${unavailable ? "—" : renderFare(value)}
+            </span>
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   AKHIR PART 1/4
+   Lanjutkan dengan PART 2/4.
+========================================================= */
+/* =========================================================
+   TARSUS FINDER
+   APP ENGINE — PART 2/4
+
+   - Kartu hasil
+   - Tarif utama
+   - Tarif alternatif
+   - Ringkasan hasil pencarian
+   ========================================================= */
+
+
+/* =========================================================
+   14. CREATE TARIFF DETAIL
+========================================================= */
+
+function renderTariffDetail(tarif, isMain = false) {
+    const route = Array.isArray(tarif.referenceRoute)
+        ? tarif.referenceRoute
+        : [];
+
+    const label = isMain
+        ? "TARIF UTAMA"
+        : "TARIF KHUSUS ALTERNATIF";
+
+    return `
+        <div class="tariff-detail ${
+            isMain ? "tariff-main" : "tariff-alternative"
+        }">
+
+            <div class="reference-box">
+                <div class="reference-label">
+                    ${label}
+                </div>
+
+                <div class="reference-route">
+                    ${renderRelation(route)}
+                </div>
+            </div>
+
+            <div class="fare-list">
+                ${renderFareItem("EKS", tarif.eks)}
+                ${renderFareItem("BIS", tarif.bis)}
+                ${renderFareItem("EKO", tarif.eko)}
+            </div>
+
+            <div class="tariff-meta">
+                <span class="tariff-direction">
+                    ${
+                        tarif.roundTrip
+                            ? "PULANG PERGI"
+                            : "SEARAH"
+                    }
+                </span>
+
+                <span class="tariff-id">
+                    ID: ${safeHTML(tarif.idTarif)}
+                </span>
+            </div>
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   15. CREATE RESULT CARD
+========================================================= */
+
+function renderResultCard(group, index) {
+    const main = group.main;
+
+    const alternatives = Array.isArray(group.alternatives)
+        ? group.alternatives
+        : [];
+
+    const cardId = "result-" + index;
+
+    const journey = `
+        <div class="journey">
+            <span class="journey-station">
+                ${safeHTML(group.asal)}
+            </span>
+
+            <span class="journey-arrow">→</span>
+
+            <span class="journey-station">
+                ${safeHTML(group.tujuan)}
+            </span>
+        </div>
+    `;
+
+    const alternativeHTML = alternatives.length
+        ? `
+            <details class="tariff-alternatives">
+                <summary>
+                    <span>
+                        Lihat ${alternatives.length}
+                        tarif khusus alternatif
+                    </span>
+
+                    <span class="alternative-arrow">+</span>
+                </summary>
+
+                <div class="alternative-content">
+                    ${alternatives
+                        .map(tarif =>
+                            renderTariffDetail(tarif, false)
+                        )
+                        .join("")}
+                </div>
+            </details>
+        `
+        : `
+            <div class="no-alternative">
+                Tidak ada tarif alternatif lain
+                untuk kelompok KA ini.
+            </div>
+        `;
+
+    return `
+        <article
+            class="result-card grouped-result-card"
+            id="${cardId}"
+        >
+            <div class="result-card-top">
+                <div class="result-train-symbol">T</div>
+
+                <div class="result-train-info">
+                    <div class="result-overline">
+                        HASIL PENCARIAN
+                    </div>
+
+                    <h3 class="result-name">
+                        ${safeHTML(group.namaKA)}
+                    </h3>
+                </div>
+
+                <div class="result-number">
+                    ${String(index + 1).padStart(2, "0")}
+                </div>
+            </div>
+
+            ${journey}
+
+            ${renderTariffDetail(main, true)}
+
+            ${alternativeHTML}
+        </article>
+    `;
+}
+
+
+/* =========================================================
+   16. RENDER RESULTS
+========================================================= */
+
+function renderResults(groups, asal, tujuan) {
+    if (!DOM.results) {
+        return;
+    }
+
+    if (!groups.length) {
+        renderEmptyResults(
+            "Tarif belum ditemukan",
+            "Tidak ditemukan relasi tarif yang cocok. Periksa kembali nama stasiun, arah perjalanan, dan data tarif."
+        );
+
+        if (DOM.resultsSummary) {
+            DOM.resultsSummary.textContent =
+                `${asal} → ${tujuan}`;
+        }
+
+        if (DOM.resultsCount) {
+            DOM.resultsCount.innerHTML = `
+                <span>0</span>
+                <small>HASIL</small>
+            `;
+        }
+
+        return;
+    }
+
+    DOM.results.innerHTML = groups
+        .map((group, index) =>
+            renderResultCard(group, index)
+        )
+        .join("");
+
+    if (DOM.resultsSummary) {
+        DOM.resultsSummary.textContent =
+            `${asal} → ${tujuan} · ${groups.length} kelompok KA ditemukan`;
+    }
+
+    if (DOM.resultsCount) {
+        DOM.resultsCount.innerHTML = `
+            <span>${groups.length}</span>
+            <small>HASIL</small>
+        `;
+    }
+
+    /*
+       Beri animasi masuk ringan.
+    */
+
+    $$(".result-card", DOM.results).forEach(
+        (card, index) => {
+            card.style.animationDelay =
+                `${Math.min(index * 45, 270)}ms`;
+
+            card.classList.add("result-enter");
+        }
+    );
+}
+
+
+/* =========================================================
+   17. RESULT SUMMARY
+========================================================= */
+
+function showResultSummary(asal, tujuan, total) {
+    if (!DOM.resultsSummary) {
+        return;
+    }
+
+    DOM.resultsSummary.textContent =
+        total > 0
+            ? `${asal} → ${tujuan} · ${total} kelompok KA ditemukan`
+            : `${asal} → ${tujuan} · Tidak ada tarif yang cocok`;
+}
+
+
+/* =========================================================
+   18. ALTERNATIVE DETAILS INTERACTION
+========================================================= */
+
+function setupAlternativeDetails() {
+    if (!DOM.results) {
+        return;
+    }
+
+    DOM.results.addEventListener("toggle", event => {
+        const details = event.target;
+
+        if (
+            details instanceof HTMLDetailsElement &&
+            details.classList.contains("tariff-alternatives")
+        ) {
+            const arrow = $(".alternative-arrow", details);
+
+            if (arrow) {
+                arrow.textContent = details.open ? "−" : "+";
+            }
+        }
+    }, true);
+}
+
+
+/* =========================================================
+   AKHIR PART 2/4
+   Lanjutkan dengan PART 3/4.
+========================================================= */
+/* =========================================================
+   TARSUS FINDER
+   APP ENGINE — PART 3/4
+
+   - Saran stasiun
+   - Pilih stasiun
+   - Tukar stasiun
+   - Reset formulir
+   - Pencarian tarif
+   ========================================================= */
+
+
+/* =========================================================
+   19. HIDE SUGGESTIONS
+========================================================= */
+
+function hideSuggestions(container) {
+    if (!container) {
+        return;
+    }
+
+    container.hidden = true;
+    container.innerHTML = "";
+}
+
+
+/* =========================================================
+   20. RENDER STATION SUGGESTIONS
+========================================================= */
+
+function renderStationSuggestions(
+    input,
+    container,
+    query,
+    fieldName
+) {
+    if (!container || !input) {
+        return;
+    }
+
+    const keyword = String(query ?? "").trim();
+
+    if (!keyword || !STATE.databaseReady) {
+        hideSuggestions(container);
+        return;
+    }
+
+    const suggestions =
+        window.TARSUS_DATA.suggestions(
+            keyword,
+            APP_CONFIG.suggestionLimit
+        );
+
+    if (!suggestions.length) {
+        container.innerHTML = `
+            <div class="suggestion-empty">
+                Stasiun tidak ditemukan.
+            </div>
+        `;
+
+        container.hidden = false;
+        return;
+    }
+
+    container.innerHTML = suggestions
+        .map((station, index) => `
+            <button
+                type="button"
+                class="suggestion-item"
+                data-station-name="${safeHTML(station.namaStasiun)}"
+                data-station-field="${fieldName}"
+                role="option"
+                aria-selected="false"
+            >
+                <span class="suggestion-marker">
+                    ${index + 1}
+                </span>
+
+                <span class="suggestion-copy">
+                    <span class="suggestion-name">
+                        ${safeHTML(station.namaStasiun)}
+                    </span>
+
+                    <span class="suggestion-meta">
+                        ${safeHTML(station.daop || "Stasiun")}
+                    </span>
+                </span>
+
+                <span class="suggestion-arrow">↗</span>
+            </button>
+        `)
+        .join("");
+
+    container.hidden = false;
+}
+
+
+/* =========================================================
+   21. SELECT STATION
+========================================================= */
+
+function selectStation(name, fieldName) {
+    const isOrigin = fieldName === "origin";
+
+    const input = isOrigin
+        ? DOM.origin
+        : DOM.destination;
+
+    const container = isOrigin
+        ? DOM.originSuggestions
+        : DOM.destinationSuggestions;
+
+    if (!input) {
+        return;
+    }
+
+    input.value = name;
+
+    if (isOrigin) {
+        STATE.selectedOrigin = name;
+    } else {
+        STATE.selectedDestination = name;
+    }
+
+    hideSuggestions(container);
+
+    updateClearButtons();
+
+    input.focus();
+}
+
+
+/* =========================================================
+   22. SUGGESTION CLICK HANDLERS
+========================================================= */
+
+function setupSuggestionClick(container) {
+    if (!container) {
+        return;
+    }
+
+    container.addEventListener("click", event => {
+        const button = event.target.closest(
+            "[data-station-name]"
+        );
+
+        if (!button) {
+            return;
+        }
+
+        selectStation(
+            button.dataset.stationName,
+            button.dataset.stationField
+        );
     });
-  }
+}
 
-  // AUTOCOMPLETE STASIUN
-  bindAutocomplete(
-    asalInput,
-    $("#asal-suggestions")
-  );
 
-  bindAutocomplete(
-    tujuanInput,
-    $("#tujuan-suggestions")
-  );
+/* =========================================================
+   23. INPUT EVENTS
+========================================================= */
 
-  function bindAutocomplete(input, list) {
+function setupStationInput(input, container, fieldName) {
+    if (!input || !container) {
+        return;
+    }
+
     input.addEventListener("input", () => {
-      const query = normalize(input.value);
+        updateClearButtons();
 
-      list.replaceChildren();
+        const value = input.value;
 
-      if (query.length < 2) {
-        list.classList.add("hidden");
-        return;
-      }
+        /*
+           Batalkan timer sebelumnya agar
+           tidak memproses setiap ketikan
+           secara berlebihan.
+        */
 
-      const stations = getStationNames()
-        .filter((name) => normalize(name).includes(query))
-        .slice(0, 8);
+        window.clearTimeout(
+            STATE.suggestionTimers[fieldName]
+        );
 
-      if (!stations.length) {
-        list.classList.add("hidden");
-        return;
-      }
-
-      stations.forEach((name) => {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "suggestion-item";
-        button.textContent = name;
-
-        button.addEventListener("click", () => {
-          input.value = name;
-          list.classList.add("hidden");
-          input.dispatchEvent(new Event("input"));
-          input.focus();
-        });
-
-        list.appendChild(button);
-      });
-
-      list.classList.remove("hidden");
+        STATE.suggestionTimers[fieldName] =
+            window.setTimeout(() => {
+                renderStationSuggestions(
+                    input,
+                    container,
+                    value,
+                    fieldName
+                );
+            }, APP_CONFIG.searchDebounce);
     });
-  }
 
-  document.addEventListener("click", (event) => {
-    if (!event.target.closest(".field-group")) {
-      hideSuggestions();
+    input.addEventListener("focus", () => {
+        if (input.value.trim()) {
+            renderStationSuggestions(
+                input,
+                container,
+                input.value,
+                fieldName
+            );
+        }
+    });
+
+    input.addEventListener("keydown", event => {
+        if (event.key === "Escape") {
+            hideSuggestions(container);
+        }
+
+        if (
+            event.key === "Enter" &&
+            !container.hidden
+        ) {
+            const first = $(
+                "[data-station-name]",
+                container
+            );
+
+            if (first) {
+                event.preventDefault();
+
+                selectStation(
+                    first.dataset.stationName,
+                    fieldName
+                );
+            }
+        }
+    });
+}
+
+
+/* =========================================================
+   24. CLEAR STATION
+========================================================= */
+
+function clearStation(fieldName) {
+    const isOrigin = fieldName === "origin";
+
+    const input = isOrigin
+        ? DOM.origin
+        : DOM.destination;
+
+    const container = isOrigin
+        ? DOM.originSuggestions
+        : DOM.destinationSuggestions;
+
+    if (!input) {
+        return;
     }
-  });
 
-  function hideSuggestions() {
-    document.querySelectorAll(".suggestion-list").forEach((list) => {
-      list.classList.add("hidden");
-    });
-  }
+    input.value = "";
 
-  // FORM PENCARIAN
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
+    if (isOrigin) {
+        STATE.selectedOrigin = "";
+    } else {
+        STATE.selectedDestination = "";
+    }
 
-    const asal = asalInput.value.trim();
-    const tujuan = tujuanInput.value.trim();
+    hideSuggestions(container);
 
-    clearStatus();
-    hideSuggestions();
+    updateClearButtons();
+
+    input.focus();
+}
+
+
+/* =========================================================
+   25. SWAP STATIONS
+========================================================= */
+
+function swapStations() {
+    if (!DOM.origin || !DOM.destination) {
+        return;
+    }
+
+    const oldOrigin = DOM.origin.value;
+    const oldDestination = DOM.destination.value;
+
+    DOM.origin.value = oldDestination;
+    DOM.destination.value = oldOrigin;
+
+    STATE.selectedOrigin = DOM.origin.value;
+    STATE.selectedDestination = DOM.destination.value;
+
+    hideSuggestions(DOM.originSuggestions);
+    hideSuggestions(DOM.destinationSuggestions);
+
+    updateClearButtons();
+
+    /*
+       Animasi kecil pada tombol.
+    */
+
+    if (DOM.swapStations) {
+        DOM.swapStations.classList.remove("swap-animate");
+
+        void DOM.swapStations.offsetWidth;
+
+        DOM.swapStations.classList.add("swap-animate");
+    }
+}
+
+
+/* =========================================================
+   26. RESET SEARCH
+========================================================= */
+
+function resetSearch() {
+    if (DOM.origin) {
+        DOM.origin.value = "";
+    }
+
+    if (DOM.destination) {
+        DOM.destination.value = "";
+    }
+
+    STATE.selectedOrigin = "";
+    STATE.selectedDestination = "";
+
+    hideSuggestions(DOM.originSuggestions);
+    hideSuggestions(DOM.destinationSuggestions);
+
+    setSearchMessage("");
+
+    setSearchLoading(false);
+
+    renderEmptyResults();
+
+    updateClearButtons();
+
+    if (DOM.origin) {
+        DOM.origin.focus();
+    }
+}
+
+
+/* =========================================================
+   27. RUN SEARCH
+========================================================= */
+
+async function runSearch(event) {
+    if (event) {
+        event.preventDefault();
+    }
+
+    if (!DOM.origin || !DOM.destination) {
+        return;
+    }
+
+    const asal = DOM.origin.value.trim();
+    const tujuan = DOM.destination.value.trim();
 
     if (!asal || !tujuan) {
-      showStatus("Masukkan stasiun asal dan tujuan.", "error");
-      return;
+        setSearchMessage(
+            "Lengkapi stasiun asal dan tujuan terlebih dahulu.",
+            "error"
+        );
+
+        showToast(
+            "Stasiun asal dan tujuan wajib diisi.",
+            "error"
+        );
+
+        return;
     }
 
-    if (normalize(asal) === normalize(tujuan)) {
-      showStatus("Stasiun asal dan tujuan tidak boleh sama.", "error");
-      return;
+    if (
+        normalizeStationName(asal) ===
+        normalizeStationName(tujuan)
+    ) {
+        setSearchMessage(
+            "Stasiun asal dan tujuan tidak boleh sama.",
+            "error"
+        );
+
+        return;
     }
 
-    if (typeof window.searchSpecialTariffs !== "function") {
-      showStatus(
-        "Mesin pencarian belum siap. Periksa file data.js.",
-        "error"
-      );
-      return;
+    if (!STATE.databaseReady) {
+        setSearchMessage(
+            "Database belum siap. Tunggu hingga data selesai dimuat.",
+            "error"
+        );
+
+        return;
     }
 
-    const currentSequence = ++searchSequence;
+    const requestId = ++STATE.searchRequest;
 
-    searchButton.disabled = true;
-    searchButton.querySelector("span").textContent = "Mencari...";
-    showStatus("Sedang mencari relasi tarif khusus...", "");
+    hideSuggestions(DOM.originSuggestions);
+    hideSuggestions(DOM.destinationSuggestions);
+
+    setSearchMessage("");
+
+    setSearchLoading(true);
 
     try {
-      const results = await window.searchSpecialTariffs(asal, tujuan);
+        /*
+           Pencarian data bersifat sinkron.
+           setTimeout memberi kesempatan browser
+           memperbarui tampilan loading.
+        */
 
-      if (currentSequence !== searchSequence) return;
+        await new Promise(resolve =>
+            window.setTimeout(resolve, 30)
+        );
 
-      renderResults(results, asal, tujuan);
+        if (requestId !== STATE.searchRequest) {
+            return;
+        }
+
+        const results =
+            window.TARSUS_DATA.search(asal, tujuan);
+
+        renderResults(results, asal, tujuan);
+
+        if (results.length) {
+            setSearchMessage(
+                `${results.length} kelompok KA ditemukan.`,
+                "success"
+            );
+        } else {
+            setSearchMessage(
+                "Tidak ditemukan tarif yang sesuai dengan rute tersebut.",
+                "info"
+            );
+        }
+
+        if (DOM.resultsSection) {
+            DOM.resultsSection.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }
+
     } catch (error) {
-      console.error("TARSUS search error:", error);
+        console.error(
+            "[TARSUS] Pencarian gagal:",
+            error
+        );
 
-      showStatus(
-        "Pencarian gagal. Periksa koneksi data atau struktur data.js.",
-        "error"
-      );
+        setSearchMessage(
+            "Pencarian gagal. Periksa data dan coba kembali.",
+            "error"
+        );
+
+        showToast(
+            "Terjadi kesalahan saat mencari tarif.",
+            "error"
+        );
+
     } finally {
-      if (currentSequence === searchSequence) {
-        searchButton.disabled = false;
-        searchButton.querySelector("span").textContent = "Cari Tarif";
-      }
+        if (requestId === STATE.searchRequest) {
+            setSearchLoading(false);
+        }
     }
-  });
+}
 
-  function renderResults(results, asal, tujuan) {
-    resultsContainer.replaceChildren();
 
-    if (!Array.isArray(results) || results.length === 0) {
-      resultsSection.classList.add("hidden");
-      emptyState.classList.remove("hidden");
+/* =========================================================
+   28. NORMALIZE STATION NAME
+========================================================= */
 
-      showStatus(
-        `Tidak ditemukan tarif khusus untuk ${asal} – ${tujuan}.`,
-        "error"
-      );
+function normalizeStationName(value) {
+    return String(value ?? "")
+        .trim()
+        .toLocaleLowerCase("id-ID")
+        .replace(/\s+/g, " ");
+}
 
-      return;
-    }
 
-    resultsTitle.textContent = `${asal} – ${tujuan}`;
-    resultsDescription.textContent =
-      "Berikut relasi tarif khusus yang cocok dengan pencarian.";
+/* =========================================================
+   29. SETUP SEARCH EVENTS
+========================================================= */
 
-    resultsCount.textContent = `${results.length} HASIL`;
-
-    results.forEach((item) => {
-      resultsContainer.appendChild(createResultCard(item));
-    });
-
-    emptyState.classList.add("hidden");
-    resultsSection.classList.remove("hidden");
-
-    showStatus(
-      `${results.length} relasi tarif khusus ditemukan.`,
-      "success"
+function setupSearchEvents() {
+    setupStationInput(
+        DOM.origin,
+        DOM.originSuggestions,
+        "origin"
     );
 
-    resultsSection.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
+    setupStationInput(
+        DOM.destination,
+        DOM.destinationSuggestions,
+        "destination"
+    );
+
+    setupSuggestionClick(
+        DOM.originSuggestions
+    );
+
+    setupSuggestionClick(
+        DOM.destinationSuggestions
+    );
+
+    if (DOM.searchForm) {
+        DOM.searchForm.addEventListener(
+            "submit",
+            runSearch
+        );
+    }
+
+    if (DOM.swapStations) {
+        DOM.swapStations.addEventListener(
+            "click",
+            swapStations
+        );
+    }
+
+    if (DOM.resetSearch) {
+        DOM.resetSearch.addEventListener(
+            "click",
+            resetSearch
+        );
+    }
+
+    if (DOM.clearOrigin) {
+        DOM.clearOrigin.addEventListener(
+            "click",
+            () => clearStation("origin")
+        );
+    }
+
+    if (DOM.clearDestination) {
+        DOM.clearDestination.addEventListener(
+            "click",
+            () => clearStation("destination")
+        );
+    }
+
+    /*
+       Klik di luar kolom menutup saran.
+    */
+
+    document.addEventListener("click", event => {
+        const originField = DOM.origin?.closest(
+            ".station-field"
+        );
+
+        const destinationField =
+            DOM.destination?.closest(".station-field");
+
+        if (
+            originField &&
+            !originField.contains(event.target)
+        ) {
+            hideSuggestions(DOM.originSuggestions);
+        }
+
+        if (
+            destinationField &&
+            !destinationField.contains(event.target)
+        ) {
+            hideSuggestions(DOM.destinationSuggestions);
+        }
     });
-  }
 
-  // Membuat kartu dengan textContent agar data tidak dianggap sebagai HTML.
-  function createResultCard(item) {
-    const card = document.createElement("article");
-    card.className = "result-card";
+    updateClearButtons();
+}
 
-    const header = document.createElement("div");
-    header.className = "result-card-header";
 
-    const titleWrap = document.createElement("div");
+/* =========================================================
+   AKHIR PART 3/4
+   Lanjutkan dengan PART 4/4.
+========================================================= */
+/* =========================================================
+   TARSUS FINDER
+   APP ENGINE — PART 4/4
 
-    const title = document.createElement("h3");
-    title.className = "train-name";
-    title.textContent = item.trainName || "Nama kereta tidak tersedia";
+   - Navigasi sidebar
+   - Tema gelap/terang
+   - Cinematic intro
+   - Memuat database
+   - Inisialisasi aplikasi
+   ========================================================= */
 
-    const label = document.createElement("span");
-    label.className = "result-label";
-    label.textContent = item.trainNumber
-      ? `Nomor KA ${item.trainNumber}`
-      : "Tarif khusus";
 
-    titleWrap.append(title, label);
+/* =========================================================
+   30. SIDEBAR
+========================================================= */
 
-    const badge = document.createElement("span");
-    badge.className = "direction-badge";
-    badge.textContent = item.direction || "Sesuai ketentuan";
+function openSidebar() {
+    if (!DOM.sidebar) {
+        return;
+    }
 
-    header.append(titleWrap, badge);
+    DOM.sidebar.classList.add("open");
 
-    const body = document.createElement("div");
-    body.className = "result-card-body";
+    if (DOM.sidebarBackdrop) {
+        DOM.sidebarBackdrop.classList.add("visible");
+    }
 
-    const relationLabel = document.createElement("div");
-    relationLabel.className = "relation-label";
-    relationLabel.textContent = "RELASI TARIF KHUSUS";
+    document.body.classList.add("sidebar-open");
+}
 
-    const relation = document.createElement("p");
-    relation.className = "relation-value";
-    relation.textContent = item.specialRelation || "-";
 
-    const fares = document.createElement("div");
-    fares.className = "fare-grid";
+function closeSidebar() {
+    if (DOM.sidebar) {
+        DOM.sidebar.classList.remove("open");
+    }
 
-    [
-      ["Eksekutif", item.fares?.executive],
-      ["Bisnis", item.fares?.business],
-      ["Ekonomi", item.fares?.economy]
-    ].forEach(([name, price]) => {
-      const fare = document.createElement("div");
-      fare.className = "fare-item";
+    if (DOM.sidebarBackdrop) {
+        DOM.sidebarBackdrop.classList.remove("visible");
+    }
 
-      const fareName = document.createElement("span");
-      fareName.className = "fare-class";
-      fareName.textContent = name;
+    document.body.classList.remove("sidebar-open");
+}
 
-      const farePrice = document.createElement("strong");
-      farePrice.className = "fare-price";
 
-      if (price === null || price === undefined || price === "") {
-        fare.classList.add("unavailable");
-        farePrice.textContent = "Tidak tersedia";
-      } else if (typeof price === "number" && Number.isFinite(price)) {
-        farePrice.textContent = formatRupiah(price);
-      } else {
-        farePrice.textContent = String(price);
-      }
+/* =========================================================
+   31. PAGE NAVIGATION
+========================================================= */
 
-      fare.append(fareName, farePrice);
-      fares.appendChild(fare);
+const PAGE_NAMES = {
+    search: "Pencarian Tarif",
+    information: "Informasi Aplikasi",
+    guide: "Panduan Penggunaan",
+    terms: "Syarat & Ketentuan",
+    contact: "Hubungi Pengelola"
+};
+
+
+function navigateToPage(pageName) {
+    const page = PAGE_NAMES[pageName]
+        ? pageName
+        : "search";
+
+    STATE.activePage = page;
+
+    $$(".page-section").forEach(section => {
+        section.classList.toggle(
+            "active",
+            section.id === "page-" + page
+        );
     });
 
-    body.append(relationLabel, relation, fares);
+    $$("[data-page]").forEach(button => {
+        const isActive =
+            button.dataset.page === page;
 
-    if (item.note) {
-      const note = document.createElement("div");
-      note.className = "result-note";
-      note.textContent = item.note;
-      body.appendChild(note);
+        button.classList.toggle(
+            "active",
+            isActive
+        );
+
+        button.setAttribute(
+            "aria-current",
+            isActive ? "page" : "false"
+        );
+    });
+
+    if (DOM.breadcrumbCurrent) {
+        DOM.breadcrumbCurrent.textContent =
+            PAGE_NAMES[page];
     }
 
-    card.append(header, body);
+    closeSidebar();
 
-    return card;
-  }
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
 
-  function formatRupiah(value) {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      maximumFractionDigits: 0
-    }).format(value);
-  }
 
-  function showStatus(message, type) {
-    searchStatus.textContent = message;
-    searchStatus.classList.remove("hidden", "error", "success");
-
-    if (type) {
-      searchStatus.classList.add(type);
-    }
-  }
-
-  function clearStatus() {
-    searchStatus.textContent = "";
-    searchStatus.classList.add("hidden");
-    searchStatus.classList.remove("error", "success");
-  }
-
-  function normalize(value) {
-    return String(value || "")
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, " ");
-  }
-
-  function getStationNames() {
-    if (typeof window.getTarsusStations === "function") {
-      const stations = window.getTarsusStations();
-
-      if (Array.isArray(stations)) {
-        return stations;
-      }
-    }
-
-    return [];
-  }
-
-  // Versi aplikasi ditampilkan konsisten.
-  $("#sidebar-version").textContent = "v2.0.0";
-  $("#information-version").textContent = "2.0.0";
-
-  // Escape menutup menu di perangkat yang memakai keyboard.
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-      closeSidebar();
-      hideSuggestions();
-    }
-  });
-
-  // Registrasi service worker.
-  if ("serviceWorker" in navigator && location.protocol === "https:") {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker
-        .register("/tarsus-backup/sw.js")
-        .catch((error) => {
-          console.warn("Service worker tidak terdaftar:", error);
+function setupNavigation() {
+    $$("[data-page]").forEach(button => {
+        button.addEventListener("click", () => {
+            navigateToPage(button.dataset.page);
         });
     });
-  }
-      }
+
+    if (DOM.openSidebar) {
+        DOM.openSidebar.addEventListener(
+            "click",
+            openSidebar
+        );
+    }
+
+    if (DOM.closeSidebar) {
+        DOM.closeSidebar.addEventListener(
+            "click",
+            closeSidebar
+        );
+    }
+
+    if (DOM.sidebarBackdrop) {
+        DOM.sidebarBackdrop.addEventListener(
+            "click",
+            closeSidebar
+        );
+    }
+
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape") {
+            closeSidebar();
+        }
+    });
+}
+
+
+/* =========================================================
+   32. THEME
+========================================================= */
+
+function applyTheme(theme, save = true) {
+    const selectedTheme =
+        theme === "dark" ? "dark" : "light";
+
+    document.body.dataset.theme = selectedTheme;
+
+    if (DOM.themeIcon) {
+        DOM.themeIcon.textContent =
+            selectedTheme === "dark" ? "☾" : "☼";
+    }
+
+    if (DOM.themeToggle) {
+        DOM.themeToggle.setAttribute(
+            "aria-label",
+            selectedTheme === "dark"
+                ? "Gunakan tema terang"
+                : "Gunakan tema gelap"
+        );
+    }
+
+    const metaTheme = $(
+        'meta[name="theme-color"]'
+    );
+
+    if (metaTheme) {
+        metaTheme.content =
+            selectedTheme === "dark"
+                ? "#0c1421"
+                : "#101b2d";
+    }
+
+    if (save) {
+        try {
+            localStorage.setItem(
+                "tarsus-theme",
+                selectedTheme
+            );
+        } catch (error) {
+            console.warn(
+                "[TARSUS] Preferensi tema tidak dapat disimpan."
+            );
+        }
+    }
+}
+
+
+function initializeTheme() {
+    let savedTheme = "light";
+
+    try {
+        savedTheme =
+            localStorage.getItem("tarsus-theme") ||
+            "light";
+    } catch (error) {
+        savedTheme = "light";
+    }
+
+    applyTheme(savedTheme, false);
+
+    if (DOM.themeToggle) {
+        DOM.themeToggle.addEventListener("click", () => {
+            const current =
+                document.body.dataset.theme;
+
+            applyTheme(
+                current === "dark" ? "light" : "dark"
+            );
+        });
+    }
+}
+
+
+/* =========================================================
+   33. CINEMATIC INTRO
+========================================================= */
+
+function playIntro() {
+    return new Promise(resolve => {
+        if (!DOM.intro) {
+            resolve();
+            return;
+        }
+
+        const reducedMotion =
+            window.matchMedia(
+                "(prefers-reduced-motion: reduce)"
+            ).matches;
+
+        const duration = reducedMotion
+            ? 250
+            : APP_CONFIG.introDuration;
+
+        window.setTimeout(() => {
+            DOM.intro.classList.add("is-hidden");
+            DOM.intro.classList.add("hide");
+
+            window.setTimeout(() => {
+                DOM.intro.hidden = true;
+                resolve();
+            }, reducedMotion ? 0 : 650);
+
+        }, duration);
+    });
+}
+
+
+/* =========================================================
+   34. UPDATE INTRO STATUS
+========================================================= */
+
+function updateIntroStatus(message) {
+    const status = $("#introStatus");
+
+    if (status) {
+        status.textContent = message;
+    }
+}
+
+
+/* =========================================================
+   35. DATABASE INITIALIZATION
+========================================================= */
+
+async function initializeDatabase() {
+    if (
+        !window.TARSUS_DATA ||
+        typeof window.TARSUS_DATA.load !== "function"
+    ) {
+        throw new Error(
+            "Data engine tidak ditemukan. " +
+            "Pastikan data.js dimuat sebelum app.js."
+        );
+    }
+
+    STATE.databaseLoading = true;
+
+    updateIntroStatus("MENGHUBUNGKAN DATABASE");
+
+    try {
+        const info =
+            await window.TARSUS_DATA.load();
+
+        STATE.databaseReady = true;
+
+        updateIntroStatus("SISTEM SIAP");
+
+        console.info(
+            "[TARSUS] Database berhasil dimuat:",
+            info
+        );
+
+        showToast(
+            `Database siap · ${info.totalStasiun} stasiun`,
+            "success"
+        );
+
+        return info;
+
+    } catch (error) {
+        STATE.databaseReady = false;
+
+        updateIntroStatus("DATABASE PERLU DIPERIKSA");
+
+        console.error(
+            "[TARSUS] Database gagal dimuat:",
+            error
+        );
+
+        setSearchMessage(
+            "Database belum dapat diakses. Periksa koneksi internet, izin Google Sheets, dan nama sheet.",
+            "error"
+        );
+
+        showToast(
+            "Database gagal dimuat. Periksa koneksi dan akses Google Sheets.",
+            "error"
+        );
+
+        return null;
+
+    } finally {
+        STATE.databaseLoading = false;
+    }
+}
+
+
+/* =========================================================
+   36. CLOSE SUGGESTIONS WHEN SCROLLING
+========================================================= */
+
+function setupGlobalInteractions() {
+    window.addEventListener("resize", () => {
+        if (window.innerWidth > 900) {
+            closeSidebar();
+        }
+    });
+
+    window.addEventListener("online", () => {
+        showToast(
+            "Koneksi internet tersedia kembali.",
+            "success"
+        );
+    });
+
+    window.addEventListener("offline", () => {
+        showToast(
+            "Koneksi internet terputus.",
+            "error"
+        );
+    });
+}
+
+
+/* =========================================================
+   37. INITIALIZE APPLICATION
+========================================================= */
+
+async function initializeApp() {
+    initializeVersion();
+
+    initializeTheme();
+
+    setupNavigation();
+
+    setupSearchEvents();
+
+    setupAlternativeDetails();
+
+    setupGlobalInteractions();
+
+    renderEmptyResults();
+
+    /*
+       Tampilkan aplikasi setelah intro.
+       Database dimuat bersamaan dengan
+       tampilan pembuka.
+    */
+
+    const databasePromise =
+        initializeDatabase();
+
+    await playIntro();
+
+    const databaseInfo =
+        await databasePromise;
+
+    if (databaseInfo) {
+        setSearchMessage(
+            "Database siap digunakan. Silakan pilih stasiun asal dan tujuan.",
+            "success"
+        );
+    }
+
+    console.info(
+        "[TARSUS] Aplikasi berhasil diinisialisasi."
+    );
+}
+
+
+/* =========================================================
+   38. START APPLICATION
+========================================================= */
+
+if (document.readyState === "loading") {
+    document.addEventListener(
+        "DOMContentLoaded",
+        initializeApp,
+        { once: true }
+    );
+} else {
+    initializeApp();
+}
+
+
+/* =========================================================
+   END OF APP.JS
+========================================================= */
