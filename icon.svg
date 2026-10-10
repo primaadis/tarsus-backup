@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="512"
+     height="512"
+     viewBox="0 0 512 512">
+
+  <rect
+    width="512"
+    height="512"
+    rx="112"
+    fill="#111827"/>
+
+  <rect
+    x="38"
+    y="38"
+    width="436"
+    height="436"
+    rx="88"
+    fill="none"
+    stroke="#ffffff"
+    stroke-opacity="0.12"
+    stroke-width="3"/>
+
+  <path
+    d="M145 132 H367 V183 H284 V374 H228 V183 H145 Z"
+    fill="#e4c783"/>
+
+  <path
+    d="M145 394 H367"
+    stroke="#ffffff"
+    stroke-opacity="0.65"
+    stroke-width="9"
+    stroke-linecap="round"/>
+
+  <circle
+    cx="173"
+    cy="423"
+    r="9"
+    fill="#c76568"/>
+
+  <circle
+    cx="339"
+    cy="423"
+    r="9"
+    fill="#6fa783"/>
+
+</svg>
