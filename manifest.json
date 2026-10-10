@@ -1,0 +1,26 @@
+{
+  "id": "/tarsus-backup/",
+  "name": "TARSUS Finder — KAI 121",
+  "short_name": "TARSUS",
+  "description": "Aplikasi pencarian tarif khusus kereta api untuk KAI Contact Center 121.",
+  "lang": "id-ID",
+  "start_url": "/tarsus-backup/",
+  "scope": "/tarsus-backup/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#111827",
+  "theme_color": "#111827",
+  "categories": [
+    "business",
+    "productivity",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "/tarsus-backup/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
