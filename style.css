@@ -459,3 +459,131 @@ body[data-theme="dark"]{--gold:#f47721;--gold-strong:#ff8a35;--line:rgba(244,119
 @keyframes softReveal{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:600px){.home-hero{padding:25px 17px}.home-hero h1{font-size:30px}.ads-heading h2{font-size:16px}.ad-card{flex-basis:68vw}.developer-card{grid-template-columns:82px minmax(0,1fr);gap:12px;padding:14px}.developer-photo{width:82px;height:108px}.developer-bio h2{font-size:17px}.developer-socials{display:grid;grid-template-columns:1fr}.tariff-card{padding:14px}.tariff-title-stack h3{font-size:16px}.fare-cell strong{font-size:12px}.tariff-card-foot>span{max-width:44%}.page-heading{margin-bottom:16px}}
 @media(prefers-reduced-motion:reduce){.boot-logo,.app-reveal,.login-leave,.page-enter,.tariff-card,.ad-modal-panel,.home-search-choices{animation:none!important}.boot-screen{transition:none}}
+
+/* ==================================================
+   TARSUS FINDER 4.5.1 — CINEMATIC BOOT
+   Background boot terpisah dari background aplikasi
+================================================== */
+
+.boot-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  isolation: isolate;
+
+  background-color: #080b10;
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(4, 8, 15, 0.60) 0%,
+      rgba(4, 8, 15, 0.34) 48%,
+      rgba(4, 8, 15, 0.76) 100%
+    ),
+    url("assets/background-boot.jpg");
+
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 1s cubic-bezier(.22, 1, .36, 1),
+    visibility 1s;
+}
+
+.boot-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block !important;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(0, 0, 0, 0.04) 0%,
+      rgba(0, 0, 0, 0.20) 56%,
+      rgba(0, 0, 0, 0.48) 100%
+    );
+}
+
+.boot-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block !important;
+  pointer-events: none;
+  background: linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.20),
+    transparent 34%,
+    transparent 68%,
+    rgba(0, 0, 0, 0.14)
+  );
+}
+
+.boot-logo {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: min(76vw, 360px);
+  max-width: 80vw;
+  max-height: 42vh;
+  object-fit: contain;
+  opacity: 0;
+  transform: translateY(12px) scale(.96);
+  filter:
+    drop-shadow(0 8px 24px rgba(0, 0, 0, .38))
+    drop-shadow(0 0 34px rgba(255, 255, 255, .10));
+  animation: tarsusBootLogo 3.8s cubic-bezier(.22, 1, .36, 1) forwards;
+}
+
+.boot-screen.boot-screen-out {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@keyframes tarsusBootLogo {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(.96);
+  }
+
+  22% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  72% {
+    opacity: 1;
+    transform: translateY(0) scale(1.015);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.02);
+  }
+}
+
+@media (max-width: 600px) {
+  .boot-logo {
+    width: min(82vw, 330px);
+    max-height: 36vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boot-logo {
+    animation-duration: 1s;
+  }
+
+  .boot-screen {
+    transition-duration: .25s;
+  }
+}
