@@ -483,7 +483,7 @@ body[data-theme="dark"]{--gold:#f47721;--gold-strong:#ff8a35;--line:rgba(244,119
       rgba(4, 8, 15, 0.34) 48%,
       rgba(4, 8, 15, 0.76) 100%
     ),
-    url("assets/background-boot.jpg");
+    url("/tarsus-backup/assets/background-boot.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
