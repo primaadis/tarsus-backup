@@ -28,11 +28,17 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(
-        keys
-          .filter(key => key.startsWith("tarsus-") && key !== CACHE_NAME)
-          .map(key => caches.delete(key))
-      ))
+      .then(keys =>
+        Promise.all(
+          keys
+            .filter(
+              key =>
+                key.startsWith("tarsus-") &&
+                key !== CACHE_NAME
+            )
+            .map(key => caches.delete(key))
+        )
+      )
       .then(() => self.clients.claim())
   );
 });
@@ -57,10 +63,12 @@ self.addEventListener("fetch", event => {
         event.waitUntil(
           caches.open(CACHE_NAME)
             .then(cache => cache.put(request, copy))
-            .catch(error => console.warn(
-              "[TARSUS] Cache gagal diperbarui:",
-              error
-            ))
+            .catch(error => {
+              console.warn(
+                "[TARSUS] Cache gagal diperbarui:",
+                error
+              );
+            })
         );
       }
 
@@ -72,18 +80,24 @@ self.addEventListener("fetch", event => {
         return cached;
       }
 
-      // Hanya navigasi dokumen yang boleh memakai fallback HTML.
       if (request.mode === "navigate") {
         const indexPage = await caches.match("./index.html");
-        if (indexPage) return indexPage;
+
+        if (indexPage) {
+          return indexPage;
+        }
       }
 
-      // Jangan mengembalikan HTML sebagai pengganti JS, CSS, atau gambar.
-      return new Response("Aset tidak tersedia. Periksa koneksi.", {
-        status: 503,
-        statusText: "Service Unavailable",
-        headers: { "Content-Type": "text/plain; charset=utf-8" }
-      });
+      return new Response(
+        "Aset tidak tersedia. Periksa koneksi internet.",
+        {
+          status: 503,
+          statusText: "Service Unavailable",
+          headers: {
+            "Content-Type": "text/plain; charset=utf-8"
+          }
+        }
+      );
     }
   })());
 });
