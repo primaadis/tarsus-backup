@@ -1,0 +1,26 @@
+TARSUS FINDER — PAKET SIAP PWABUILDER
+Versi paket: 5.0.0
+
+APA YANG SUDAH DISIAPKAN
+- Web App Manifest yang lebih lengkap dan valid untuk PWA.
+- Ikon launcher PNG 192x192 dan 512x512.
+- Ikon maskable 512x512 untuk adaptasi bentuk ikon Android.
+- Shortcut aplikasi: Cari Tarif, Tarif per Kereta, dan Favorit.
+- Service worker dengan cache version baru.
+- Metadata bahasa Indonesia, warna tema, scope, dan start URL.
+
+CARA MEMBUAT APLIKASI ANDROID DENGAN PWABUILDER
+1. Unggah ISI folder tarsus-backup-main ini ke root repository GitHub Pages yang dipakai aplikasi. Jangan mengunggah folder pembungkus sebagai subfolder tambahan.
+2. Tunggu GitHub Pages selesai deploy, lalu pastikan halaman aplikasi dapat dibuka melalui HTTPS.
+3. Buka https://www.pwabuilder.com/
+4. Masukkan URL aplikasi yang sudah online, misalnya https://primaadis.github.io/tarsus-backup/ jika itu masih alamat deployment aktif.
+5. Jalankan pemeriksaan PWA. Pastikan manifest, ikon, dan service worker terdeteksi. Jika PWABuilder menampilkan masalah, selesaikan masalah yang ditandai sebelum membuat paket.
+6. Pilih Package for Stores / Android (opsi dapat berubah sesuai antarmuka PWABuilder), lalu ikuti langkah untuk membuat paket Android.
+7. Untuk memasang sebagai APK secara langsung, unduh paket yang disediakan jika tersedia. Untuk Google Play, biasanya diperlukan paket Android yang sesuai, signing, dan verifikasi domain Digital Asset Links (assetlinks.json). Ikuti panduan PWABuilder pada saat packaging.
+8. Uji instalasi di HP Android: ikon, membuka aplikasi, navigasi bawah, pencarian tarif, favorit, tampilan offline, dan pembaruan versi.
+
+PENTING
+- ZIP ini adalah source PWA yang disiapkan agar bisa dianalisis/dipaketkan melalui PWABuilder; bukan APK yang sudah jadi. PWABuilder perlu URL HTTPS yang telah di-deploy.
+- Pastikan URL yang dimasukkan benar-benar alamat terbaru aplikasi.
+- Service worker mendukung cache/offline untuk aset aplikasi, tetapi pencarian offline tetap bergantung pada aset/data yang berhasil tersimpan dan perlu diuji pada perangkat.
+- Jangan menganggap login prototipe sebagai autentikasi aman.

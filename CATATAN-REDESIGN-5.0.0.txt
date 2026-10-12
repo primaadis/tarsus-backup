@@ -1,0 +1,18 @@
+TARSUS Finder 5.0.0 — Redesign tampilan mobile-first
+
+Arah visual: aplikasi perjalanan modern yang terinspirasi pola UX aplikasi seperti Traveloka dan tiket.com, tetapi memakai identitas TARSUS Finder sendiri. Ini bukan salinan logo atau aset merek lain.
+
+Perubahan utama:
+- Beralih dari latar cinematic gelap/glassmorphism sebagai gaya dominan ke antarmuka terang, bersih, berwarna biru, dan berorientasi kartu.
+- Sidebar desktop dirapikan; pada layar kecil menjadi drawer. Navigasi bawah mobile tetap tersedia untuk akses fitur utama.
+- Beranda memiliki hero biru, pintasan fitur yang selalu terlihat, area informasi internal, riwayat, dan catatan kerja.
+- Tombol Mulai pencarian langsung membuka halaman pencarian tarif.
+- Form stasiun, saran autocomplete, tombol tukar, hasil tarif, kartu direktori, favorit, bantuan, tentang, dan pengaturan diberi gaya baru.
+- Tema terang menjadi default, tetapi opsi tema gelap tetap dipertahankan.
+- Fungsi bisnis pencarian, data.js, integrasi data, dan ID elemen utama dipertahankan.
+- Cache service worker diperbarui ke v5.0.0 dan stylesheet baru ditambahkan ke daftar aset inti.
+
+Catatan:
+- Ini adalah redesign antarmuka berbasis kode yang tersedia, bukan klaim bahwa seluruh skenario sudah diuji di perangkat fisik.
+- Setelah mengunggah isi ZIP ke GitHub Pages, lakukan hard refresh/bersihkan cache bila browser masih menampilkan versi lama.
+- Pastikan hasil pencarian tarif diuji dengan data internal yang benar sebelum dipakai operasional.
