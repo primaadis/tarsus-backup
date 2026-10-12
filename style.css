@@ -460,7 +460,6 @@ body[data-theme="dark"]{--gold:#f47721;--gold-strong:#ff8a35;--line:rgba(244,119
 @media(max-width:600px){.home-hero{padding:25px 17px}.home-hero h1{font-size:30px}.ads-heading h2{font-size:16px}.ad-card{flex-basis:68vw}.developer-card{grid-template-columns:82px minmax(0,1fr);gap:12px;padding:14px}.developer-photo{width:82px;height:108px}.developer-bio h2{font-size:17px}.developer-socials{display:grid;grid-template-columns:1fr}.tariff-card{padding:14px}.tariff-title-stack h3{font-size:16px}.fare-cell strong{font-size:12px}.tariff-card-foot>span{max-width:44%}.page-heading{margin-bottom:16px}}
 @media(prefers-reduced-motion:reduce){.boot-logo,.app-reveal,.login-leave,.page-enter,.tariff-card,.ad-modal-panel,.home-search-choices{animation:none!important}.boot-screen{transition:none}}
 
-```css
 /* =========================================================
    TARSUS FINDER — CINEMATIC BOOT
    Fade in → hold → fade out
@@ -575,4 +574,3 @@ body[data-theme="dark"]{--gold:#f47721;--gold-strong:#ff8a35;--line:rgba(244,119
     transition-duration: 300ms;
   }
 }
-```
