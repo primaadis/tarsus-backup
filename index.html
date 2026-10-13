@@ -13,14 +13,69 @@
 <div id="bootScreen" class="boot-screen" aria-hidden="true"><img class="boot-logo" src="assets/logo-boot.png" alt="Logo TARSUS Finder" onerror="this.onerror=null;this.src='assets/logo.png'"></div>
 <div class="backdrop-scene" aria-hidden="true"></div><div class="scene-shade" aria-hidden="true"></div><div class="scene-grain" aria-hidden="true"></div>
 
+
 <section id="loginScreen" class="login-screen" hidden>
+  <video
+    class="login-video"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="metadata"
+    aria-hidden="true"
+  >
+    <source src="assets/background-animation-boot.mp4" type="video/mp4">
+  </video>
+
+  <div class="login-video-shade" aria-hidden="true"></div>
+
   <div class="login-panel glass-panel">
-    <div class="login-brand login-brand-stacked"><img src="assets/logo.png" alt="Logo TARSUS"><strong>TARSUS <span>FINDER</span></strong><small>KAI CONTACT CENTER 121</small></div>
-    <h1>Selamat datang.</h1><p class="login-desc">Masuk untuk mengakses referensi tarif khusus kereta api.</p>
-    <form id="loginForm" class="login-form"><label for="agentId">Akun</label><input id="agentId" name="agentId" autocomplete="username" placeholder="Masukkan akun" required><label for="agentPassword">Kata sandi</label><input id="agentPassword" name="password" type="password" autocomplete="current-password" placeholder="Masukkan kata sandi" required><button class="primary-button" type="submit">Masuk ke TARSUS</button><p id="loginMessage" class="login-message" aria-live="polite"></p></form>
-    <div class="login-foot"><span class="secure-dot"></span> Khusus petugas internal KAI Contact Center 121</div><p class="auth-notice">Mode antarmuka: autentikasi server belum dikonfigurasi.</p>
+    <div class="login-brand login-brand-stacked">
+      <img src="assets/logo.png" alt="Logo TARSUS">
+      <strong>TARSUS <span>FINDER</span></strong>
+      <small>KAI CONTACT CENTER 121</small>
+    </div>
+
+    <h1>Selamat datang.</h1>
+    <p class="login-desc">
+      Masuk untuk mengakses referensi tarif khusus kereta api.
+    </p>
+
+    <form id="loginForm" class="login-form">
+      <label for="agentId">Akun</label>
+      <input
+        id="agentId"
+        name="agentId"
+        autocomplete="username"
+        placeholder="Masukkan akun"
+        required
+      >
+
+      <label for="agentPassword">Kata sandi</label>
+      <input
+        id="agentPassword"
+        name="password"
+        type="password"
+        autocomplete="current-password"
+        placeholder="Masukkan kata sandi"
+        required
+      >
+
+      <button class="primary-button" type="submit">Masuk</button>
+      <p id="loginMessage" class="login-message" aria-live="polite"></p>
+    </form>
+
+    <div class="login-foot">
+      <span class="secure-dot"></span>
+      Khusus petugas internal KAI Contact Center 121
+    </div>
+
+    <p class="auth-notice">
+      Mode antarmuka: autentikasi server belum dikonfigurasi.
+    </p>
   </div>
 </section>
+
 <div id="appShell" class="app-shell" hidden>
   <div id="sidebarScrim" class="sidebar-scrim"></div>
   <aside id="sidebar" class="sidebar glass-panel" aria-label="Menu utama">
