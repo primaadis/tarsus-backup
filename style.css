@@ -574,3 +574,357 @@ body[data-theme="dark"]{--gold:#f47721;--gold-strong:#ff8a35;--line:rgba(244,119
     transition-duration: 300ms;
   }
 }
+
+/* =========================================================
+   TARSUS FINDER — MOBILE LOGIN REFINEMENT
+   Background video, glass panel, blue KAI + orange accent.
+   Boot screen sengaja tidak disentuh.
+   ========================================================= */
+
+.login-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding:
+    max(20px, env(safe-area-inset-top))
+    18px
+    max(20px, env(safe-area-inset-bottom));
+  overflow-x: hidden;
+  overflow-y: auto;
+  isolation: isolate;
+  background: #091827;
+  animation: tarsusLoginFadeIn 700ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.login-video {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  background: #091827;
+}
+
+.login-video-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(4, 17, 31, .65) 0%,
+      rgba(7, 25, 42, .48) 48%,
+      rgba(4, 15, 28, .76) 100%
+    ),
+    radial-gradient(
+      ellipse at 50% 20%,
+      rgba(35, 103, 150, .20),
+      transparent 65%
+    );
+}
+
+.login-panel {
+  position: relative;
+  z-index: 2;
+  width: min(390px, 100%);
+  margin: auto;
+  padding: 29px 27px;
+  border: 1px solid rgba(190, 216, 237, .25);
+  border-radius: 23px;
+  background: linear-gradient(
+    145deg,
+    rgba(11, 35, 56, .76),
+    rgba(6, 20, 36, .66)
+  );
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, .28),
+    inset 0 1px 0 rgba(255, 255, 255, .045);
+  -webkit-backdrop-filter: blur(18px) saturate(115%);
+  backdrop-filter: blur(18px) saturate(115%);
+  animation: tarsusLoginPanelIn 760ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.login-panel::before {
+  right: -95px;
+  top: -115px;
+  width: 230px;
+  height: 230px;
+  background: rgba(39, 111, 158, .12);
+  filter: blur(42px);
+}
+
+.login-brand-stacked {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  margin: 0 auto 23px;
+  text-align: center;
+}
+
+.login-brand-stacked img {
+  display: block;
+  width: 66px;
+  height: 66px;
+  margin: 0 auto 4px;
+  object-fit: contain;
+  object-position: center;
+  filter: drop-shadow(0 5px 18px rgba(0, 0, 0, .2));
+}
+
+.login-brand-stacked strong {
+  font: 800 15px/1.35 Manrope, sans-serif;
+  letter-spacing: .13em;
+}
+
+.login-brand-stacked strong span {
+  color: #f0a052;
+}
+
+.login-brand-stacked small {
+  margin-top: 2px;
+  color: rgba(219, 231, 241, .72);
+  font-size: 9px;
+  letter-spacing: .16em;
+}
+
+.login-panel h1 {
+  margin: 0 0 7px;
+  font-size: clamp(25px, 6vw, 29px);
+  line-height: 1.2;
+  letter-spacing: -.035em;
+}
+
+.login-desc {
+  margin: 0 0 23px;
+  color: rgba(216, 228, 239, .76);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.login-form {
+  display: grid;
+  gap: 9px;
+}
+
+.login-form label {
+  margin-top: 3px;
+  color: rgba(235, 242, 248, .9);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.login-form input {
+  width: 100%;
+  min-width: 0;
+  height: 48px;
+  padding: 0 14px;
+  border: 1px solid rgba(194, 216, 235, .34);
+  border-radius: 12px;
+  background: rgba(224, 239, 250, .065);
+  color: #f5f8fb;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, .08);
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.login-form input::placeholder {
+  color: rgba(198, 214, 229, .55);
+}
+
+.login-form input:focus {
+  border-color: #f0a052;
+  background: rgba(224, 239, 250, .09);
+  box-shadow: 0 0 0 3px rgba(240, 160, 82, .13);
+  outline: none;
+}
+
+.login-form .primary-button {
+  width: 100%;
+  min-height: 49px;
+  margin-top: 10px;
+  border: 1px solid rgba(255, 185, 106, .2);
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f0a052, #df812f);
+  color: #102338;
+  font-weight: 800;
+  letter-spacing: .01em;
+  box-shadow: 0 9px 24px rgba(205, 111, 38, .2);
+  transition:
+    transform 180ms ease,
+    filter 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.login-form .primary-button:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 12px 28px rgba(205, 111, 38, .27);
+}
+
+.login-form .primary-button:active {
+  transform: translateY(1px) scale(.99);
+}
+
+.login-message {
+  min-height: 0;
+  margin: 0;
+}
+
+.login-message:not(:empty) {
+  margin-top: 3px;
+}
+
+.login-foot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 21px;
+  color: rgba(221, 232, 241, .78);
+  font-size: 11px;
+  text-align: center;
+}
+
+.login-foot .secure-dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 50%;
+  background: #f0a052;
+  box-shadow: 0 0 12px rgba(240, 160, 82, .42);
+}
+
+.auth-notice {
+  margin: 10px 0 0;
+  color: rgba(195, 211, 225, .48);
+  font-size: 9px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+/* Transisi saat meninggalkan halaman login */
+.login-screen.login-leave {
+  pointer-events: none;
+  animation: tarsusLoginFadeOut 420ms ease both;
+}
+
+.login-screen.login-leave .login-panel {
+  animation: tarsusLoginPanelOut 420ms ease both;
+}
+
+#appShell.app-reveal {
+  animation: tarsusLoginFadeIn 650ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@keyframes tarsusLoginFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes tarsusLoginFadeOut {
+  from {
+    opacity: 1;
+    visibility: visible;
+  }
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes tarsusLoginPanelIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes tarsusLoginPanelOut {
+  to {
+    opacity: 0;
+    transform: translateY(-5px) scale(.99);
+  }
+}
+
+/* Optimasi layar ponsel */
+@media (max-width: 420px) {
+  .login-screen {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .login-panel {
+    width: min(360px, 100%);
+    padding: 23px 21px;
+    border-radius: 21px;
+  }
+
+  .login-brand-stacked {
+    margin-bottom: 20px;
+  }
+
+  .login-brand-stacked img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .login-desc {
+    margin-bottom: 19px;
+  }
+}
+
+/* Ponsel dengan tinggi layar terbatas */
+@media (max-height: 700px) {
+  .login-screen {
+    align-items: start;
+  }
+
+  .login-panel {
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+
+  .login-brand-stacked {
+    margin-bottom: 15px;
+  }
+
+  .login-brand-stacked img {
+    width: 52px;
+    height: 52px;
+  }
+
+  .login-desc {
+    margin-bottom: 15px;
+  }
+}
+
+/* Hormati preferensi pengurangan animasi */
+@media (prefers-reduced-motion: reduce) {
+  .login-screen,
+  .login-panel,
+  #appShell.app-reveal {
+    animation-duration: 1ms !important;
+  }
+
+  .login-form input,
+  .login-form .primary-button {
+    transition-duration: 1ms !important;
+  }
+}
