@@ -1,0 +1,1 @@
+Letakkan gambar logo.png, background.jpg, background-boot.jpg, background-animation-boot.mp4, dan iklan-1.jpg s.d iklan-5.jpg di folder ini.
