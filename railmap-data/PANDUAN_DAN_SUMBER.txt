@@ -1,0 +1,61 @@
+================================================================================
+   DOKUMENTASI KAI GIS CS & HERITAGE EXPLORER (V4.0 CINEMATIC & RESPONSIVE)
+================================================================================
+
+1. LOGIKA INTERAKSI & DUKUNGAN MOBILE (RESPONSIVE 60 FPS):
+--------------------------------------------------------------------------------
+A. Navigasi Mobile-First (HP & Tablet):
+   - Dilengkapi Mobile Bottom Sheet: Saat stasiun diklik di HP, lembar detail
+     meluncur mulus dari bawah (slide-up) dengan drag-handle khas aplikasi peta
+     modern (Apple Maps / Google Maps) tanpa merusak tampilan peta utama.
+   - Bilah Filter Horizontal (Slide-Nav): Tombol filter kategori dapat digeser
+     secara horizontal dengan sentuhan jari (smooth touch swipe 60 FPS).
+   - Sidebar slide-over dengan tombol "Katalog" di bagian atas untuk layar kecil.
+
+B. Klasifikasi Kategori & Perbedaan Warna Pin Stasiun:
+   1. Merah Crimson (Whoosh):
+      Stasiun Kereta Cepat Jakarta-Bandung (Halim, Padalarang, Tegalluar).
+   2. Kuning/Amber (Bandara & Feeder):
+      Stasiun terintegrasi bandara (YIA, Kualanamu Railink, Feeder Cimahi).
+   3. Cyan Neon (KRL / Lokal):
+      Pusat KAI Commuter Jabodetabek & Solo-Jogja (Manggarai, Bogor, Tanah Abang).
+   4. Biru Safir (KA Antarkota):
+      Pemberhentian utama KA Jarak Jauh Daop 1 Jakarta s.d. Divre IV Lampung.
+   5. Bronze/Stone Kuno (Jalur Non-Aktif / Sejarah):
+      Stasiun cagar budaya dan jalur mati legendaris (Museum Ambarawa, Bedono rel
+      gigi, Cikajang eks stasiun tertinggi +1.246 mdpl, Pangandaran lintas
+      terowongan Wilhelmina, Kudus jalur trem uap SJS, Bukittinggi Lembah Anai).
+      Lengkap dengan narasi sejarah kolonial dan elevasi mdpl.
+
+
+2. CARA MENGGANTI FOTO STASIUN DI GITHUB:
+--------------------------------------------------------------------------------
+Letakkan foto pada folder: assets/images/stations/ dengan nama ID stasiun:
+- hlm.jpg  -> Stasiun Halim Whoosh
+- abr.jpg  -> Museum Ambarawa
+- ckg.jpg  -> Eks Stasiun Cikajang
+- bdn.jpg  -> Stasiun Bedono
+- pnd.jpg  -> Eks Stasiun Pangandaran
+- yia.jpg  -> Stasiun Bandara YIA
+- mri.jpg  -> Stasiun Manggarai
+- smc.jpg  -> Stasiun Semarang Poncol
+- smt.jpg  -> Stasiun Semarang Tawang
+
+* Sistem memiliki mekanisme fail-safe: jika foto lokal belum diunggah, gambar
+  otomatis beralih ke cadangan resolusi tinggi dari Unsplash tanpa error.
+
+
+3. CARA UPLOAD KE GITHUB & HOSTING ONLINE (GITHUB PAGES):
+--------------------------------------------------------------------------------
+1. Buka terminal di folder proyek:
+   git init
+   git add .
+   git commit -m "KAI CS GIS Explorer v4.0 Cinematic Mobile-Ready"
+   git branch -M main
+   git remote add origin https://github.com/USERNAME/NAMA-REPO.git
+   git push -u origin main
+
+2. Masuk ke Settings repository di GitHub:
+   Menu: Pages -> Source: Deploy from a branch -> Branch: main -> Save.
+3. Website langsung aktif dan dapat diakses dari HP seluruh tim Customer Service.
+================================================================================
