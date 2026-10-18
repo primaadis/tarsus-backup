@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a1420">
+<meta name="description" content="K-Pedia — platform pencarian informasi perkeretaapian. Cari tarif khusus kereta api berdasarkan stasiun atau nama kereta.">
+<title>K-Pedia — Informasi Perkeretaapian</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="assets/logo.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+/* Terapkan tema, ukuran teks, dan status boot sebelum render pertama agar tidak ada kilatan. Kunci penyimpanan sama dengan app.js. */
+(function(){try{var h=document.documentElement,p=localStorage.getItem("tarsus-pref:theme")||"system",d=window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches,v=p==="light"?"light":p==="dark"?"dark":(d?"dark":"light");h.dataset.theme=v;h.dataset.font=localStorage.getItem("tarsus-pref:fontSize")||"normal";if(sessionStorage.getItem("kp-booted"))h.classList.add("no-boot");var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",v==="light"?"#f4f6f9":"#0a1420");}catch(e){}})();
+</script>
+</head>
+<body data-theme="dark">
+<script>try{document.body.dataset.theme=document.documentElement.dataset.theme||"dark";}catch(e){}</script>
+<noscript><p style="margin:0;padding:16px;text-align:center">K-Pedia memerlukan JavaScript. Aktifkan JavaScript di browser lalu muat ulang halaman.</p></noscript>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></symbol>
+<symbol id="i-train" viewBox="0 0 24 24"><rect x="5" y="2.5" width="14" height="17" rx="3"/><path d="M8 7h8M8 11h8m-7 8-2 3m8-3 2 3"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9z"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></symbol>
+<symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+<symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4M16 8l4 4-4 4M20 12H9"/></symbol>
+<symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+<symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+<symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 6.1A9.8 9.8 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.7C3.9 8.6 2 12 2 12s3.5 7 10 7c1.7 0 3.2-.4 4.5-1M9.9 9.9a3 3 0 0 0 4.2 4.2"/></symbol>
+<symbol id="i-swap" viewBox="0 0 24 24"><path d="M7 4v16m0-16-3 3m3-3 3 3M17 20V4m0 16-3-3m3 3 3-3"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></symbol>
+<symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+</defs></svg>
+
+<div id="bootScreen" class="boot-screen" aria-hidden="true"><img class="boot-logo" src="assets/logo-boot.png" alt="Logo K-Pedia" onerror="this.onerror=null;this.src='assets/logo.png'"><div class="boot-bar"><span></span></div></div>
+
+<section id="loginScreen" class="login-screen" hidden>
+  <div class="login-visual">
+    <video class="login-video" autoplay muted loop playsinline preload="metadata" poster="assets/background-boot.jpg" aria-hidden="true"><source src="assets/background-animation-boot.mp4" type="video/mp4"></video>
+    <div class="login-video-shade" aria-hidden="true"></div>
+    <div class="login-visual-inner">
+      <div class="visual-brand"><img src="assets/logo.png" alt=""><span class="brand-name">K-<span>Pedia</span></span></div>
+      <div><h2 class="login-tagline">Tarif khusus kereta api, mudah dicari.</h2><svg class="rail" viewBox="0 0 480 120" aria-hidden="true" focusable="false"><path class="rail-base" d="M10 90C120 90 140 30 240 30S380 90 470 90"/><path class="rail-draw" pathLength="1" d="M10 90C120 90 140 30 240 30S380 90 470 90"/><circle class="rail-st" cx="10" cy="90" r="7"/><circle class="rail-st" cx="240" cy="30" r="7"/><circle class="rail-st" cx="470" cy="90" r="7"/><circle class="rail-train" r="5" opacity="0"><set attributeName="opacity" to="1" begin="3s"/><animateMotion dur="7s" begin="3s" repeatCount="indefinite" path="M10 90C120 90 140 30 240 30S380 90 470 90"/></circle></svg></div>
+      <div class="login-foot"><span class="secure-dot"></span>Referensi informasi perkeretaapian</div>
+    </div>
+  </div>
+
+  <div class="login-panel">
+    <div class="login-brand"><img src="assets/logo.png" alt="Logo K-Pedia"><div><span class="brand-name">K-<span>Pedia</span></span><small>Informasi perkeretaapian</small></div></div>
+    <h1>Selamat datang</h1>
+    <p class="login-desc">Masuk untuk mencari tarif khusus kereta api.</p>
+    <form id="loginForm" class="login-form">
+      <label for="agentId">Akun</label>
+      <input id="agentId" name="agentId" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Masukkan akun" required>
+      <label for="agentPassword">Kata sandi</label>
+      <div class="field">
+        <input id="agentPassword" name="password" type="password" autocomplete="current-password" placeholder="Masukkan kata sandi" required>
+        <button id="togglePassword" class="pw-toggle" type="button" aria-label="Tampilkan kata sandi"><svg class="ic" aria-hidden="true"><use href="#i-eye"/></svg></button>
+      </div>
+      <button class="primary-button" type="submit">Masuk</button>
+      <p id="loginMessage" class="login-message" aria-live="polite"></p>
+    </form>
+  </div>
+</section>
+
+<div id="appShell" class="app-shell" hidden>
+  <div id="sidebarScrim" class="sidebar-scrim"></div>
+  <aside id="sidebar" class="sidebar" aria-label="Menu utama">
+    <div class="side-brand"><img src="assets/logo.png" alt=""><div><strong>K-<span>Pedia</span></strong><small>Informasi perkeretaapian</small></div><button id="closeSidebar" class="icon-btn side-close" type="button" aria-label="Tutup menu"><svg class="ic" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+    <div class="side-profile"><div class="profile-info"><strong id="profileName">Petugas</strong><small>Akun personal</small></div></div>
+    <nav class="side-nav">
+      <button class="nav-link" data-page="home"><svg class="ic" aria-hidden="true"><use href="#i-home"/></svg><span>Beranda</span></button>
+      <div class="nav-group-label">Pencarian</div>
+      <button class="nav-link" data-page="search"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg><span>Cari berdasarkan rute</span></button>
+      <button class="nav-link" data-page="trains"><svg class="ic" aria-hidden="true"><use href="#i-train"/></svg><span>Cari berdasarkan kereta</span></button>
+      <button class="nav-link" data-page="stations"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg><span>Direktori stasiun</span></button>
+      <button class="nav-link" data-page="favorites"><svg class="ic" aria-hidden="true"><use href="#i-star"/></svg><span>Favorit</span><span id="favoriteCount" class="nav-badge" hidden>0</span></button>
+      <button class="nav-link" data-page="history"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg><span>Riwayat pencarian</span></button>
+      <div class="nav-group-label">Lainnya</div>
+      <button class="nav-link" data-page="guide"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg><span>Panduan penggunaan</span></button>
+      <button class="nav-link" data-page="help"><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg><span>Kritik dan saran</span></button>
+      <button class="nav-link" data-page="settings"><svg class="ic" aria-hidden="true"><use href="#i-sliders"/></svg><span>Pengaturan</span></button>
+    </nav>
+    <div class="side-bottom"><button id="exitAppButton" class="logout-link" type="button"><svg class="ic" aria-hidden="true"><use href="#i-logout"/></svg><span>Keluar aplikasi</span></button><div class="side-version"><span style="display:flex;align-items:center;gap:8px"><span class="presence-dot" id="dbDot" role="img" aria-label="Status data"></span>K-Pedia</span><span id="appVersion">v5.1.0</span></div><span id="dbStatus" hidden></span><span id="dbStatusDetail" hidden></span></div>
+  </aside>
+
+  <div class="main-area">
+    <header class="topbar"><div class="topbar-leading"><button id="openSidebar" class="icon-btn menu-btn" type="button" aria-label="Buka menu"><svg class="ic" aria-hidden="true"><use href="#i-menu"/></svg></button><div class="crumb"><span>K-Pedia</span><i>/</i><strong id="pageCrumb">Beranda</strong></div></div><div class="topbar-actions"><button id="accountButton" class="account-button" type="button"><span id="topAccountName">Petugas</span><svg class="ic ic-sm" aria-hidden="true"><use href="#i-chevron-down"/></svg></button></div></header>
+    <main id="mainContent" class="main-content">
+
+      <section class="page active" id="page-home">
+        <section class="hero"><h1>Tarif khusus kereta api, mudah dicari.</h1><p>Pilih cara pencarian yang kamu butuhkan.</p><svg class="rail" viewBox="0 0 480 120" aria-hidden="true" focusable="false"><path class="rail-base" d="M10 90C120 90 140 30 240 30S380 90 470 90"/><path class="rail-draw" pathLength="1" d="M10 90C120 90 140 30 240 30S380 90 470 90"/><circle class="rail-st" cx="10" cy="90" r="7"/><circle class="rail-st" cx="240" cy="30" r="7"/><circle class="rail-st" cx="470" cy="90" r="7"/><circle class="rail-train" r="5" opacity="0"><set attributeName="opacity" to="1" begin="3s"/><animateMotion dur="7s" begin="3s" repeatCount="indefinite" path="M10 90C120 90 140 30 240 30S380 90 470 90"/></circle></svg></section>
+        <div class="kp-modes">
+          <button class="kp-mode" data-go="search" type="button"><span class="kp-mode-icon"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg></span><span class="kp-mode-text"><strong>Cari berdasarkan rute</strong><small>Masukkan stasiun asal dan tujuan</small></span><span class="kp-mode-go" aria-hidden="true"><svg class="ic" aria-hidden="true"><use href="#i-chevron"/></svg></span></button>
+          <button class="kp-mode" data-go="trains" type="button"><span class="kp-mode-icon"><svg class="ic" aria-hidden="true"><use href="#i-train"/></svg></span><span class="kp-mode-text"><strong>Cari berdasarkan kereta</strong><small>Pilih nama kereta, lihat semua relasinya</small></span><span class="kp-mode-go" aria-hidden="true"><svg class="ic" aria-hidden="true"><use href="#i-chevron"/></svg></span></button>
+        </div>
+        <div class="kp-shortcuts"><button data-go="stations" type="button"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg>Direktori stasiun</button><button data-go="favorites" type="button"><svg class="ic" aria-hidden="true"><use href="#i-star"/></svg>Favorit</button><button data-go="history" type="button"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>Riwayat</button></div>
+        <section class="home-section"><div class="section-head"><h2>Pencarian terakhir</h2><button class="quiet-link" data-go="history" type="button">Lihat semua</button></div><div id="homeRecent" class="compact-list"><div class="list-placeholder">Riwayat pencarian akan muncul di sini.</div></div></section>
+        <section class="home-section"><div class="section-head"><h2>Informasi terbaru</h2><span class="hint">Geser untuk melihat</span></div><div id="adCarousel" class="ad-carousel" aria-label="Poster informasi"><button class="ad-card" data-ad="0" type="button"><img src="assets/iklan-1.jpg" alt="Poster informasi 1" loading="lazy"><span>Informasi 01</span></button><button class="ad-card" data-ad="1" type="button"><img src="assets/iklan-2.jpg" alt="Poster informasi 2" loading="lazy"><span>Informasi 02</span></button><button class="ad-card" data-ad="2" type="button"><img src="assets/iklan-3.jpg" alt="Poster informasi 3" loading="lazy"><span>Informasi 03</span></button><button class="ad-card" data-ad="3" type="button"><img src="assets/iklan-4.jpg" alt="Poster informasi 4" loading="lazy"><span>Informasi 04</span></button><button class="ad-card" data-ad="4" type="button"><img src="assets/iklan-5.jpg" alt="Poster informasi 5" loading="lazy"><span>Informasi 05</span></button></div></section>
+        <div class="home-note"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg><div><strong>Tarif dapat berubah</strong>Tarif khusus dapat berubah sewaktu-waktu. Pastikan kembali ke sumber resmi dan ketentuan yang berlaku sebelum menggunakan informasi ini.</div></div>
+      </section>
+
+      <section class="page" id="page-search">
+        <div class="kp-seg" role="group" aria-label="Mode pencarian"><button type="button" data-page="search">Rute</button><button type="button" data-page="trains">Kereta</button></div>
+        <div class="page-heading"><div><h1>Cari tarif berdasarkan rute</h1><p>Masukkan stasiun asal dan tujuan untuk menemukan relasi tarif yang sesuai.</p></div></div>
+        <form id="searchForm" class="search-panel" autocomplete="off">
+          <div class="search-panel-top"><span class="panel-symbol"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg></span><div><h2>Rute perjalanan</h2><p>Pilih nama stasiun yang muncul pada saran.</p></div></div>
+          <div class="station-fields">
+            <div class="field-wrap"><label for="origin">Stasiun asal</label><div class="station-input"><span class="station-dot origin-dot"></span><input id="origin" placeholder="Ketik nama stasiun" autocomplete="off" aria-autocomplete="list" aria-controls="originSuggestions"><button id="clearOrigin" class="clear-input" type="button" hidden aria-label="Hapus asal"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-close"/></svg></button></div><div id="originSuggestions" class="suggestions" role="listbox" hidden></div></div>
+            <button id="swapStations" class="swap-btn" type="button" aria-label="Tukar stasiun"><svg class="ic" aria-hidden="true"><use href="#i-swap"/></svg></button>
+            <div class="field-wrap"><label for="destination">Stasiun tujuan</label><div class="station-input"><span class="station-dot dest-dot"></span><input id="destination" placeholder="Ketik nama stasiun" autocomplete="off" aria-autocomplete="list" aria-controls="destinationSuggestions"><button id="clearDestination" class="clear-input" type="button" hidden aria-label="Hapus tujuan"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-close"/></svg></button></div><div id="destinationSuggestions" class="suggestions" role="listbox" hidden></div></div>
+          </div>
+          <div class="form-foot"><span>Pencarian mengikuti aturan relasi dan arah tarif di database.</span><button id="resetSearch" class="quiet-link" type="button">Reset</button></div>
+          <button id="searchButton" class="primary-button search-submit" type="submit"><span class="submit-text">Cari tarif</span></button>
+          <p id="searchMessage" class="inline-message" aria-live="polite" hidden></p>
+        </form>
+        <div class="results-heading"><h2>Relasi yang ditemukan</h2><p id="resultsSummary">Hasil tarif akan ditampilkan di sini.</p></div>
+        <div id="results" class="results-list"><div class="empty-state"><span class="empty-symbol"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg></span><h3>Siap mencari tarif</h3><p>Masukkan stasiun asal dan tujuan, lalu tekan Cari tarif untuk menampilkan referensi yang sesuai.</p></div></div>
+      </section>
+
+      <section class="page" id="page-trains">
+        <div class="kp-seg" role="group" aria-label="Mode pencarian"><button type="button" data-page="search">Rute</button><button type="button" data-page="trains">Kereta</button></div>
+        <div class="page-heading"><div><h1>Cari tarif berdasarkan kereta</h1><p>Pilih nama kereta untuk melihat semua relasi tarif khusus yang tercatat.</p></div></div>
+        <div class="tool-search"><span class="tool-search-icon"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg></span><input id="trainFilter" placeholder="Cari nama kereta..." aria-label="Cari nama kereta"></div>
+        <div id="trainList" class="directory-list"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
+      </section>
+
+      <section class="page" id="page-stations">
+        <div class="page-heading"><div><h1>Direktori stasiun</h1><p>Telusuri stasiun aktif berdasarkan wilayah Daop atau Divre.</p></div></div>
+        <div class="directory-tools"><div class="tool-search"><span class="tool-search-icon"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg></span><input id="stationFilter" placeholder="Cari nama stasiun..." aria-label="Cari stasiun"></div><select id="divisionFilter" class="glass-select" aria-label="Filter Daop atau Divre"><option value="">Semua Daop / Divre</option></select></div>
+        <div id="stationList" class="directory-list"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
+      </section>
+
+      <section class="page" id="page-favorites">
+        <div class="page-heading"><div><h1>Favorit</h1><p>Simpan relasi penting agar lebih cepat ditemukan kembali.</p></div></div>
+        <div id="favoritesList" class="directory-list"><div class="empty-state"><span class="empty-symbol"><svg class="ic" aria-hidden="true"><use href="#i-star"/></svg></span><h3>Belum ada favorit</h3><p>Simpan hasil pencarian menggunakan ikon bintang.</p></div></div>
+      </section>
+
+      <section class="page" id="page-history">
+        <div class="page-heading"><div><h1>Riwayat pencarian</h1><p>Pencarian sebelumnya tersimpan secara lokal untuk akun ini pada perangkat ini.</p></div><button id="clearHistory" class="secondary-button" type="button">Hapus riwayat</button></div>
+        <div id="historyList" class="directory-list"><div class="list-placeholder">Belum ada riwayat.</div></div>
+      </section>
+
+      <section class="page" id="page-guide">
+        <div class="page-heading"><div><h1>Panduan penggunaan</h1><p>Langkah singkat untuk mendapatkan referensi yang sesuai.</p></div></div>
+        <div class="guide-grid">
+          <article class="guide-card"><span>01</span><h3>Cari berdasarkan stasiun</h3><p>Pilih stasiun asal dan tujuan dari saran nama stasiun, lalu jalankan pencarian.</p></article>
+          <article class="guide-card"><span>02</span><h3>Cari berdasarkan kereta</h3><p>Buka Tarif per Kereta, pilih nama KA, lalu tinjau seluruh relasi khusus yang tercatat.</p></article>
+          <article class="guide-card"><span>03</span><h3>Periksa arah dan kelas</h3><p>Perhatikan relasi, ketentuan arah perjalanan, dan harga kelas yang tersedia.</p></article>
+          <article class="guide-card"><span>04</span><h3>Simpan yang sering dipakai</h3><p>Gunakan ikon bintang untuk menyimpan hasil ke favorit pribadi.</p></article>
+        </div>
+        <div class="notice-panel"><strong>Penting: tarif khusus dapat berubah</strong><p>Data tarif dan relasi dapat berubah sewaktu-waktu sesuai ketentuan operasional. Periksa pembaruan secara berkala dan pastikan kembali ke sumber resmi atau ketentuan yang berlaku sebelum menggunakan atau menyampaikan informasi ini.</p></div>
+      </section>
+
+      <section class="page" id="page-help">
+        <div class="page-heading"><div><h1>Kritik dan saran</h1><p>Masukan membantu pengembangan K-Pedia.</p></div></div>
+        <article class="developer-card"><img class="developer-photo" src="assets/pengembang.jpg" alt="Foto pengembang" onerror="this.style.display='none'"><div class="developer-bio"><span class="eyebrow">Pengembang</span><h2>Prima Adi Saputra</h2><p>Pengembangan K-Pedia, platform pencarian informasi perkeretaapian yang dimulai dari referensi tarif khusus kereta api.</p><div class="developer-socials"><a href="https://instagram.com/prima_adis" target="_blank" rel="noopener noreferrer">Instagram <span>@prima_adis</span><svg class="ic ic-sm" aria-hidden="true"><use href="#i-external"/></svg></a><a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer">LinkedIn <span>Lihat LinkedIn</span><svg class="ic ic-sm" aria-hidden="true"><use href="#i-external"/></svg></a></div></div></article>
+        <div class="support-intro"><h2>Ada koreksi atau saran?</h2><p>Jika menemukan data yang perlu diperiksa, kendala fitur, atau ide pengembangan, kirimkan rincian agar mudah ditindaklanjuti.</p></div>
+        <a class="support-link" href="mailto:primaadis46@gmail.com?subject=Kritik%20dan%20Saran%20K-Pedia"><span class="support-link-icon"><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg></span><span><strong>Kirim email pengembang</strong><small>primaadis46@gmail.com</small></span><span class="support-open">Kirim</span></a>
+        <p class="support-note">Untuk laporan data, sertakan nama kereta, relasi, kelas tarif, dan waktu pengecekan. Jangan menyertakan data pribadi pelanggan.</p>
+      </section>
+
+      <section class="page" id="page-settings">
+        <div class="page-heading"><div><h1>Pengaturan</h1><p>Atur tampilan aplikasi dan kelola data pencarian di perangkat ini.</p></div></div>
+        <div class="settings-stack">
+          <section class="settings-group"><div class="settings-group-title"><span class="settings-group-icon"><svg class="ic" aria-hidden="true"><use href="#i-sun"/></svg></span><div><h2>Tampilan</h2><p>Sesuaikan kenyamanan membaca.</p></div></div>
+            <div class="setting-row"><div><strong>Mode warna</strong><p>Pilih mode terang atau gelap.</p></div><select id="themeSetting" class="setting-select" aria-label="Mode warna"><option value="system">Ikuti perangkat</option><option value="light">Terang</option><option value="dark">Gelap</option></select></div>
+            <div class="setting-row"><div><strong>Ukuran teks</strong><p>Sesuaikan ukuran tulisan.</p></div><select id="fontSizeSetting" class="setting-select" aria-label="Ukuran teks"><option value="xsmall">Sangat kecil</option><option value="small">Kecil</option><option value="normal">Standar</option><option value="large">Besar</option><option value="xlarge">Sangat besar</option></select></div>
+          </section>
+          <section class="settings-group"><div class="settings-group-title"><span class="settings-group-icon"><svg class="ic" aria-hidden="true"><use href="#i-trash"/></svg></span><div><h2>Bersihkan data</h2><p>Hapus riwayat pencarian atau daftar favorit yang tersimpan di perangkat ini.</p></div></div>
+            <div class="setting-row"><div><strong>Riwayat pencarian</strong><p>Hapus daftar pencarian sebelumnya.</p></div><button id="clearHistorySetting" class="setting-action setting-danger" type="button">Hapus riwayat</button></div>
+            <div class="setting-row"><div><strong>Favorit</strong><p>Hapus semua relasi yang tersimpan.</p></div><button id="clearFavoritesSetting" class="setting-action setting-danger" type="button">Hapus favorit</button></div>
+            <div class="setting-row"><div><strong>Sesi akun</strong><p>Keluar dari akun K-Pedia.</p></div><button id="logoutButton" class="setting-action setting-danger" type="button">Logout</button></div>
+          </section>
+        </div>
+      </section>
+
+      <footer class="app-footer"><span>K-Pedia <i>·</i> Informasi perkeretaapian</span><span id="footerDataStatus">Menyiapkan database</span></footer>
+    </main>
+  </div>
+</div>
+
+<div id="adModal" class="ad-modal" hidden role="dialog" aria-modal="true" aria-labelledby="adModalTitle"><div class="ad-modal-backdrop" data-close-ad></div><div class="ad-modal-panel"><button class="ad-modal-close" type="button" data-close-ad aria-label="Tutup informasi"><svg class="ic" aria-hidden="true"><use href="#i-close"/></svg></button><img id="adModalImage" src="" alt="Poster informasi lengkap"><div class="ad-modal-copy"><h2 id="adModalTitle">Informasi</h2><p id="adModalDescription" hidden></p></div></div></div>
+<div id="themeTransition" class="theme-transition-orb" hidden aria-hidden="true"></div><div id="toastRegion" class="toast-region" aria-live="polite"></div>
+<script src="data.js"></script><script src="app.js"></script><script src="railmap-data/data-stations.js"></script><script>window.KP_STATIONS=stationsData;</script><script src="kaipedia.js"></script>
+</body>
+</html>
