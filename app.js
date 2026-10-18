@@ -1439,9 +1439,35 @@ document.addEventListener(
   init,
   { once: true }
 );
-// Tambahkan di dalam fungsi pergantian halaman (navigate / showPage) di app.js:
-if (pageId === 'map') {
-  if (typeof window.initGisMap === 'function') {
-    window.initGisMap();
+/* =========================================================
+   INTEGRASI PETA KAIPEDIA & NAVIGASI PINTAS
+   ========================================================= */
+
+// Fungsi agar tombol Beranda bisa langsung loncat ke halaman tujuan
+window.navigatePage = function(pageId) {
+  const targetNavBtn = document.querySelector(`.nav-link[data-page="${pageId}"]`);
+  if (targetNavBtn) {
+    targetNavBtn.click();
+  } else {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById(`page-${pageId}`);
+    if (target) target.classList.add('active');
   }
-}
+
+  // Jika yang dibuka adalah menu peta, jalankan mesin peta Leaflet
+  if (pageId === 'map' && typeof window.initGisMap === 'function') {
+    setTimeout(window.initGisMap, 100);
+  }
+};
+
+// Pastikan saat menu samping (sidebar) 'Peta GIS' diklik, peta langsung di-render
+document.addEventListener('DOMContentLoaded', function() {
+  const mapNavBtn = document.querySelector('.nav-link[data-page="map"]');
+  if (mapNavBtn) {
+    mapNavBtn.addEventListener('click', function() {
+      if (typeof window.initGisMap === 'function') {
+        setTimeout(window.initGisMap, 150);
+      }
+    });
+  }
+});
