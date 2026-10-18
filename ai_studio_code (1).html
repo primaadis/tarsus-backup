@@ -1,0 +1,742 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#071526">
+  <meta name="description" content="KAIPEDIA — Portal Geospasial, Tarif Khusus, Direktori Stasiun & Ensiklopedia Perkeretaapian Indonesia.">
+  <title>KAIPEDIA — Hub Informasi Perkeretaapian</title>
+  
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+
+  <!-- Typography: Plus Jakarta Sans & Sora -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Leaflet GIS CSS & FontAwesome Icons -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <link rel="stylesheet" href="style.css">
+
+  <script>
+    (function(){
+      try{
+        var h=document.documentElement,
+            p=localStorage.getItem("tarsus-pref:theme")||"dark",
+            f=localStorage.getItem("tarsus-pref:fontSize")||"normal";
+        h.dataset.theme=p;
+        h.dataset.font=f;
+        if(sessionStorage.getItem("kp-booted")) h.classList.add("no-boot");
+      }catch(e){}
+    })();
+  </script>
+</head>
+<body data-theme="dark">
+
+<!-- SVG Sprite Icons -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></symbol>
+  <symbol id="i-train" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="16" rx="3"/><path d="M4 11h16M8 3v8m8-8v8m-6 8-2 3m6-3 2 3"/><circle cx="8" cy="15" r="1"/><circle cx="16" cy="15" r="1"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><line x1="4" x2="14" y1="6" y2="6"/><line x1="18" x2="20" y1="6" y2="6"/><line x1="4" x2="8" y1="12" y2="12"/><line x1="12" x2="20" y1="12" y2="12"/><line x1="4" x2="16" y1="18" y2="18"/><line x1="20" x2="20" y1="18" y2="18"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+  <symbol id="i-swap" viewBox="0 0 24 24"><path d="m16 3 4 4-4 4M20 7H4M8 21l-4-4 4-4M4 17h16"/></symbol>
+  <symbol id="i-chevron-right" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></symbol>
+  <symbol id="i-external" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></symbol>
+</defs></svg>
+
+<!-- Cinematic Boot Screen -->
+<div id="bootScreen" class="boot-screen" aria-hidden="true">
+  <div class="boot-glow"></div>
+  <img class="boot-logo" src="assets/logo-boot.png" alt="KAIPEDIA" onerror="this.onerror=null;this.src='assets/logo.png'">
+  <div class="boot-bar"><span></span></div>
+  <p class="boot-caption">Memuat Sistem Informasi Perkeretaapian...</p>
+</div>
+
+<!-- Login Prototype Modal -->
+<section id="loginScreen" class="login-screen" hidden>
+  <div class="login-backdrop"></div>
+  <div class="login-panel">
+    <div class="login-brand">
+      <img src="assets/logo.png" alt="KAIPEDIA">
+      <div>
+        <span class="brand-title">KAI<span>PEDIA</span></span>
+        <small>Portal Petugas & Layanan Pelanggan</small>
+      </div>
+    </div>
+    <h2>Masuk Sistem</h2>
+    <p class="login-desc">Gunakan akun terdaftar untuk sinkronisasi tarif & preferensi.</p>
+    <form id="loginForm" class="login-form">
+      <label for="agentId">ID Petugas</label>
+      <input id="agentId" name="agentId" placeholder="Contoh: admin" required autocomplete="username">
+      <label for="agentPassword">Kata Sandi</label>
+      <input id="agentPassword" name="password" type="password" placeholder="••••••••" required autocomplete="current-password">
+      <button class="kp-btn-primary" type="submit">Buka Aplikasi</button>
+      <p id="loginMessage" class="login-message" aria-live="polite"></p>
+    </form>
+  </div>
+</section>
+
+<!-- Shell Aplikasi Utama -->
+<div id="appShell" class="app-shell" hidden>
+  <div id="sidebarScrim" class="sidebar-scrim"></div>
+
+  <!-- Sidebar Navigasi Bersih & Rapi -->
+  <aside id="sidebar" class="sidebar" aria-label="Menu Utama">
+    <div class="side-brand">
+      <img src="assets/logo.png" alt="Logo KAIPEDIA">
+      <div>
+        <strong>KAI<span>PEDIA</span></strong>
+        <small>Rail GIS & Tariff Engine</small>
+      </div>
+      <button id="closeSidebar" class="side-close-btn" type="button" aria-label="Tutup Menu">
+        <svg class="ic"><use href="#i-close"/></svg>
+      </button>
+    </div>
+
+    <div class="side-profile">
+      <div class="profile-avatar"><i class="fa-solid fa-user-shield"></i></div>
+      <div class="profile-info">
+        <strong id="profileName">Petugas KAI</strong>
+        <span class="presence-tag"><span class="presence-dot is-ready"></span> Online</span>
+      </div>
+    </div>
+
+    <nav class="side-nav">
+      <div class="nav-section-title">Eksplorasi</div>
+      <button class="nav-link active" data-page="home">
+        <svg class="ic"><use href="#i-home"/></svg><span>Beranda</span>
+      </button>
+      <button class="nav-link" data-page="map">
+        <svg class="ic"><use href="#i-map"/></svg><span>Peta GIS & Jalur</span>
+        <span class="nav-badge-pill">GIS</span>
+      </button>
+      <button class="nav-link" data-page="stations">
+        <svg class="ic"><use href="#i-pin"/></svg><span>Direktori Stasiun</span>
+      </button>
+
+      <div class="nav-section-title">Tarif Khusus</div>
+      <button class="nav-link" data-page="search">
+        <svg class="ic"><use href="#i-search"/></svg><span>Cari Berdasarkan Rute</span>
+      </button>
+      <button class="nav-link" data-page="trains">
+        <svg class="ic"><use href="#i-train"/></svg><span>Cari Berdasarkan Kereta</span>
+      </button>
+
+      <div class="nav-section-title">Aktivitas Saya</div>
+      <button class="nav-link" data-page="favorites">
+        <svg class="ic"><use href="#i-star"/></svg><span>Favorit Tersimpan</span>
+        <span id="favoriteCount" class="nav-badge" hidden>0</span>
+      </button>
+      <button class="nav-link" data-page="history">
+        <svg class="ic"><use href="#i-clock"/></svg><span>Riwayat Pencarian</span>
+      </button>
+
+      <div class="nav-section-title">Informasi & Bantuan</div>
+      <button class="nav-link" data-page="guide">
+        <svg class="ic"><use href="#i-info"/></svg><span>Panduan & Aturan</span>
+      </button>
+      <button class="nav-link" data-page="help">
+        <svg class="ic"><use href="#i-mail"/></svg><span>Kritik & Pengembang</span>
+      </button>
+      <button class="nav-link" data-page="settings">
+        <svg class="ic"><use href="#i-sliders"/></svg><span>Pengaturan</span>
+      </button>
+    </nav>
+
+    <div class="side-bottom">
+      <button id="exitAppButton" class="side-logout-btn" type="button">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        <span>Keluar Sesi</span>
+      </button>
+      <div class="side-version-tag">
+        <span>KAIPEDIA Pro GIS</span>
+        <span id="appVersion">v5.2.0</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <div class="main-area">
+    <!-- Topbar Glass -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button id="openSidebar" class="icon-btn" type="button" aria-label="Buka Menu">
+          <svg class="ic"><use href="#i-menu"/></svg>
+        </button>
+        <div class="breadcrumb">
+          <span class="crumb-root">KAIPEDIA</span>
+          <span class="crumb-separator">/</span>
+          <strong id="pageCrumb" class="crumb-current">Beranda</strong>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button onclick="navigatePage('map')" class="topbar-chip-btn" title="Buka Peta">
+          <i class="fa-solid fa-map-location-dot"></i>
+          <span>Peta Jalur</span>
+        </button>
+        <button id="accountButton" class="topbar-user" type="button">
+          <span id="topAccountName">Petugas</span>
+          <i class="fa-solid fa-angle-down"></i>
+        </button>
+      </div>
+    </header>
+
+    <main id="mainContent" class="main-content">
+      
+      <!-- ================= PAGE: BERANDA ================= -->
+      <section class="page active" id="page-home">
+        <div class="hero-banner">
+          <div class="hero-content">
+            <span class="hero-tag"><i class="fa-solid fa-bolt"></i> Integrated Railway Intelligence</span>
+            <h1>Tarif Khusus & Informasi Jalur Kereta Api Indonesia.</h1>
+            <p>Pusat pencarian tarif go-show, peta geospasial lintasan aktif & heritage, hingga profil stasiun terlengkap.</p>
+            <div class="hero-actions">
+              <button class="kp-btn-primary" onclick="navigatePage('search')">
+                <svg class="ic"><use href="#i-search"/></svg> Cari Tiket Go-Show
+              </button>
+              <button class="kp-btn-glass" onclick="navigatePage('map')">
+                <svg class="ic"><use href="#i-map"/></svg> Buka Peta Rel GIS
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mode Utama Grid -->
+        <div class="hub-grid">
+          <div class="hub-card" onclick="navigatePage('search')">
+            <div class="hub-icon-wrap"><svg class="ic"><use href="#i-pin"/></svg></div>
+            <div class="hub-meta">
+              <strong>Tarif per Rute</strong>
+              <small>Cari tarif khusus dari stasiun asal ke tujuan</small>
+            </div>
+            <svg class="ic hub-go"><use href="#i-chevron-right"/></svg>
+          </div>
+
+          <div class="hub-card" onclick="navigatePage('trains')">
+            <div class="hub-icon-wrap"><svg class="ic"><use href="#i-train"/></svg></div>
+            <div class="hub-meta">
+              <strong>Tarif per Nama Kereta</strong>
+              <small>Daftar seluruh relasi tarif parsial tiap KA</small>
+            </div>
+            <svg class="ic hub-go"><use href="#i-chevron-right"/></svg>
+          </div>
+
+          <div class="hub-card" onclick="navigatePage('map')">
+            <div class="hub-icon-wrap hub-icon-map"><svg class="ic"><use href="#i-map"/></svg></div>
+            <div class="hub-meta">
+              <strong>Peta GIS Jawa & Sumatera</strong>
+              <small>Titik stasiun aktif, Whoosh, & cagar budaya</small>
+            </div>
+            <svg class="ic hub-go"><use href="#i-chevron-right"/></svg>
+          </div>
+
+          <div class="hub-card" onclick="navigatePage('stations')">
+            <div class="hub-icon-wrap"><i class="fa-solid fa-archway"></i></div>
+            <div class="hub-meta">
+              <strong>Direktori Stasiun</strong>
+              <small>Daftar stasiun per wilayah operasional Daop/Divre</small>
+            </div>
+            <svg class="ic hub-go"><use href="#i-chevron-right"/></svg>
+          </div>
+        </div>
+
+        <!-- Carousel Informasi & Pengumuman Resmi KAI -->
+        <section class="home-section">
+          <div class="section-header">
+            <div>
+              <h2>Informasi & Program Resmi KAI</h2>
+              <p>Program layanan terbaru, loyalty point, dan kabar operasional.</p>
+            </div>
+            <span class="carousel-indicator" id="adIndicator">1 / 5</span>
+          </div>
+
+          <div class="promo-carousel-container">
+            <div id="promoCarousel" class="promo-carousel">
+              <!-- Item 1: enterTrain -->
+              <div class="promo-card" data-ad="0">
+                <div class="promo-img-wrap"><img src="assets/iklan-1.jpg" alt="enterTrain KAI" loading="lazy"></div>
+                <div class="promo-body">
+                  <span class="promo-kicker">Layanan On-Board</span>
+                  <h3>Meet enterTrain: Hiburan Tanpa Kuota</h3>
+                  <p>Streaming film dan musik lokal gratis di dalam perjalanan kereta api jarak jauh.</p>
+                  <button class="promo-btn" type="button">Lihat Rincian</button>
+                </div>
+              </div>
+              <!-- Item 2: Railpoin di KAI Services -->
+              <div class="promo-card" data-ad="1">
+                <div class="promo-img-wrap"><img src="assets/iklan-2.jpg" alt="Railpoin KAI Services" loading="lazy"></div>
+                <div class="promo-body">
+                  <span class="promo-kicker">Loyalty Program</span>
+                  <h3>Railpoin Kini Bisa di Loko Cafe</h3>
+                  <p>Gunakan poin perjalanan untuk kulineran di Kereta Makan & Dining Car Whoosh.</p>
+                  <button class="promo-btn" type="button">Lihat Rincian</button>
+                </div>
+              </div>
+              <!-- Item 3: SOP Gempa Bumi -->
+              <div class="promo-card" data-ad="2">
+                <div class="promo-img-wrap"><img src="assets/iklan-3.jpg" alt="SOP Gempa KAI" loading="lazy"></div>
+                <div class="promo-body">
+                  <span class="promo-kicker">Keselamatan Operasional</span>
+                  <h3>Kenapa Kereta Berhenti Saat Gempa?</h3>
+                  <p>Mengenal protokol inspeksi prasarana jalur rel dan jembatan pasca lindu demi keamanan.</p>
+                  <button class="promo-btn" type="button">Pelajari SOP</button>
+                </div>
+              </div>
+              <!-- Item 4: Giveaway Synchronize -->
+              <div class="promo-card" data-ad="3">
+                <div class="promo-img-wrap"><img src="assets/iklan-4.jpg" alt="Giveaway Synchronize Fest" loading="lazy"></div>
+                <div class="promo-body">
+                  <span class="promo-kicker">Special Event</span>
+                  <h3>Giveaway Tiket 3 Day Pass</h3>
+                  <p>Ikuti aktivasi aplikasi Access by KAI dan raih kesempatan nonton Synchronize Fest 2026.</p>
+                  <button class="promo-btn" type="button">Syarat & Ketentuan</button>
+                </div>
+              </div>
+              <!-- Item 5: Rebranding KA Muria -->
+              <div class="promo-card" data-ad="4">
+                <div class="promo-img-wrap"><img src="assets/iklan-5.jpg" alt="Rebranding Kereta" loading="lazy"></div>
+                <div class="promo-body">
+                  <span class="promo-kicker">Identitas Baru</span>
+                  <h3>Menyambut Identitas Baru: KA Muria</h3>
+                  <p>Pemberian identitas nama baru armada kereta api mulai 1 Oktober 2026.</p>
+                  <button class="promo-btn" type="button">Rute & Armada</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Pencarian Terakhir -->
+        <section class="home-section">
+          <div class="section-header">
+            <h2>Pencarian Terakhir Anda</h2>
+            <button class="text-link" onclick="navigatePage('history')">Buka Riwayat Lengkap</button>
+          </div>
+          <div id="homeRecent" class="compact-grid">
+            <div class="empty-compact">Belum ada riwayat rute yang dicari pada perangkat ini.</div>
+          </div>
+        </section>
+      </section>
+
+      <!-- ================= PAGE: PETA GIS INTERAKTIF ================= -->
+      <section class="page" id="page-map">
+        <div class="map-view-wrapper">
+          <!-- Control Bar Atas Peta -->
+          <div class="map-hud-bar">
+            <!-- Filter Kategori Layanan -->
+            <div class="map-category-slider">
+              <button class="map-cat-pill active" data-cat="all" onclick="filterMapCategory('all', this)">Semua Layanan</button>
+              <button class="map-cat-pill" data-cat="antarkota" onclick="filterMapCategory('antarkota', this)">Antarkota</button>
+              <button class="map-cat-pill" data-cat="whoosh" onclick="filterMapCategory('whoosh', this)">Whoosh KCIC</button>
+              <button class="map-cat-pill" data-cat="commuter" onclick="filterMapCategory('commuter', this)">KRL & Lokal</button>
+              <button class="map-cat-pill" data-cat="bandara" onclick="filterMapCategory('bandara', this)">Bandara / Feeder</button>
+              <button class="map-cat-pill" data-cat="heritage" onclick="filterMapCategory('heritage', this)">Non-Aktif / Sejarah</button>
+            </div>
+
+            <!-- Daop Filter & Search Pin -->
+            <div class="map-tools-row">
+              <div class="map-search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input id="mapStationSearch" placeholder="Cari stasiun di peta..." oninput="searchMapStations(this.value)">
+              </div>
+
+              <select id="mapRegionSelect" class="map-region-dropdown" onchange="filterMapRegion(this.value)">
+                <option value="ALL">Seluruh Daop & Divre</option>
+                <optgroup label="Pulau Jawa">
+                  <option value="Daop 1 Jakarta">Daop 1 Jakarta</option>
+                  <option value="Daop 2 Bandung">Daop 2 Bandung</option>
+                  <option value="Daop 3 Cirebon">Daop 3 Cirebon</option>
+                  <option value="Daop 4 Semarang">Daop 4 Semarang</option>
+                  <option value="Daop 5 Purwokerto">Daop 5 Purwokerto</option>
+                  <option value="Daop 6 Yogyakarta">Daop 6 Yogyakarta</option>
+                  <option value="Daop 7 Madiun">Daop 7 Madiun</option>
+                  <option value="Daop 8 Surabaya">Daop 8 Surabaya</option>
+                  <option value="Daop 9 Jember">Daop 9 Jember</option>
+                </optgroup>
+                <optgroup label="Pulau Sumatera">
+                  <option value="Divre I Sumatera Utara">Divre I Sumatera Utara</option>
+                  <option value="Divre II Sumatera Barat">Divre II Sumatera Barat</option>
+                  <option value="Divre III Palembang">Divre III Palembang</option>
+                  <option value="Divre IV Tanjungkarang">Divre IV Tanjungkarang</option>
+                </optgroup>
+                <optgroup label="Cagar Budaya">
+                  <option value="Heritage NIS / SS">Heritage NIS / SS / Jalur Mati</option>
+                </optgroup>
+              </select>
+
+              <!-- Layer Switcher Button -->
+              <button id="toggleMapLayers" class="map-icon-toggle" onclick="toggleMapLayerMenu()" title="Ganti Mode Peta">
+                <i class="fa-solid fa-layer-group"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dropdown Mode Peta -->
+          <div id="mapLayerDropdown" class="map-layer-panel" hidden>
+            <span class="map-layer-title">Tampilan Peta Dasar</span>
+            <div class="map-layer-options">
+              <button onclick="setMapBaseLayer('dark')" class="layer-btn active" id="btn-layer-dark">Fokus Rel (Dark)</button>
+              <button onclick="setMapBaseLayer('osm')" class="layer-btn" id="btn-layer-osm">Peta Jalan (OSM)</button>
+              <button onclick="setMapBaseLayer('satellite')" class="layer-btn" id="btn-layer-sat">Satelit Esri</button>
+            </div>
+          </div>
+
+          <!-- Leaflet GIS Container -->
+          <div id="gisMap" class="gis-map-canvas"></div>
+
+          <!-- Station Detail Drawer / Bottom Sheet -->
+          <aside id="gisDrawer" class="gis-station-drawer">
+            <div class="drawer-drag-pill"></div>
+            <div class="drawer-header">
+              <div class="drawer-badges">
+                <span id="gisDrawerType" class="badge-type">ANTARKOTA</span>
+                <span id="gisDrawerStatus" class="badge-status">AKTIF</span>
+              </div>
+              <button class="drawer-close-btn" onclick="closeGisDrawer()">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
+            <div class="drawer-body">
+              <div class="drawer-media">
+                <img id="gisDrawerImg" src="assets/background.jpg" alt="Foto Stasiun">
+                <div class="drawer-media-meta">
+                  <h3 id="gisDrawerName">Stasiun Gambir</h3>
+                  <span id="gisDrawerCity">Jakarta Pusat • +16 mdpl</span>
+                </div>
+              </div>
+
+              <div class="drawer-card">
+                <h4><i class="fa-solid fa-circle-info"></i> Karakteristik Operasional & Sejarah</h4>
+                <p id="gisDrawerDesc">Memuat ringkasan stasiun...</p>
+              </div>
+
+              <div class="drawer-card">
+                <h4><i class="fa-solid fa-concierge-bell"></i> Fasilitas Layanan</h4>
+                <div id="gisDrawerFacilities" class="facilities-grid"></div>
+              </div>
+
+              <div class="drawer-card">
+                <h4><i class="fa-solid fa-route"></i> Panduan Boarding & Akses</h4>
+                <p id="gisDrawerGuide">-</p>
+                <a id="gisDrawerGmaps" href="#" target="_blank" rel="noopener noreferrer" class="link-external">
+                  Buka Titik Koordinat di Google Maps <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+              </div>
+            </div>
+
+            <div class="drawer-footer">
+              <a href="https://booking.kai.id" target="_blank" rel="noopener noreferrer" class="kp-btn-primary full">
+                <i class="fa-solid fa-ticket"></i> Pesan Tiket di Access by KAI
+              </a>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ================= PAGE: CARI TARIF RUTE ================= -->
+      <section class="page" id="page-search">
+        <div class="mode-toggle-bar">
+          <button class="mode-toggle-btn active" onclick="navigatePage('search')">Pencarian Rute</button>
+          <button class="mode-toggle-btn" onclick="navigatePage('trains')">Pencarian per Kereta</button>
+        </div>
+
+        <div class="page-title-box">
+          <h1>Cari Tarif Khusus Berdasarkan Rute</h1>
+          <p>Masukkan stasiun asal dan stasiun tujuan untuk mengecek ketersediaan tarif reduksi go-show.</p>
+        </div>
+
+        <form id="searchForm" class="glass-form-panel" autocomplete="off">
+          <div class="route-input-grid">
+            <div class="input-field-group">
+              <label for="origin">Stasiun Asal</label>
+              <div class="input-box">
+                <span class="station-indicator-dot origin"></span>
+                <input id="origin" placeholder="Ketik nama stasiun (misal: Gambir)" autocomplete="off">
+                <button id="clearOrigin" class="clear-input-btn" type="button" hidden><i class="fa-solid fa-xmark"></i></button>
+              </div>
+              <div id="originSuggestions" class="autocomplete-list" hidden></div>
+            </div>
+
+            <button id="swapStations" class="swap-action-btn" type="button" title="Tukar Asal & Tujuan">
+              <svg class="ic"><use href="#i-swap"/></svg>
+            </button>
+
+            <div class="input-field-group">
+              <label for="destination">Stasiun Tujuan</label>
+              <div class="input-box">
+                <span class="station-indicator-dot dest"></span>
+                <input id="destination" placeholder="Ketik stasiun tujuan (misal: Cirebon)" autocomplete="off">
+                <button id="clearDestination" class="clear-input-btn" type="button" hidden><i class="fa-solid fa-xmark"></i></button>
+              </div>
+              <div id="destinationSuggestions" class="autocomplete-list" hidden></div>
+            </div>
+          </div>
+
+          <div class="form-actions-row">
+            <span class="form-hint"><i class="fa-solid fa-shield-halved"></i> Tarif khusus hanya dapat dibeli mulai 2 jam sebelum keberangkatan KA.</span>
+            <div class="form-buttons">
+              <button id="resetSearch" class="kp-btn-ghost" type="button">Reset</button>
+              <button id="searchButton" class="kp-btn-primary" type="submit">
+                <svg class="ic"><use href="#i-search"/></svg> Temukan Tarif
+              </button>
+            </div>
+          </div>
+          <p id="searchMessage" class="error-banner" hidden></p>
+        </form>
+
+        <div class="results-container">
+          <div class="results-header">
+            <h2>Relasi Kereta yang Tersedia</h2>
+            <p id="resultsSummary">Hasil pencarian tarif akan ditampilkan di bawah.</p>
+          </div>
+          <div id="results" class="results-stack">
+            <div class="empty-state-card">
+              <i class="fa-solid fa-magnifying-glass-location"></i>
+              <h3>Siap Mencari Tarif</h3>
+              <p>Pilih stasiun asal dan tujuan dari saran nama stasiun yang muncul di atas.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= PAGE: CARI PER KERETA ================= -->
+      <section class="page" id="page-trains">
+        <div class="mode-toggle-bar">
+          <button class="mode-toggle-btn" onclick="navigatePage('search')">Pencarian Rute</button>
+          <button class="mode-toggle-btn active" onclick="navigatePage('trains')">Pencarian per Kereta</button>
+        </div>
+
+        <div class="page-title-box">
+          <h1>Tarif Khusus Menurut Nama Kereta</h1>
+          <p>Pilih nama kereta api untuk melihat seluruh penggalan relasi tarif parsial yang berlaku.</p>
+        </div>
+
+        <div class="search-bar-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input id="trainFilter" placeholder="Cari nama kereta (contoh: Argo Bromo Anggrek, Lodaya, Taksaka)...">
+        </div>
+
+        <div id="trainList" class="cards-grid">
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+        </div>
+      </section>
+
+      <!-- ================= PAGE: DIREKTORI STASIUN ================= -->
+      <section class="page" id="page-stations">
+        <div class="page-title-box">
+          <h1>Direktori Stasiun Kereta Api</h1>
+          <p>Katalog stasiun berdasarkan wilayah Daerah Operasi (Daop) dan Divisi Regional (Divre).</p>
+        </div>
+
+        <div class="filter-tools-row">
+          <div class="search-bar-wrap flex-1">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input id="stationFilter" placeholder="Filter nama stasiun...">
+          </div>
+          <select id="divisionFilter" class="glass-select">
+            <option value="">Semua Wilayah Operasi</option>
+          </select>
+        </div>
+
+        <div id="stationList" class="cards-grid">
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+        </div>
+      </section>
+
+      <!-- ================= PAGE: FAVORIT ================= -->
+      <section class="page" id="page-favorites">
+        <div class="page-title-box">
+          <h1>Relasi Favorit Tersimpan</h1>
+          <p>Daftar tarif yang Anda tandai dengan bintang agar mudah dicek sewaktu-waktu.</p>
+        </div>
+        <div id="favoritesList" class="cards-grid">
+          <div class="empty-state-card">
+            <i class="fa-regular fa-star"></i>
+            <h3>Belum Ada Favorit</h3>
+            <p>Tekan ikon bintang pada kartu hasil pencarian untuk menyimpan relasi di sini.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= PAGE: RIWAYAT ================= -->
+      <section class="page" id="page-history">
+        <div class="page-title-row">
+          <div class="page-title-box">
+            <h1>Riwayat Pencarian</h1>
+            <p>Tersimpan secara lokal pada peramban perangkat Anda.</p>
+          </div>
+          <button id="clearHistory" class="kp-btn-danger-ghost" type="button">Hapus Riwayat</button>
+        </div>
+        <div id="historyList" class="cards-grid">
+          <div class="empty-state-card">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <h3>Riwayat Kosong</h3>
+            <p>Riwayat rute yang pernah Anda telusuri akan tampil di sini.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= PAGE: PANDUAN ================= -->
+      <section class="page" id="page-guide">
+        <div class="page-title-box">
+          <h1>Panduan Tarif Khusus & Aturan Pembelian</h1>
+          <p>Kaidah resmi PT Kereta Api Indonesia (Persero) terkait reduksi tiket parsial.</p>
+        </div>
+        <div class="guide-cards-grid">
+          <article class="guide-box">
+            <span class="guide-num">01</span>
+            <h3>Waktu Pemesanan Go-Show</h3>
+            <p>Tarif khusus hanya dibuka dan dapat dibeli mulai <strong>2 jam sebelum jadwal keberangkatan KA</strong> dari stasiun awal relasi tarif khusus tersebut.</p>
+          </article>
+          <article class="guide-box">
+            <span class="guide-num">02</span>
+            <h3>Kanal Pembelian</h3>
+            <p>Dapat dipesan melalui aplikasi resmi <strong>Access by KAI</strong> maupun di loket stasiun yang berada dalam relasi tarif khusus bersangkutan.</p>
+          </article>
+          <article class="guide-box">
+            <span class="guide-num">03</span>
+            <h3>Ketersediaan Tempat Duduk</h3>
+            <p>Tarif khusus berlaku selama tempat duduk (idle seat) pada kelas terkait masih tersedia. Kuota tarif khusus dapat habis sewaktu-waktu.</p>
+          </article>
+          <article class="guide-box">
+            <span class="guide-num">04</span>
+            <h3>Kesesuaian Arah Relasi</h3>
+            <p>Perhatikan arah relasi perjalanan. Sebagian tarif khusus berlaku bolak-balik (2 arah), namun ada yang hanya berlaku untuk 1 arah tertentu.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ================= PAGE: KRITIK & SARAN ================= -->
+      <section class="page" id="page-help">
+        <div class="page-title-box">
+          <h1>Informasi Pengembang & Narahubung</h1>
+          <p>Sampaikan masukan, pembaruan data relasi, atau kendala teknis.</p>
+        </div>
+
+        <div class="developer-profile-card">
+          <img class="dev-avatar" src="assets/pengembang.jpg" alt="Prima Adi Saputra" onerror="this.src='assets/logo.png'">
+          <div class="dev-info">
+            <span class="dev-badge">Front-End & Railway GIS Developer</span>
+            <h2>Prima Adi Saputra</h2>
+            <p>Petugas layanan perkeretaapian KAI Wisata & inisiator platform K-Pedia. Berdedikasi menyajikan informasi perjalanan kereta api yang akurat dan transparan.</p>
+            <div class="dev-links">
+              <a href="mailto:primaadis46@gmail.com?subject=Kritik%20dan%20Saran%20KAIPEDIA" class="dev-link-btn">
+                <i class="fa-solid fa-envelope"></i> primaadis46@gmail.com
+              </a>
+              <a href="https://instagram.com/prima_adis" target="_blank" rel="noopener noreferrer" class="dev-link-btn">
+                <i class="fa-brands fa-instagram"></i> @prima_adis
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= PAGE: PENGATURAN ================= -->
+      <section class="page" id="page-settings">
+        <div class="page-title-box">
+          <h1>Pengaturan Aplikasi</h1>
+          <p>Konfigurasi tampilan dan manajemen memori lokal perangkat.</p>
+        </div>
+
+        <div class="settings-group-card">
+          <h3><i class="fa-solid fa-palette"></i> Tampilan Antarmuka</h3>
+          <div class="setting-item">
+            <div>
+              <strong>Mode Tema</strong>
+              <p>Pilih kontras tampilan gelap atau terang.</p>
+            </div>
+            <select id="themeSetting" class="glass-select-sm">
+              <option value="dark">Cinematic Dark</option>
+              <option value="light">Crisp Light</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <div>
+              <strong>Skala Ukuran Teks</strong>
+              <p>Sesuaikan keterbacaan font.</p>
+            </div>
+            <select id="fontSizeSetting" class="glass-select-sm">
+              <option value="small">Kecil</option>
+              <option value="normal" selected>Standar</option>
+              <option value="large">Besar</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="settings-group-card">
+          <h3><i class="fa-solid fa-database"></i> Manajemen Data Lokal</h3>
+          <div class="setting-item">
+            <div>
+              <strong>Riwayat Pencarian</strong>
+              <p>Hapus jejak pencarian stasiun di perangkat ini.</p>
+            </div>
+            <button id="clearHistorySetting" class="kp-btn-danger-sm" type="button">Hapus Riwayat</button>
+          </div>
+          <div class="setting-item">
+            <div>
+              <strong>Daftar Favorit</strong>
+              <p>Bersihkan semua relasi bertanda bintang.</p>
+            </div>
+            <button id="clearFavoritesSetting" class="kp-btn-danger-sm" type="button">Hapus Favorit</button>
+          </div>
+          <div class="setting-item">
+            <div>
+              <strong>Sesi Masuk</strong>
+              <p>Keluar dari akun petugas saat ini.</p>
+            </div>
+            <button id="logoutButton" class="kp-btn-danger-sm" type="button">Keluar Akun</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Global App Footer -->
+      <footer class="app-footer">
+        <div>
+          <strong>KAIPEDIA by KAI</strong> — Portal Informasi Perkeretaapian Terpadu
+        </div>
+        <div id="footerDataStatus">Sinkronisasi Basis Data</div>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<!-- Modal Poster Promo Pop-up -->
+<div id="adModal" class="ad-modal" hidden role="dialog" aria-modal="true">
+  <div class="ad-modal-backdrop" onclick="closeAdModal()"></div>
+  <div class="ad-modal-box">
+    <button class="ad-modal-close" onclick="closeAdModal()"><i class="fa-solid fa-xmark"></i></button>
+    <img id="adModalImage" src="" alt="Poster Informasi">
+    <div class="ad-modal-content">
+      <h3 id="adModalTitle">Informasi Resmi</h3>
+      <p id="adModalDescription"></p>
+    </div>
+  </div>
+</div>
+
+<div id="toastRegion" class="toast-region" aria-live="polite"></div>
+
+<!-- Data & Engine Scripts -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="railmap-data/data-stations.js"></script>
+<script>window.KP_STATIONS = typeof stationsData !== 'undefined' ? stationsData : [];</script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="kaipedia-map.js"></script>
+</body>
+</html>
