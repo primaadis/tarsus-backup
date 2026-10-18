@@ -1,0 +1,79 @@
+/* FAIL-SAFE UNIVERSAL HIDDEN */
+[hidden], .ad-modal[hidden], .login-screen[hidden], .app-shell[hidden], .map-layer-panel[hidden], .autocomplete-list[hidden] {
+  display: none !important;
+}
+:root {
+  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-display: "Sora", sans-serif;
+  --bg-deep: #071526;
+  --bg-surface: rgba(9, 24, 43, 0.75);
+  --bg-surface-elevated: rgba(14, 34, 60, 0.90);
+  --border-glass: rgba(255, 255, 255, 0.10);
+  --border-glass-strong: rgba(255, 255, 255, 0.20);
+  --kai-orange: #ff7a18;
+  --kai-orange-soft: rgba(255, 122, 24, 0.16);
+  --kai-blue: #0ea5e9;
+  --kai-blue-soft: rgba(14, 165, 233, 0.15);
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-faint: #64748b;
+  --status-ok: #10b981;
+  --status-danger: #f43f5e;
+  --side-width: 270px;
+  --topbar-height: 64px;
+  --radius-xl: 18px;
+  --radius-lg: 14px;
+  --radius-md: 10px;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0; min-height: 100vh; font-family: var(--font-sans);
+  background: var(--bg-deep) url("assets/background.jpg") center/cover fixed no-repeat;
+  color: var(--text-primary); line-height: 1.5; overflow-x: hidden;
+}
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1;
+  background: linear-gradient(135deg, rgba(5,15,28,0.88), rgba(7,24,44,0.82) 60%, rgba(9,31,56,0.92));
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); pointer-events: none;
+}
+.boot-screen {
+  position: fixed; inset: 0; z-index: 1000; background: #050e1a;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+  transition: opacity 0.4s ease, visibility 0.4s;
+}
+.boot-screen.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+.boot-logo { width: 90px; height: 90px; object-fit: contain; filter: drop-shadow(0 0 35px rgba(255,122,24,0.45)); }
+.boot-bar { width: 140px; height: 3px; border-radius: 99px; background: rgba(255,255,255,0.1); overflow: hidden; }
+.boot-bar span { display: block; width: 45%; height: 100%; background: linear-gradient(90deg, var(--kai-orange), var(--kai-blue)); border-radius: 99px; animation: bootSlide 1.2s infinite ease-in-out; }
+@keyframes bootSlide { 0% { transform: translateX(-100%); } 100% { transform: translateX(250%); } }
+.login-screen { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.login-backdrop { position: absolute; inset: 0; background: rgba(4,11,20,0.85); backdrop-filter: blur(16px); }
+.login-panel { position: relative; width: min(100%, 420px); padding: 36px 30px; border-radius: var(--radius-xl); background: var(--bg-surface-elevated); border: 1px solid var(--border-glass-strong); box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+.login-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.login-brand img { width: 44px; height: 44px; object-fit: contain; }
+.login-form { display: grid; gap: 10px; }
+.login-form input { height: 48px; border-radius: var(--radius-md); background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass-strong); color: #fff; padding: 0 14px; outline: none; }
+.login-message { color: var(--status-danger); font-size: 0.82rem; min-height: 1.2rem; }
+.kp-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; padding: 0 20px; height: 46px; border-radius: var(--radius-md); border: 0; cursor: pointer; background: linear-gradient(135deg, var(--kai-orange), #ea580c); color: #fff; text-decoration: none; }
+.app-shell { display: flex; min-height: 100vh; }
+.sidebar { position: fixed; inset: 0 auto 0 0; width: var(--side-width); z-index: 100; background: rgba(6,18,32,0.94); backdrop-filter: blur(24px); border-right: 1px solid var(--border-glass); display: flex; flex-direction: column; padding: 20px 16px; overflow-y: auto; transition: transform 0.3s; }
+.main-area { flex: 1; margin-left: var(--side-width); min-height: 100vh; display: flex; flex-direction: column; }
+.topbar { position: sticky; top: 0; z-index: 80; height: var(--topbar-height); padding: 0 30px; background: rgba(7,21,38,0.82); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-glass); display: flex; align-items: center; justify-content: space-between; }
+.main-content { flex: 1; padding: 30px; max-width: 1200px; width: 100%; margin: 0 auto; }
+.page { display: none; }
+.page.active { display: block; }
+.hero-banner { padding: 40px; border-radius: var(--radius-xl); background: linear-gradient(135deg, rgba(14,39,70,0.75), rgba(7,21,38,0.85)); border: 1px solid var(--border-glass-strong); margin-bottom: 28px; }
+.hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 36px; }
+.hub-card { display: flex; align-items: center; gap: 16px; padding: 20px; border-radius: var(--radius-lg); background: var(--bg-surface); border: 1px solid var(--border-glass); cursor: pointer; }
+.map-view-wrapper { position: relative; width: 100%; height: calc(100vh - var(--topbar-height) - 60px); border-radius: var(--radius-xl); overflow: hidden; border: 1px solid var(--border-glass-strong); }
+.gis-map-canvas { width: 100%; height: 100%; }
+.ad-modal { position: fixed; inset: 0; z-index: 999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.ad-modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); }
+.ad-modal-box { position: relative; width: min(100%, 480px); max-height: 90vh; overflow-y: auto; border-radius: var(--radius-xl); background: var(--bg-surface-elevated); border: 1px solid var(--border-glass-strong); overflow: hidden; }
+.ad-modal-close { position: absolute; top: 12px; right: 12px; z-index: 10; width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.6); border: 0; color: #fff; cursor: pointer; }
+@media (max-width: 960px) {
+  .sidebar { transform: translateX(-105%); }
+  .sidebar.open { transform: translateX(0); }
+  .main-area { margin-left: 0; }
+  .main-content { padding: 20px 14px; }
+}
