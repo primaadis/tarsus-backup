@@ -1,2 +1,0 @@
-# PANDUAN GOOGLE SPREADSHEET K-PEDIA
-Lihat tab MASTER_KAMUS, MASTER_ARMADA, dan MASTER_STASIUN_GIS untuk sinkronisasi database online.
