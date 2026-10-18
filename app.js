@@ -1439,3 +1439,9 @@ document.addEventListener(
   init,
   { once: true }
 );
+// Tambahkan di dalam fungsi pergantian halaman (navigate / showPage) di app.js:
+if (pageId === 'map') {
+  if (typeof window.initGisMap === 'function') {
+    window.initGisMap();
+  }
+}
