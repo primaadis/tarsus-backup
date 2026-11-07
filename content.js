@@ -9,7 +9,7 @@ window.KP_CONTENT = {
 
   /* ---------- Tautan penting ---------- */
   links: {
-    access:   "https://access.kai.id",          // Access by KAI (cek ketersediaan / pesan tiket)
+    access:   "https://kai.id",          // Access by KAI (cek ketersediaan / pesan tiket)
     whatsapp: "https://wa.me/6281122233121",    // WhatsApp KAI 0811-2223-3121 — verifikasi sebelum dipublikasikan
     call:     "tel:121",                         // Contact Center KAI
     email:    "mailto:cs@kai.id"
