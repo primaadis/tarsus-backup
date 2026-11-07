@@ -1,0 +1,27 @@
+{
+  "id": "./",
+  "name": "K-Pedia",
+  "short_name": "K-Pedia",
+  "description": "Pusat informasi perkeretaapian: tarif khusus, peta dan nama stasiun, ensiklopedia KAI",
+  "lang": "id",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a1420",
+  "theme_color": "#0a1420",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
