@@ -1,0 +1,40 @@
+/* K-Pedia 6.6 — RAKA expressive UI */
+.home-hero-raka{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,390px);align-items:center;gap:clamp(18px,3vw,38px);min-height:390px;padding:10px 0 30px}
+.home-hero-copy{position:relative;z-index:3;min-width:0}
+.home-hero-raka .home-hero-copy h1{max-width:18ch}
+.raka-widget{position:relative;isolation:isolate;display:flex;align-items:flex-end;justify-content:center;min-height:390px;overflow:visible;border-radius:30px;background:radial-gradient(ellipse at 50% 78%,rgba(40,104,190,.13),transparent 58%)}
+.raka-glow{position:absolute;z-index:-2;left:12%;right:12%;bottom:4%;height:42%;border-radius:50%;background:rgba(40,104,190,.14);filter:blur(32px)}
+.raka-orbit{position:absolute;z-index:-1;left:50%;top:55%;width:280px;height:280px;border:1px solid color-mix(in srgb,var(--accent) 22%,transparent);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none}
+.raka-orbit-two{width:340px;height:340px;border-style:dashed;opacity:.5;animation:rakaOrbit 36s linear infinite}
+.raka-stage{position:relative;z-index:1;width:min(100%,370px);height:350px;display:flex;align-items:flex-end;justify-content:center;overflow:visible;transform:translate3d(var(--raka-x,0),var(--raka-y,0),0);transition:transform .24s ease-out;will-change:transform}
+.raka-frame{position:absolute;bottom:0;left:50%;width:auto;height:100%;max-width:100%;object-fit:contain;object-position:center bottom;opacity:0;transform:translate3d(-50%,10px,0) scale(.985);filter:drop-shadow(0 16px 20px rgba(11,35,76,.17));transition:opacity .24s ease,transform .42s cubic-bezier(.2,.8,.2,1);will-change:opacity,transform}
+.raka-frame.is-active{opacity:1;transform:translate3d(-50%,0,0) scale(1);animation:rakaBreath 4.8s ease-in-out infinite}
+.raka-speech{position:absolute;z-index:4;top:12px;right:0;display:grid;gap:5px;width:min(245px,76%);padding:14px 17px;border:1px solid color-mix(in srgb,var(--line-strong) 60%,transparent);border-radius:18px 18px 5px 18px;background:color-mix(in srgb,var(--solid) 90%,transparent);color:var(--text);box-shadow:var(--shadow);backdrop-filter:blur(14px);font-size:.84rem;line-height:1.4;animation:rakaSpeechIn .55s cubic-bezier(.2,.8,.2,1) both}
+.raka-speech strong{font-size:.96rem;color:var(--accent)}.raka-speech span:last-child{color:var(--muted)}
+.raka-live-dot{position:absolute;top:14px;right:14px;width:8px;height:8px;border-radius:50%;background:#22b77a;box-shadow:0 0 0 4px rgba(34,183,122,.14)}
+.raka-widget[data-state="searching"] .raka-live-dot{animation:rakaPulse .9s ease-in-out infinite}
+.raka-actions{position:absolute;z-index:5;right:0;bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.raka-ask,.raka-quick{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 15px;border:1px solid transparent;border-radius:999px;font:800 .8rem var(--font);cursor:pointer;transition:transform .2s ease,box-shadow .2s ease,background .2s ease}
+.raka-ask{color:#fff;background:linear-gradient(135deg,#1b56a8,#12346e);box-shadow:0 8px 18px rgba(16,54,112,.24)}.raka-ask span:first-child{color:#ffad3d;font-size:1rem}
+.raka-quick{color:var(--text);background:var(--surface-2);border-color:var(--line);box-shadow:var(--shadow-sm)}
+.raka-ask:hover,.raka-quick:hover{transform:translateY(-3px);box-shadow:var(--shadow)}.raka-ask:active,.raka-quick:active{transform:scale(.97)}
+.raka-widget[data-state="thinking"] .raka-frame.is-active{animation:rakaThink 2.2s ease-in-out infinite}
+.raka-widget[data-state="happy"] .raka-frame.is-active,.raka-widget[data-state="success"] .raka-frame.is-active{animation:rakaCelebrate .65s ease-in-out 1}
+.raka-widget[data-state="listening"] .raka-frame.is-active{animation:rakaListen 2.4s ease-in-out infinite}
+.raka-login{margin:-120px auto 8px;gap:0;position:relative;z-index:2}
+.raka-login-stage{position:relative;width:clamp(170px,32vw,220px);height:220px;display:grid;place-items:end center}
+.raka-login .raka-stage-login{position:relative;width:100%;height:100%}
+.raka-login .raka-frame{height:100%;max-width:100%;object-fit:contain;filter:drop-shadow(0 12px 18px rgba(5,20,60,.24))}
+.raka-login .m-say{max-width:32ch;margin:4px auto 0;padding:8px 13px;border-radius:14px;background:var(--surface-2);color:var(--muted);font-size:.82rem;text-align:center}
+.raka-login .raka-login-spark{position:absolute;top:12px;right:8px;color:#f28b20;font-size:1.4rem;animation:rakaPulse 2s ease-in-out infinite}
+@keyframes rakaBreath{0%,100%{translate:0 0}50%{translate:0 -6px}}
+@keyframes rakaSpeechIn{from{opacity:0;translate:0 8px}to{opacity:1;translate:0 0}}
+@keyframes rakaPulse{0%,100%{opacity:1;scale:1}50%{opacity:.45;scale:.82}}
+@keyframes rakaOrbit{to{rotate:360deg}}
+@keyframes rakaThink{0%,100%{translate:0 0}50%{translate:0 -3px}}
+@keyframes rakaListen{0%,100%{rotate:0}35%{rotate:-.7deg}70%{rotate:.7deg}}
+@keyframes rakaCelebrate{0%,100%{translate:0 0}45%{translate:0 -11px}}
+@media(max-width:900px){.home-hero-raka{grid-template-columns:minmax(0,1fr) minmax(250px,320px);min-height:350px}.raka-widget{min-height:350px}.raka-stage{height:315px}.raka-orbit{width:230px;height:230px}.raka-orbit-two{width:290px;height:290px}}
+@media(max-width:680px){.home-hero-raka{grid-template-columns:1fr;gap:4px;min-height:0;padding-bottom:28px}.home-hero-raka .home-hero-copy h1{max-width:22ch}.raka-widget{min-height:310px;margin:0 2px 4px}.raka-stage{height:300px;width:min(100%,340px)}.raka-speech{top:2px;right:2px;width:min(225px,68%);padding:11px 13px;font-size:.78rem}.raka-actions{right:4px;bottom:0}.raka-orbit{width:215px;height:215px}.raka-orbit-two{width:270px;height:270px}.raka-login{margin-top:-102px}.raka-login-stage{height:190px;width:190px}}
+@media(max-width:390px){.raka-widget{min-height:285px}.raka-stage{height:270px}.raka-speech{width:67%;font-size:.72rem}.raka-quick{display:none}.raka-actions{bottom:2px}}
+@media(prefers-reduced-motion:reduce){.raka-frame,.raka-orbit-two,.raka-live-dot,.raka-login-spark{animation:none!important;transition:none!important}.raka-frame{will-change:auto}.raka-stage{transition:none}}
