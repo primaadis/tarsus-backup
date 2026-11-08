@@ -1,0 +1,299 @@
+/* =========================================================
+   K-PEDIA 6.4 — TEMA CLAYMORPHISM
+   Dimuat terakhir; menimpa token dan komponen tema kaca.
+   Prinsip: permukaan "tanah liat" lembut, sudut sangat bulat,
+   bayangan ganda (luar + dalam), warna pastel, tombol menggembung
+   yang menekan saat disentuh. Tanpa blur, tanpa teks gradien.
+   ========================================================= */
+
+:root {
+  --font: "Nunito", ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  --display: "Fredoka", "Nunito", ui-rounded, "Segoe UI", system-ui, sans-serif;
+  --num: "Nunito", ui-rounded, system-ui, sans-serif;
+  --r: 22px; --r-lg: 30px; --r-sm: 16px;
+  --blur: 0px;
+}
+
+/* ---------- Token: terang (siang) ---------- */
+body[data-theme="light"], html[data-theme="light"] body {
+  color-scheme: light;
+  --bg: #e7ecf6;
+  --clay: #edf1f9;
+  --surface: #edf1f9;
+  --surface-2: #e2e8f4;
+  --glass-strong: #f1f4fb;
+  --solid: #f4f6fc;
+  --line: rgba(255, 255, 255, .0);
+  --line-strong: rgba(110, 126, 160, .28);
+  --text: #1f2b47;
+  --muted: #4a5878;
+  --faint: #66738f;
+  --accent: #3d74f2;
+  --accent-ink: #ffffff;
+  --accent-soft: rgba(61, 116, 242, .13);
+  --accent-2: #f08a24;
+  --danger: #d4483f;
+  --ok: #1f9d63;
+  --sh-d: rgba(150, 166, 198, .62);
+  --sh-l: rgba(255, 255, 255, .95);
+  --in-d: rgba(150, 166, 198, .38);
+  --in-l: rgba(255, 255, 255, .9);
+  --pop: #3d74f2; --pop-d: #2c5bd0; --pop-l: #6f9bff;
+  --shadow: 14px 16px 30px var(--sh-d), -10px -10px 24px var(--sh-l);
+  --shadow-sm: 8px 9px 18px var(--sh-d), -6px -6px 14px var(--sh-l);
+  --rail-base: rgba(110, 126, 160, .3); --rail-acc: #3d74f2; --rail-dot: #edf1f9;
+}
+/* ---------- Token: gelap (senja) ---------- */
+body, body[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #1a2133;
+  --clay: #222b42;
+  --surface: #222b42;
+  --surface-2: #1c2438;
+  --glass-strong: #27314a;
+  --solid: #27314a;
+  --line: rgba(255, 255, 255, .0);
+  --line-strong: rgba(170, 186, 222, .26);
+  --text: #eef2fb;
+  --muted: #c3cde3;
+  --faint: #98a6c4;
+  --accent: #6d9cff;
+  --accent-ink: #0c1a3d;
+  --accent-soft: rgba(109, 156, 255, .16);
+  --accent-2: #ffab4a;
+  --danger: #ff8f86;
+  --ok: #5fdca2;
+  --sh-d: rgba(8, 12, 24, .72);
+  --sh-l: rgba(64, 80, 120, .34);
+  --in-d: rgba(8, 12, 24, .5);
+  --in-l: rgba(120, 140, 190, .16);
+  --pop: #4b7cf0; --pop-d: #3159c4; --pop-l: #7ea4ff;
+  --shadow: 14px 16px 30px var(--sh-d), -9px -9px 22px var(--sh-l);
+  --shadow-sm: 8px 9px 18px var(--sh-d), -5px -5px 13px var(--sh-l);
+  --rail-base: rgba(170, 186, 222, .28); --rail-acc: #ffab4a; --rail-dot: #222b42;
+}
+html, html[data-theme="light"] { background: #e7ecf6; }
+html[data-theme="dark"] { background: #1a2133; }
+
+/* ---------- Latar ---------- */
+.bg-layer { background: var(--bg); }
+.bg-img, .bg-scrim { display: none !important; }
+.bg-layer::before, .bg-layer::after { content: ""; position: absolute; border-radius: 50%; filter: blur(60px); opacity: .55; }
+.bg-layer::before { width: 46vw; height: 46vw; left: -12vw; top: -10vw; background: radial-gradient(circle, color-mix(in srgb, var(--accent) 34%, transparent), transparent 70%); }
+.bg-layer::after { width: 40vw; height: 40vw; right: -10vw; bottom: -8vw; background: radial-gradient(circle, color-mix(in srgb, var(--accent-2) 30%, transparent), transparent 70%); }
+body { background: transparent; color: var(--text); font-weight: 500; }
+
+/* ---------- Tipografi ---------- */
+h1, h2, h3, .brand-name { font-family: var(--display); letter-spacing: 0; font-weight: 600; }
+h1, h2, h3, h4 { color: var(--text); }
+.home-hero h1 { background: none !important; -webkit-text-fill-color: currentColor !important; color: var(--text); font-weight: 600; letter-spacing: 0; line-height: 1.15; }
+.eyebrow { color: var(--accent); font-weight: 800; letter-spacing: .02em; }
+.page-heading h1 { font-weight: 600; }
+strong, b { font-weight: 800; }
+.kp-welcome h2 { letter-spacing: 0; font-weight: 600; }
+.wiki-body h3 { font-weight: 600; }
+
+/* ---------- Permukaan clay (kartu & panel) ---------- */
+.glass, .glass-strong, .tariff-card, .directory-card, .history-card, .station-region, .empty-state, .developer-card, .support-link,
+.guide-card, .notice-panel, .settings-group, .compact-history, .alt-card, .menu-tile, .kp-mode, .wiki-card, .wiki-answer, .search-panel,
+.gresults, .map-shell, .sheet-panel, .ad-modal-panel, .login-panel, .sidebar, .st-hero, .sim-result, .layer-menu, .stepper {
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  background: var(--clay);
+  border: 0;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm), inset 2px 2px 3px var(--in-l), inset -3px -3px 6px var(--in-d);
+}
+.glass-strong, .sheet-panel, .ad-modal-panel, .login-panel, .gresults { box-shadow: var(--shadow), inset 2px 2px 3px var(--in-l), inset -3px -3px 6px var(--in-d); }
+.tariff-card, .directory-card, .menu-tile, .kp-mode, .wiki-card, .support-link, .guide-card, .history-card, .alt-card {
+  transition: transform .22s var(--ease), box-shadow .22s var(--ease);
+}
+.tariff-card:hover, .directory-card:hover, .menu-tile:hover, .kp-mode:hover, .wiki-card:hover, .support-link:hover {
+  transform: translateY(-3px);
+  box-shadow: 12px 14px 26px var(--sh-d), -8px -8px 18px var(--sh-l), inset 2px 2px 3px var(--in-l), inset -3px -3px 6px var(--in-d);
+}
+.tariff-card:active, .directory-card:active, .menu-tile:active, .kp-mode:active, .wiki-card:active {
+  transform: translateY(1px); box-shadow: 3px 4px 8px var(--sh-d), -2px -2px 6px var(--sh-l), inset 3px 3px 6px var(--in-d), inset -2px -2px 4px var(--in-l);
+}
+.wiki-card, .wiki-answer { background: var(--clay) !important; }
+.wiki-answer { box-shadow: var(--shadow-sm), inset 0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent), inset 2px 2px 3px var(--in-l); }
+.wiki-answer .wa-tag { background: var(--pop); box-shadow: inset 2px 2px 3px var(--pop-l), inset -2px -2px 3px var(--pop-d); }
+
+/* ---------- Tombol ---------- */
+.primary-button, .search-submit, .clay-btn.primary {
+  background: linear-gradient(145deg, var(--pop-l), var(--pop));
+  color: #fff; border: 0; border-radius: 20px; font-weight: 800; letter-spacing: .01em;
+  box-shadow: 8px 9px 18px color-mix(in srgb, var(--pop-d) 45%, var(--sh-d)), -5px -5px 12px var(--sh-l), inset 3px 3px 6px rgba(255, 255, 255, .38), inset -4px -4px 8px var(--pop-d);
+  transition: transform .18s var(--ease), box-shadow .18s var(--ease), filter .18s;
+}
+.primary-button:hover, .search-submit:hover, .clay-btn.primary:hover { filter: brightness(1.05); transform: translateY(-2px); }
+.primary-button:active, .search-submit:active, .clay-btn:active {
+  transform: translateY(1px) scale(.985);
+  box-shadow: 2px 3px 6px var(--sh-d), inset 4px 4px 8px var(--pop-d), inset -2px -2px 5px rgba(255, 255, 255, .2);
+}
+.secondary-button, .setting-action, .icon-btn, .account-button, .map-btn, .pw-toggle, .swap-btn, .more-btn, .menu-btn, .clear-input, .sheet-close, .ad-modal-close, .side-close, .clay-btn.ghost, .stepper button, .seg-mini button, .kp-seg button, .star-action {
+  background: var(--clay); color: var(--text); border: 0; border-radius: 18px; font-weight: 700;
+  box-shadow: 6px 7px 14px var(--sh-d), -5px -5px 11px var(--sh-l), inset 1px 1px 2px var(--in-l), inset -2px -2px 4px var(--in-d);
+  transition: transform .18s var(--ease), box-shadow .18s var(--ease), color .18s;
+}
+.secondary-button:hover, .setting-action:hover, .icon-btn:hover, .account-button:hover, .map-btn:hover, .swap-btn:hover, .more-btn:hover, .clay-btn.ghost:hover { transform: translateY(-2px); color: var(--accent); }
+.secondary-button:active, .setting-action:active, .icon-btn:active, .account-button:active, .map-btn:active, .swap-btn:active, .more-btn:active, .menu-btn:active, .clay-btn.ghost:active, .star-action:active {
+  transform: translateY(1px); box-shadow: inset 4px 4px 8px var(--in-d), inset -3px -3px 6px var(--in-l);
+}
+.seg-mini button.active, .kp-seg button.active, .chip-row button.active, .map-chips button.active {
+  background: linear-gradient(145deg, var(--pop-l), var(--pop)); color: #fff;
+  box-shadow: 5px 6px 12px color-mix(in srgb, var(--pop-d) 40%, var(--sh-d)), inset 2px 2px 4px rgba(255, 255, 255, .35), inset -3px -3px 6px var(--pop-d);
+}
+.star-action.is-saved { color: var(--accent-2); }
+.setting-danger, .clay-btn.danger {
+  background: linear-gradient(145deg, #ff8a80, #e0453b); color: #fff; border: 0; border-radius: 18px; font-weight: 800;
+  box-shadow: 7px 8px 16px rgba(180, 50, 40, .3), -4px -4px 10px var(--sh-l), inset 3px 3px 6px rgba(255, 255, 255, .35), inset -4px -4px 8px #b9322a;
+}
+.setting-danger:hover, .clay-btn.danger:hover { filter: brightness(1.05); color: #fff; }
+.clay-btn { min-height: 46px; padding: 0 22px; font: 800 .95rem var(--font); cursor: pointer; border-radius: 20px; }
+
+/* ---------- Chip & saran ---------- */
+.chip-row button, .map-chips button, .suggest-row button, .wiki-toc button, .badge {
+  background: var(--clay) !important; color: var(--text); border: 0 !important; border-radius: 999px; font-weight: 700;
+  -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  box-shadow: 4px 5px 10px var(--sh-d), -3px -3px 8px var(--sh-l), inset 1px 1px 2px var(--in-l), inset -1px -1px 3px var(--in-d);
+}
+.chip-row button.active, .map-chips button.active { background: linear-gradient(145deg, var(--pop-l), var(--pop)) !important; color: #fff; }
+.suggest-row button:hover, .wiki-toc button:hover { color: var(--accent); transform: translateY(-1px); }
+.badge { box-shadow: 2px 3px 6px var(--sh-d), -2px -2px 5px var(--sh-l); }
+
+/* ---------- Input (cekung/inset) ---------- */
+.gsearch-box, .station-input, .map-search, .sim-money, .tool-search, .field input, .login-form input, .glass-select, .setting-select, input[type="search"], input[type="text"], input[type="password"], select, textarea {
+  background: var(--surface-2); color: var(--text); border: 0; border-radius: 22px;
+  box-shadow: inset 5px 5px 10px var(--in-d), inset -5px -5px 10px var(--in-l);
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+.gsearch-box input, .station-input input, .map-search input, .sim-money input { background: transparent; box-shadow: none; border-radius: 0; }
+.gsearch-box:focus-within, .station-input:focus-within, .map-search:focus-within, .sim-money:focus-within, .login-form input:focus, .glass-select:focus, select:focus, textarea:focus {
+  outline: 0; box-shadow: inset 5px 5px 10px var(--in-d), inset -5px -5px 10px var(--in-l), 0 0 0 3px color-mix(in srgb, var(--accent) 38%, transparent);
+}
+::placeholder { color: var(--faint); opacity: 1; font-weight: 600; }
+.glass-select option { background: var(--solid); color: var(--text); }
+
+/* ---------- Sakelar ---------- */
+.switch-ui { background: var(--surface-2); border: 0; box-shadow: inset 3px 3px 6px var(--in-d), inset -3px -3px 6px var(--in-l); }
+.switch-ui::after { background: var(--clay); box-shadow: 3px 3px 6px var(--sh-d), -2px -2px 5px var(--sh-l); }
+.switch input:checked + .switch-ui { background: linear-gradient(145deg, var(--pop-l), var(--pop)); box-shadow: inset 3px 3px 6px var(--pop-d); }
+.switch input:checked + .switch-ui::after { background: #fff; }
+
+/* ---------- Sidebar & navigasi ---------- */
+.sidebar { border-radius: 0 var(--r-lg) var(--r-lg) 0; background: var(--clay); box-shadow: 10px 0 26px var(--sh-d), inset -2px 0 3px var(--in-l); }
+.side-profile { background: var(--surface-2); border: 0; border-radius: 22px; box-shadow: inset 4px 4px 8px var(--in-d), inset -4px -4px 8px var(--in-l); }
+.nav-link { border-radius: 18px; font-weight: 700; color: var(--muted); transition: transform .18s var(--ease), box-shadow .18s, color .18s; }
+.nav-link:hover { color: var(--text); background: transparent; box-shadow: 4px 5px 10px var(--sh-d), -3px -3px 8px var(--sh-l); }
+.nav-link.active { background: var(--clay); color: var(--accent); box-shadow: inset 4px 4px 8px var(--in-d), inset -4px -4px 8px var(--in-l); }
+.nav-link.active::before { display: none; }
+.nav-group-label { font-weight: 800; letter-spacing: .04em; color: var(--faint); }
+.main-area > header, .topbar, header.top { background: transparent; border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.sidebar-scrim { background: rgba(25, 34, 56, .38); -webkit-backdrop-filter: none; backdrop-filter: none; }
+
+/* ---------- Ikon bertema ---------- */
+.menu-ic, .kp-mode-icon, .directory-icon, .settings-group-icon, .support-link-icon, .gr-ic, .panel-symbol, .empty-symbol, .guide-card > .ic {
+  background: var(--surface-2); color: var(--accent); border: 0; border-radius: 18px;
+  box-shadow: inset 3px 3px 6px var(--in-d), inset -3px -3px 6px var(--in-l);
+}
+.kp-mode-icon, .menu-ic { background: linear-gradient(145deg, var(--pop-l), var(--pop)); color: #fff; box-shadow: 5px 6px 12px color-mix(in srgb, var(--pop-d) 40%, var(--sh-d)), inset 2px 2px 4px rgba(255, 255, 255, .35), inset -3px -3px 6px var(--pop-d); }
+
+/* ---------- Hasil pencarian ---------- */
+.gresults { padding: 10px; }
+.gr-item { border-radius: 18px; transition: box-shadow .18s; }
+.gr-item:hover, .gr-item:focus-visible { background: var(--clay); box-shadow: 4px 5px 10px var(--sh-d), -3px -3px 8px var(--sh-l); }
+.gr-title { font-weight: 800; color: var(--faint); }
+mark { background: color-mix(in srgb, var(--accent-2) 30%, transparent); }
+
+/* ---------- Tarif ---------- */
+.fare-cell, .st-facts div, .sim-bars, .route-info { background: var(--surface-2); border: 0; border-radius: 18px; box-shadow: inset 3px 3px 6px var(--in-d), inset -3px -3px 6px var(--in-l); }
+.fare-cell strong, .result-total, .sim-save strong { font-family: var(--num); font-weight: 800; }
+.route-track, .rt-line { opacity: .95; }
+
+/* ---------- Peta ---------- */
+.map-shell { overflow: hidden; padding: 0; }
+.leaflet-container { border-radius: var(--r-lg); font-family: var(--font); }
+.leaflet-bar { border: 0 !important; border-radius: 16px !important; overflow: hidden; box-shadow: var(--shadow-sm) !important; }
+.leaflet-bar a { background: var(--clay) !important; color: var(--text) !important; border: 0 !important; }
+.layer-menu { border-radius: 22px; }
+
+/* ---------- Login ---------- */
+.login-screen { background: var(--bg); }
+.login-video, .login-shade { display: none !important; }
+.login-screen::before, .login-screen::after { content: ""; position: absolute; border-radius: 50%; filter: blur(70px); opacity: .6; pointer-events: none; }
+.login-screen::before { width: 52vw; height: 52vw; left: -14vw; top: -14vw; background: radial-gradient(circle, color-mix(in srgb, var(--accent) 36%, transparent), transparent 70%); }
+.login-screen::after { width: 44vw; height: 44vw; right: -12vw; bottom: -10vw; background: radial-gradient(circle, color-mix(in srgb, var(--accent-2) 32%, transparent), transparent 70%); }
+.login-panel { border-radius: 36px; }
+.login-panel h1, .login-tagline, .login-desc { color: var(--text); }
+.login-form label, .field-wrap label { font-weight: 800; color: var(--muted); }
+.login-form input { min-height: 52px; padding: 0 18px; }
+.login-message { font-weight: 700; }
+
+/* ---------- Boot & sapaan ---------- */
+.boot-screen { background: var(--bg) !important; }
+.boot-bg, .boot-bg::after { display: none !important; }
+.kp-welcome { background: var(--bg) !important; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.kp-welcome .w-ic, .tod-ic { background: linear-gradient(145deg, var(--pop-l), var(--pop)); color: #fff; border: 0; border-radius: 28px; box-shadow: 10px 12px 22px var(--sh-d), -6px -6px 14px var(--sh-l), inset 3px 3px 6px rgba(255, 255, 255, .4), inset -4px -4px 8px var(--pop-d); }
+.theme-transition-orb.to-light { background: #e7ecf6; color: #3d74f2; }
+.theme-transition-orb.to-dark { background: #1a2133; color: #ffab4a; }
+
+/* ---------- Footer, kutipan, iklan ---------- */
+.ad-carousel, .ad-slide, .ad-slide img { border-radius: var(--r-lg); }
+.ad-carousel { box-shadow: var(--shadow-sm); }
+.ad-modal-backdrop, .sheet-backdrop { background: rgba(25, 34, 56, .5); -webkit-backdrop-filter: none; backdrop-filter: none; }
+.app-footer { color: var(--faint); }
+.crumb { font-weight: 700; }
+
+/* ---------- Ensiklopedia ---------- */
+.wiki-body h3 { border-top: 0; padding-top: 6px; }
+.wiki-article { border-radius: var(--r-lg); }
+.wiki-body ul li::marker, .wiki-body ol li::marker { color: var(--accent); font-weight: 800; }
+.wiki-sources a { font-weight: 700; }
+.wiki-toc button { box-shadow: 4px 5px 10px var(--sh-d), -3px -3px 8px var(--sh-l); }
+
+/* ---------- Skeleton ---------- */
+.skeleton { background: linear-gradient(90deg, var(--surface-2) 25%, var(--clay) 50%, var(--surface-2) 75%); background-size: 200% 100%; border-radius: 16px; }
+
+/* ---------- Dialog clay ---------- */
+.kp-dialog { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 22px; opacity: 0; transition: opacity .2s ease; }
+.kp-dialog.in { opacity: 1; } .kp-dialog.out { opacity: 0; }
+.kp-dialog-scrim { position: absolute; inset: 0; background: rgba(24, 32, 54, .5); }
+.kp-dialog-card { position: relative; width: min(100%, 380px); padding: 34px 26px 24px; text-align: center; border-radius: 36px; background: var(--clay);
+  box-shadow: 0 24px 50px rgba(20, 28, 50, .38), inset 3px 3px 6px var(--in-l), inset -4px -4px 8px var(--in-d);
+  transform: translateY(18px) scale(.92); transition: transform .32s cubic-bezier(.34, 1.56, .64, 1); }
+.kp-dialog.in .kp-dialog-card { transform: none; }
+.kp-dialog.out .kp-dialog-card { transform: translateY(10px) scale(.96); }
+.kp-dialog-badge { width: 76px; height: 76px; margin: -70px auto 16px; display: grid; place-items: center; border-radius: 26px; color: #fff;
+  background: linear-gradient(145deg, var(--pop-l), var(--pop));
+  box-shadow: 9px 11px 20px var(--sh-d), -5px -5px 12px var(--sh-l), inset 3px 3px 6px rgba(255, 255, 255, .42), inset -4px -4px 8px var(--pop-d); }
+.kp-dialog-badge.tone-danger { background: linear-gradient(145deg, #ff9a90, #e0453b); box-shadow: 9px 11px 20px rgba(180, 50, 40, .32), -5px -5px 12px var(--sh-l), inset 3px 3px 6px rgba(255, 255, 255, .42), inset -4px -4px 8px #b9322a; }
+.kp-dialog-badge .ic { width: 34px; height: 34px; stroke-width: 2; }
+.kp-dialog-card h2 { font-size: 1.35rem; margin-bottom: 8px; }
+.kp-dialog-card p { color: var(--muted); font-weight: 600; line-height: 1.55; margin: 0 auto 22px; max-width: 30ch; }
+.kp-dialog-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.kp-dialog-actions .clay-btn { width: 100%; white-space: nowrap; padding: 0 14px; }
+body.dialog-open { overflow: hidden; }
+
+/* ---------- Notifikasi (toast) ---------- */
+.toast-region { gap: 12px; }
+.toast { display: flex; align-items: center; gap: 12px; padding: 12px 18px 12px 12px; border-radius: 24px; background: var(--clay); color: var(--text); font-weight: 700; font-size: .92rem; line-height: 1.35; cursor: pointer;
+  box-shadow: 10px 12px 24px var(--sh-d), -6px -6px 14px var(--sh-l), inset 2px 2px 4px var(--in-l), inset -3px -3px 6px var(--in-d); transform: translateY(14px) scale(.94); }
+.toast.show { transform: none; }
+.toast .t-ic { flex: none; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 14px; color: #fff; background: linear-gradient(145deg, var(--pop-l), var(--pop));
+  box-shadow: 4px 5px 9px var(--sh-d), inset 2px 2px 4px rgba(255, 255, 255, .4), inset -2px -2px 4px var(--pop-d); }
+.toast .t-ic .ic { width: 20px; height: 20px; stroke-width: 2.2; }
+.toast-success .t-ic { background: linear-gradient(145deg, #5fe0a5, #1f9d63); box-shadow: 4px 5px 9px var(--sh-d), inset 2px 2px 4px rgba(255, 255, 255, .4), inset -2px -2px 4px #167a4c; }
+.toast-error .t-ic { background: linear-gradient(145deg, #ff9a90, #e0453b); box-shadow: 4px 5px 9px var(--sh-d), inset 2px 2px 4px rgba(255, 255, 255, .4), inset -2px -2px 4px #b9322a; }
+.toast-error, body[data-theme="dark"] .toast-error { background: var(--clay); color: var(--text); }
+
+/* ---------- Gerak: hormati preferensi ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .kp-dialog-card, .toast { transition: opacity .15s; transform: none !important; }
+}
+@media (max-width: 760px) {
+  :root { --r-lg: 26px; }
+  .sidebar { border-radius: 0 var(--r-lg) var(--r-lg) 0; }
+  .kp-dialog-actions { gap: 12px; }
+}
+body[data-theme="dark"] .kp-dialog-scrim, body:not([data-theme="light"]) .kp-dialog-scrim { background: rgba(6, 9, 18, .66); }
+.wiki-toc, #wikiChips, .chip-row, .map-chips { padding: 6px 10px 16px !important; margin-inline: -10px; }
