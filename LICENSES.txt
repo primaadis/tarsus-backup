@@ -1,0 +1,4 @@
+Pustaka pihak ketiga di folder ini (dimuat hanya saat pengguna melampirkan PDF/DOCX ke RAKA):
+
+- pdf.min.mjs, pdf.worker.min.mjs : PDF.js 6.2.108, Mozilla Foundation. Lisensi Apache-2.0. https://github.com/mozilla/pdf.js
+- jszip.min.js : JSZip 3.10.1, Stuart Knightley dkk. Lisensi MIT atau GPL-3.0 (dual license). https://github.com/Stuk/jszip
