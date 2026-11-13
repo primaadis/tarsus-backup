@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#eef3fb">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="K-Pedia: ruang kerja digital Customer Service perkeretaapian. Tarif khusus, ensiklopedia KAI, peta stasiun, cuaca, kalender, dan RAKA.">
+<title>K-Pedia | KAI Knowledge &amp; Tools</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="assets/logo.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<link rel="stylesheet" href="kpedia.css?v=8.0.0">
+<script>
+/* Tema, ukuran teks, dan status boot diterapkan sebelum render pertama (kunci sama dengan app.js). */
+(function(){try{var h=document.documentElement,p=localStorage.getItem("tarsus-pref:theme")||"system",d=window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches,v=p==="light"?"light":p==="dark"?"dark":(d?"dark":"light");h.dataset.theme=v;h.dataset.font=localStorage.getItem("tarsus-pref:fontSize")||"normal";if(sessionStorage.getItem("kp-booted"))h.classList.add("no-boot");var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",v==="light"?"#eef3fb":"#071022");}catch(e){}})();
+</script>
+</head>
+<body data-theme="dark">
+<div class="bg-layer" aria-hidden="true"></div>
+<!-- ============ BOOT ============ -->
+<div id="bootScreen" class="boot-screen" aria-hidden="true">
+  <div class="boot-bg"></div>
+  <div class="boot-track"><i class="bt-line"></i><i class="bt-light"></i></div>
+  <div class="boot-stage" id="bootStage">
+    <div class="boot-word" id="bootWord"><span class="bw-name">-Pedia</span><span class="bw-sub">KAI Knowledge &amp; Tools</span></div>
+    <svg class="boot-k" id="bootK" viewBox="48 91 427 315" aria-hidden="true" focusable="false">
+      <defs><linearGradient id="bkShine" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".75"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><clipPath id="bkClip"><path id="bkClipPath" d=""/></clipPath></defs>
+      <path id="bkRail" class="bk-rail" pathLength="1" d="M48 246H475"/>
+      <path id="bkA" class="bk-a" d=""/><path id="bkB" class="bk-b" d=""/><path id="bkC" class="bk-c" d=""/>
+      <g clip-path="url(#bkClip)"><rect id="bkShineRect" class="bk-shine" x="-200" y="80" width="120" height="340" fill="url(#bkShine)" transform="skewX(-18)"/></g>
+    </svg>
+  </div>
+</div>
+
+<!-- ============ LOGIN ============ -->
+<section id="loginScreen" class="login-screen" hidden>
+  <div class="login-bg" aria-hidden="true"><i class="lb-a"></i><i class="lb-b"></i><i class="lb-c"></i></div>
+  <button type="button" class="icon-btn theme-toggle login-theme" data-theme-toggle aria-label="Ganti mode terang atau gelap"><i class="ph ph-sun ic ic-sun" aria-hidden="true"></i><i class="ph ph-moon ic ic-moon" aria-hidden="true"></i></button>
+  <div id="authCard" class="login-card">
+    <div class="login-left">
+      <div class="login-brand"><img src="assets/logo.png" alt=""><span><b>K-Pedia</b><small>KAI Knowledge &amp; Tools</small></span></div>
+      <div class="login-bubble" id="loginBubble"><span>Halo!</span> Selamat datang di K-Pedia!</div>
+    </div>
+    <i class="login-arc" aria-hidden="true"></i>
+    <img class="login-raka" id="loginRaka" src="assets/raka/raka-sit.webp" alt="RAKA, asisten K-Pedia, duduk dan menyapa" width="560" height="635" decoding="async">
+    <div class="login-right"><div id="authView"></div></div>
+  </div>
+</section>
+
+<!-- ============ APLIKASI ============ -->
+<div id="appShell" class="app-shell" hidden>
+  <header class="topbar glass-strong" id="topbar">
+    <div class="topbar-inner">
+      <button class="brand" type="button" data-page="home" aria-label="K-Pedia, ke Beranda"><img src="assets/logo.png" alt=""><span class="brand-name">K-Pedia</span></button>
+      <div class="crumb" aria-live="polite"><strong id="pageCrumb">Beranda</strong></div>
+      <nav class="topnav" aria-label="Navigasi utama">
+        <button class="nav-ic nav-link" type="button" data-page="home" data-pages="home" data-tip="Beranda" aria-label="Beranda"><i class="ph ph-house ic " aria-hidden="true"></i></button>
+        <button class="nav-ic nav-link" type="button" data-page="guide" data-pages="guide help" data-tip="Bantuan" aria-label="Bantuan"><i class="ph ph-question ic " aria-hidden="true"></i></button>
+        <button class="nav-ic" id="notifButton" type="button" data-tip="Notifikasi" aria-label="Notifikasi" aria-haspopup="true" aria-expanded="false"><i class="ph ph-bell ic " aria-hidden="true"></i><i class="notif-dot" id="notifDot" hidden></i></button>
+        <button class="nav-ic theme-toggle" type="button" data-theme-toggle data-tip="Mode terang / gelap" aria-label="Ganti mode terang atau gelap"><i class="ph ph-sun ic ic-sun" aria-hidden="true"></i><i class="ph ph-moon ic ic-moon" aria-hidden="true"></i></button>
+        <button id="openSidebar" class="nav-avatar" type="button" data-tip="Profil" aria-label="Profil akun" aria-haspopup="true" aria-expanded="false"><span class="avatar" id="topAvatar" aria-hidden="true">P</span><span class="sr-only" id="topAccountName">Petugas</span></button>
+      </nav>
+    </div>
+  </header>
+
+  <div id="sidebarScrim" class="sidebar-scrim"></div>
+  <div id="sidebar" class="pop profile-pop glass-strong" role="menu" aria-label="Menu profil">
+    <div class="pop-head"><span class="avatar lg" id="sideAvatar" aria-hidden="true">P</span><div><strong id="profileName">Petugas</strong><small class="side-role">Akun personal</small></div></div>
+    <button class="pop-item" role="menuitem" data-page="favorites" data-pages="favorites"><i class="ph ph-star ic " aria-hidden="true"></i><span>Favorit</span><span id="favoriteCount" class="nav-badge" hidden>0</span></button>
+    <button class="pop-item" role="menuitem" data-page="history" data-pages="history"><i class="ph ph-clock ic " aria-hidden="true"></i><span>Riwayat pencarian</span></button>
+    <button class="pop-item" role="menuitem" data-page="settings" data-pages="settings"><i class="ph ph-sliders-horizontal ic " aria-hidden="true"></i><span>Pengaturan</span></button>
+    <button class="pop-item" role="menuitem" data-page="help" data-pages="help"><i class="ph ph-envelope-simple ic " aria-hidden="true"></i><span>Kritik dan saran</span></button>
+    <div class="pop-sep"></div>
+    <button class="pop-item danger" role="menuitem" id="menuLogout"><i class="ph ph-sign-out ic " aria-hidden="true"></i><span>Keluar</span></button>
+  </div>
+  <div id="notifMenu" class="pop notif-pop glass-strong" role="dialog" aria-label="Notifikasi"></div>
+  <div id="panelHost"></div>
+
+  <div class="main-area">
+    <main id="mainContent" class="main-content">
+      <!-- ===== BERANDA ===== -->
+      <section class="page active" id="page-home">
+        <section class="hero" id="hero" aria-labelledby="heroTitle">
+          <div class="hero-bg" id="heroBg" aria-hidden="true"></div>
+          <div class="hero-copy">
+            <p class="hero-greet"><i class="ph ph-sun ic " aria-hidden="true"></i><span id="homeGreeting">Selamat datang</span></p>
+            <h1 id="heroTitle">Selamat datang di <span>K-Pedia.</span></h1>
+            <p class="hero-lead">Satu ruang kerja digital untuk membantu pekerjaan perkeretaapian menjadi lebih cepat, mudah, dan akurat.</p>
+            <div class="hero-chips">
+              <button type="button" class="info-chip" id="clockChip" data-open="calendar" aria-haspopup="dialog" aria-label="Buka kalender dan detail waktu">
+                <span class="chip-ic"><i class="ph ph-clock ic " aria-hidden="true"></i></span><span class="chip-text"><b id="clockTime">--:--</b><small id="clockDate">Memuat waktu</small></span>
+              </button>
+              <button type="button" class="info-chip" id="weatherChip" data-open="weather" aria-haspopup="dialog" aria-label="Buka cuaca stasiun">
+                <span class="chip-ic" id="wxChipIc"><i class="ph ph-cloud-sun ic " aria-hidden="true"></i></span><span class="chip-text"><b id="wxChipTemp">--°</b><small id="wxChipPlace">Memuat cuaca</small></span>
+              </button>
+            </div>
+          </div>
+          <div class="hero-raka" id="heroRaka" aria-hidden="true"><img src="assets/raka/raka-stand.webp" alt="" decoding="async"></div>
+        </section>
+
+        <section class="tools" aria-labelledby="toolsTitle">
+          <div class="section-head"><div><h2 id="toolsTitle">Tools Customer Service</h2><p>Pilih alat untuk memulai. Menu bertanda Segera akan aktif setelah datanya tersedia.</p></div></div>
+          <div class="tool-grid" id="toolGrid">
+            <button class="tool-tile" type="button" data-page="tarsus" data-tool="tarsus"><span class="tool-ic"><i class="ph ph-ticket ic " aria-hidden="true"></i></span><span class="tool-txt"><strong>Tarif Khusus</strong><small>Tarif khusus per rute atau kereta, simulasi hemat, cek tiket.</small></span><span class="tool-go"><i class="ph ph-arrow-right ic " aria-hidden="true"></i></span></button>
+            <button class="tool-tile" type="button" data-page="wiki" data-tool="wiki"><span class="tool-ic"><i class="ph ph-book-open-text ic " aria-hidden="true"></i></span><span class="tool-txt"><strong>K-Pedia KAI</strong><small>Ensiklopedia aturan, istilah, dan layanan lengkap dengan sumber.</small></span><span class="tool-go"><i class="ph ph-arrow-right ic " aria-hidden="true"></i></span></button>
+            <button class="tool-tile is-soon" type="button" data-page="koordinasi" data-tool="koordinasi"><span class="tool-ic"><i class="ph ph-megaphone ic " aria-hidden="true"></i></span><span class="tool-txt"><strong>Update Info Koordinasi</strong><small>Cari hasil koordinasi unit dan layanan.</small></span><span class="soon-tag">Segera</span></button>
+            <button class="tool-tile is-soon" type="button" data-page="toka" data-tool="toka"><span class="tool-ic"><i class="ph ph-address-book ic " aria-hidden="true"></i></span><span class="tool-txt"><strong>TOKA</strong><small>Direktori kontak layanan per stasiun dan unit.</small></span><span class="soon-tag">Segera</span></button>
+            <button class="tool-tile is-soon" type="button" data-page="krl" data-tool="krl"><span class="tool-ic"><i class="ph ph-subway ic " aria-hidden="true"></i></span><span class="tool-txt"><strong>Jadwal KRL</strong><small>Jabodetabek dan Yogya–Solo, termasuk perjalanan transit.</small></span><span class="soon-tag">Segera</span></button>
+            <button class="tool-tile" type="button" data-page="peta" data-pages="peta stasiun" data-tool="peta"><span class="tool-ic"><i class="ph ph-map-trifold ic " aria-hidden="true"></i></span><span class="tool-txt"><strong>Peta Stasiun</strong><small>Peta jalur, pencarian stasiun, dan detail lokasi.</small></span><span class="tool-go"><i class="ph ph-arrow-right ic " aria-hidden="true"></i></span></button>
+            <button class="tool-tile" type="button" data-page="kalkulator" data-tool="kalkulator"><span class="tool-ic"><i class="ph ph-calculator ic " aria-hidden="true"></i></span><span class="tool-txt"><strong>Kalkulator</strong><small>Hitung cepat dan tambah atau kurang tanggal.</small></span><span class="tool-go"><i class="ph ph-arrow-right ic " aria-hidden="true"></i></span></button>
+            <button class="tool-tile" type="button" data-page="raka" data-tool="raka"><span class="tool-ic"><i class="ph ph-sparkle ic " aria-hidden="true"></i></span><span class="tool-txt"><strong>RAKA AI</strong><small>Asisten opsional. Mode teks saja direkomendasikan.</small></span><span class="tool-go"><i class="ph ph-arrow-right ic " aria-hidden="true"></i></span></button>
+          </div>
+        </section>
+
+        <section class="info-section" id="infoSection" aria-labelledby="infoTitle">
+          <div class="section-head"><div><h2 id="infoTitle">Informasi penting</h2><p id="infoSub">Pengumuman, layanan, dan pembaruan untuk Customer Service.</p></div></div>
+          <div class="chip-row" id="infoFilters" role="tablist" aria-label="Kategori informasi"></div>
+          <div class="info-grid" id="infoGrid" aria-live="polite"></div>
+        </section>
+      </section>
+
+      <!-- ===== TARIF KHUSUS dan seterusnya (dipertahankan) ===== -->
+      <section class="page" id="page-tarsus">
+        <div class="page-heading"><div><h1>Tarif Khusus</h1><p>Pilih cara pencarian, lalu bandingkan dengan tarif normal dan lanjut cek tiket.</p></div></div>
+        <div class="kp-modes">
+          <button class="kp-mode glass" data-go="search" type="button"><span class="kp-mode-icon"><i class="ph ph-map-pin ic " aria-hidden="true"></i></span><span class="kp-mode-text"><strong>Cari berdasarkan rute</strong><small>Masukkan stasiun asal dan tujuan</small></span><span class="kp-mode-go" aria-hidden="true"><i class="ph ph-caret-right ic " aria-hidden="true"></i></span></button>
+          <button class="kp-mode glass" data-go="trains" type="button"><span class="kp-mode-icon"><i class="ph ph-train ic " aria-hidden="true"></i></span><span class="kp-mode-text"><strong>Cari berdasarkan kereta</strong><small>Pilih nama kereta, lihat semua relasinya</small></span><span class="kp-mode-go" aria-hidden="true"><i class="ph ph-caret-right ic " aria-hidden="true"></i></span></button>
+        </div>
+
+        <section class="block glass sim" aria-labelledby="simTitle">
+          <div class="block-head"><span class="panel-symbol"><i class="ph ph-calculator ic " aria-hidden="true"></i></span><div><h2 id="simTitle">Simulasi hemat</h2><p>Geser nominal tarif normal dan tarif khusus, selisihnya dihitung otomatis.</p></div></div>
+          <div class="sim-grid">
+            <div class="sim-field"><label for="simNormal">Tarif normal</label><div class="sim-money"><span>Rp</span><input id="simNormalNum" inputmode="numeric" aria-label="Nominal tarif normal" value="350.000"></div><input id="simNormal" type="range" min="0" max="1500000" step="5000" value="350000"></div>
+            <div class="sim-field"><label for="simSpecial">Tarif khusus</label><div class="sim-money"><span>Rp</span><input id="simSpecialNum" inputmode="numeric" aria-label="Nominal tarif khusus" value="250.000"></div><input id="simSpecial" type="range" min="0" max="1500000" step="5000" value="250000"></div>
+          </div>
+          <div class="sim-opts">
+            <div class="stepper" role="group" aria-label="Jumlah penumpang"><span>Penumpang</span><button id="simMinus" type="button" aria-label="Kurangi penumpang"><i class="ph ph-minus ic -sm" aria-hidden="true"></i></button><output id="simPax">1</output><button id="simPlus" type="button" aria-label="Tambah penumpang"><i class="ph ph-plus ic -sm" aria-hidden="true"></i></button></div>
+            <label class="switch"><input id="simRound" type="checkbox"><span class="switch-ui" aria-hidden="true"></span><span>Pulang pergi</span></label>
+          </div>
+          <div class="sim-result" aria-live="polite">
+            <div class="sim-bars"><div class="sim-bar"><span>Normal</span><i><b id="barNormal"></b></i><em id="valNormal">Rp 0</em></div><div class="sim-bar sim-bar-sp"><span>Khusus</span><i><b id="barSpecial"></b></i><em id="valSpecial">Rp 0</em></div></div>
+            <div class="sim-save"><small id="simLabel">Kamu hemat</small><strong id="simSave">Rp 0</strong><span id="simPct" class="sim-pct">0%</span></div>
+          </div>
+          <p class="sim-note" id="simNote"></p>
+        </section>
+
+        <section class="block glass cta-ticket" aria-labelledby="ctaTitle">
+          <div class="block-head"><span class="panel-symbol"><i class="ph ph-ticket ic " aria-hidden="true"></i></span><div><h2 id="ctaTitle">Cek ketersediaan atau pesan tiket</h2><p>Tarif khusus belum tentu ada kursinya. Pastikan di Access by KAI, lalu pesan langsung bila tersedia.</p></div></div>
+          <div class="cta-row"><a class="primary-button" id="ctaAccess" href="https://access.kai.id" target="_blank" rel="noopener noreferrer">Buka Access by KAI<i class="ph ph-arrow-square-out ic -sm" aria-hidden="true"></i></a><a class="secondary-button" id="ctaCall" href="tel:121"><i class="ph ph-phone ic -sm" aria-hidden="true"></i>Hubungi KAI 121</a></div>
+        </section>
+
+        <div class="two-col">
+          <section class="block glass" aria-labelledby="howTitle"><div class="block-head"><div><h2 id="howTitle">Cara menggunakan</h2></div></div><ol id="tarsusSteps" class="steps"></ol></section>
+          <section class="block glass" aria-labelledby="termsTitle"><div class="block-head"><div><h2 id="termsTitle">Syarat dan ketentuan</h2></div></div><div id="tarsusTerms" class="terms"></div></section>
+        </div>
+      </section>
+
+      <!-- ===== CARI RUTE ===== -->
+      <section class="page" id="page-search">
+        <div class="kp-seg glass" role="group" aria-label="Mode pencarian"><button type="button" data-page="search">Rute</button><button type="button" data-page="trains">Kereta</button></div>
+        <div class="page-heading"><div><h1>Cari tarif berdasarkan rute</h1><p>Masukkan stasiun asal dan tujuan untuk menemukan relasi tarif yang sesuai.</p></div><button class="quiet-link" data-go="tarsus" type="button"><i class="ph ph-arrow-left ic -sm" aria-hidden="true"></i>Tarif Khusus</button></div>
+        <form id="searchForm" class="search-panel glass" autocomplete="off">
+          <div class="search-panel-top"><span class="panel-symbol"><i class="ph ph-magnifying-glass ic " aria-hidden="true"></i></span><div><h2>Rute perjalanan</h2><p>Pilih nama stasiun yang muncul pada saran.</p></div></div>
+          <div class="station-fields">
+            <div class="field-wrap"><label for="origin">Stasiun asal</label><div class="station-input"><span class="station-dot origin-dot"></span><input id="origin" placeholder="Ketik nama stasiun" autocomplete="off" aria-autocomplete="list" aria-controls="originSuggestions"><button id="clearOrigin" class="clear-input" type="button" hidden aria-label="Hapus asal"><i class="ph ph-x ic -sm" aria-hidden="true"></i></button></div><div id="originSuggestions" class="suggestions" role="listbox" hidden></div></div>
+            <button id="swapStations" class="swap-btn" type="button" aria-label="Tukar stasiun"><i class="ph ph-arrows-down-up ic " aria-hidden="true"></i></button>
+            <div class="field-wrap"><label for="destination">Stasiun tujuan</label><div class="station-input"><span class="station-dot dest-dot"></span><input id="destination" placeholder="Ketik nama stasiun" autocomplete="off" aria-autocomplete="list" aria-controls="destinationSuggestions"><button id="clearDestination" class="clear-input" type="button" hidden aria-label="Hapus tujuan"><i class="ph ph-x ic -sm" aria-hidden="true"></i></button></div><div id="destinationSuggestions" class="suggestions" role="listbox" hidden></div></div>
+          </div>
+          <div class="form-foot"><span>Pencarian mengikuti aturan relasi dan arah tarif di database.</span><button id="resetSearch" class="quiet-link" type="button">Reset</button></div>
+          <button id="searchButton" class="primary-button search-submit" type="submit"><span class="submit-text">Cari tarif</span></button>
+          <p id="searchMessage" class="inline-message" aria-live="polite" hidden></p>
+        </form>
+        <div class="results-heading"><h2>Relasi yang ditemukan</h2><p id="resultsSummary">Hasil tarif akan ditampilkan di sini.</p></div>
+        <div id="results" class="results-list"><div class="empty-state glass"><span class="empty-symbol"><i class="ph ph-magnifying-glass ic " aria-hidden="true"></i></span><h3>Siap mencari tarif</h3><p>Masukkan stasiun asal dan tujuan, lalu tekan Cari tarif untuk menampilkan referensi yang sesuai.</p></div></div>
+      </section>
+
+      <!-- ===== CARI KERETA ===== -->
+      <section class="page" id="page-trains">
+        <div class="kp-seg glass" role="group" aria-label="Mode pencarian"><button type="button" data-page="search">Rute</button><button type="button" data-page="trains">Kereta</button></div>
+        <div class="page-heading"><div><h1>Cari tarif berdasarkan kereta</h1><p>Pilih nama kereta untuk melihat semua relasi tarif khusus yang tercatat.</p></div><button class="quiet-link" data-go="tarsus" type="button"><i class="ph ph-arrow-left ic -sm" aria-hidden="true"></i>Tarif Khusus</button></div>
+        <div class="tool-search glass"><span class="tool-search-icon"><i class="ph ph-magnifying-glass ic " aria-hidden="true"></i></span><input id="trainFilter" placeholder="Cari nama kereta..." aria-label="Cari nama kereta"></div>
+        <div id="trainList" class="directory-list"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
+      </section>
+
+      <!-- ===== PETA ===== -->
+      <section class="page" id="page-peta">
+        <div class="kp-seg glass" role="group" aria-label="Peta dan stasiun"><button type="button" data-page="peta">Peta jalur</button><button type="button" data-page="stasiun">Nama stasiun</button></div>
+        <div class="map-shell glass" id="mapShell">
+          <div id="kpMap" class="kp-map" role="application" aria-label="Peta jalur kereta api"></div>
+          <div class="map-top">
+            <div class="map-search glass-strong"><i class="ph ph-magnifying-glass ic -sm" aria-hidden="true"></i><input id="mapSearch" type="search" placeholder="Cari stasiun di peta" autocomplete="off" aria-label="Cari stasiun di peta"><div id="mapSuggest" class="map-suggest glass-strong" hidden></div></div>
+            <button id="layerBtn" class="map-btn glass-strong" type="button" aria-label="Pengaturan peta" aria-expanded="false"><i class="ph ph-stack ic " aria-hidden="true"></i></button>
+            <button id="locateBtn" class="map-btn glass-strong" type="button" aria-label="Lokasi saya"><i class="ph ph-crosshair ic " aria-hidden="true"></i></button>
+          </div>
+          <div id="layerMenu" class="layer-menu glass-strong" hidden>
+            <strong>Tampilan peta</strong>
+            <div class="seg-mini" role="group" aria-label="Dasar peta"><button type="button" data-base="clean" class="active">Bersih</button><button type="button" data-base="osm">Jalan</button><button type="button" data-base="sat">Satelit</button></div>
+            <label class="switch"><input id="railToggle" type="checkbox" checked><span class="switch-ui" aria-hidden="true"></span><span>Jalur rel lengkap</span></label>
+            <small>Jalur rel dari OpenRailwayMap. Perlu koneksi internet.</small>
+          </div>
+          <div id="mapChips" class="map-chips" role="group" aria-label="Filter layanan"></div>
+          <div id="mapFallback" class="map-fallback glass-strong" hidden><span class="empty-symbol"><i class="ph ph-map-trifold ic " aria-hidden="true"></i></span><h3>Peta belum bisa dimuat</h3><p>Peta membutuhkan koneksi internet. Periksa koneksi, lalu coba lagi.</p><button id="mapRetry" class="primary-button" type="button">Coba lagi</button></div>
+        </div>
+      </section>
+
+      <!-- ===== NAMA STASIUN ===== -->
+      <section class="page" id="page-stasiun">
+        <div class="kp-seg glass" role="group" aria-label="Peta dan stasiun"><button type="button" data-page="peta">Peta jalur</button><button type="button" data-page="stasiun">Nama stasiun</button></div>
+        <div class="page-heading"><div><h1>Nama stasiun</h1><p>Cari per nama atau wilayah Daop/Divre, lalu buka untuk melihat informasinya.</p></div></div>
+        <div class="directory-tools"><div class="tool-search glass"><span class="tool-search-icon"><i class="ph ph-magnifying-glass ic " aria-hidden="true"></i></span><input id="stationFilter" placeholder="Cari nama stasiun..." aria-label="Cari stasiun"></div><select id="divisionFilter" class="glass-select glass" aria-label="Filter Daop atau Divre"><option value="">Semua Daop / Divre</option></select></div>
+        <p id="stationCount" class="list-meta"></p>
+        <div id="stationList" class="directory-list"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
+      </section>
+
+      <!-- ===== ENSIKLOPEDIA ===== -->
+      <section class="page" id="page-wiki">
+        <div id="wikiHome">
+          <div class="page-heading"><div><h1>Ensiklopedia KAI</h1><p>Panduan pemesanan, pembatalan, aturan penumpang, kelas kereta, dan sejarah KAI. Cari dengan kalimat biasa.</p></div></div>
+          <div class="tool-search glass"><span class="tool-search-icon"><i class="ph ph-magnifying-glass ic " aria-hidden="true"></i></span><input id="wikiFilter" type="search" placeholder="Tanya atau cari topik, mis. “refund berapa lama”" aria-label="Cari di ensiklopedia"></div>
+          <div id="wikiSuggest" class="suggest-row" aria-label="Pertanyaan populer"><button type="button" data-suggest="cara batalkan tiket">cara batalkan tiket</button><button type="button" data-suggest="ubah jadwal">ubah jadwal</button><button type="button" data-suggest="aturan bagasi">aturan bagasi</button><button type="button" data-suggest="ibu hamil naik kereta">ibu hamil naik kereta</button><button type="button" data-suggest="tarif Whoosh">tarif Whoosh</button><button type="button" data-suggest="barang tertinggal">barang tertinggal</button></div>
+          <div id="wikiChips" class="chip-row" role="group" aria-label="Kategori"></div>
+          <div id="wikiList" class="wiki-list"></div>
+        </div>
+        <article id="wikiDetail" class="wiki-detail" hidden></article>
+      </section>
+
+      <!-- ===== RAKA (Railway Assistant KAI) ===== -->
+      <section class="page" id="page-raka">
+        <div id="rakaRoot"></div>
+      </section>
+
+      <!-- ===== FAVORIT ===== -->
+      <section class="page" id="page-favorites">
+        <div class="page-heading"><div><h1>Favorit</h1><p>Simpan relasi penting agar lebih cepat ditemukan kembali.</p></div></div>
+        <div id="favoritesList" class="directory-list"></div>
+      </section>
+
+      <!-- ===== RIWAYAT ===== -->
+      <section class="page" id="page-history">
+        <div class="page-heading"><div><h1>Riwayat pencarian</h1><p>Pencarian tarif sebelumnya tersimpan secara lokal untuk akun ini pada perangkat ini.</p></div><button id="clearHistory" class="secondary-button" type="button">Hapus riwayat</button></div>
+        <div id="historyList" class="directory-list"><div class="list-placeholder">Belum ada riwayat.</div></div>
+      </section>
+
+      <!-- ===== PANDUAN ===== -->
+      <section class="page" id="page-guide">
+        <div class="page-heading"><div><h1>Panduan penggunaan</h1><p>Kenali menu K-Pedia dan cara memakainya.</p></div></div>
+        <div class="guide-grid">
+          <article class="guide-card glass"><i class="ph ph-chat-circle-text ic " aria-hidden="true"></i><h3>RAKA</h3><p>Asisten AI opsional di menu RAKA: tanya soal kereta api, minta bantuan menulis, atau kirim foto dan dokumen. Akun perlu disetujui admin.</p></article>
+        <article class="guide-card glass"><i class="ph ph-magnifying-glass ic " aria-hidden="true"></i><h3>Jam, kalender, dan cuaca</h3><p>Klik jam di Beranda untuk kalender dan hari libur nasional; klik cuaca untuk memilih stasiun atau wilayah.</p></article>
+          <article class="guide-card glass"><i class="ph ph-ticket ic " aria-hidden="true"></i><h3>Tarif Khusus</h3><p>Cari per rute atau nama kereta, hitung selisih dengan tarif normal, lalu cek tiket di Access by KAI.</p></article>
+          <article class="guide-card glass"><i class="ph ph-map-trifold ic " aria-hidden="true"></i><h3>Peta &amp; Stasiun</h3><p>Lihat peta jalur dan buka nama stasiun untuk membaca ulasan, fasilitas, dan sejarahnya.</p></article>
+          <article class="guide-card glass"><i class="ph ph-book-open-text ic " aria-hidden="true"></i><h3>Ensiklopedia KAI</h3><p>Cari istilah, jenis rangkaian, serta cara memesan dan membatalkan tiket.</p></article>
+        </div>
+        <div class="notice-panel glass"><strong>Penting: informasi dapat berubah</strong><p>Tarif, relasi, dan ketentuan dapat berubah sewaktu-waktu. Pastikan kembali ke sumber resmi KAI sebelum menggunakan atau menyampaikan informasi ini.</p></div>
+      </section>
+
+      <!-- ===== KRITIK & SARAN ===== -->
+      <section class="page" id="page-help">
+        <div class="page-heading"><div><h1>Kritik dan saran</h1><p>Masukan membantu pengembangan K-Pedia.</p></div></div>
+        <article class="developer-card glass"><img class="developer-photo" src="assets/pengembang.jpg" alt="Foto pengembang" onerror="this.style.display='none'"><div class="developer-bio"><span class="eyebrow">Pengembang</span><h2>Prima Adi Saputra</h2><p>Pengembangan K-Pedia, platform informasi perkeretaapian yang dimulai dari referensi tarif khusus kereta api.</p><div class="developer-socials"><a href="https://instagram.com/prima_adis" target="_blank" rel="noopener noreferrer">Instagram <span>@prima_adis</span><i class="ph ph-arrow-square-out ic -sm" aria-hidden="true"></i></a><a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer">LinkedIn <span>Lihat LinkedIn</span><i class="ph ph-arrow-square-out ic -sm" aria-hidden="true"></i></a></div></div></article>
+        <div class="support-intro"><h2>Ada koreksi atau saran?</h2><p>Jika menemukan data yang perlu diperiksa, kendala fitur, atau ide pengembangan, kirimkan rincian agar mudah ditindaklanjuti.</p></div>
+        <a class="support-link glass" href="mailto:primaadis46@gmail.com?subject=Kritik%20dan%20Saran%20K-Pedia"><span class="support-link-icon"><i class="ph ph-envelope-simple ic " aria-hidden="true"></i></span><span><strong>Kirim email pengembang</strong><small>primaadis46@gmail.com</small></span><span class="support-open">Kirim</span></a>
+        <p class="support-note">Untuk laporan data, sertakan nama kereta, relasi, kelas tarif, dan waktu pengecekan. Jangan menyertakan data pribadi pelanggan.</p>
+      </section>
+
+      <!-- ===== PENGATURAN ===== -->
+      <section class="page" id="page-settings">
+        <div class="page-heading"><div><h1>Pengaturan</h1><p>Atur tampilan aplikasi dan kelola data pencarian di perangkat ini.</p></div></div>
+        <div class="settings-stack">
+          <section class="settings-group glass"><div class="settings-group-title"><span class="settings-group-icon"><i class="ph ph-sun ic " aria-hidden="true"></i></span><div><h2>Tampilan</h2><p>Sesuaikan kenyamanan membaca.</p></div></div>
+            <div class="setting-row"><div><strong>Mode warna</strong><p>Pilih mode terang atau gelap.</p></div><select id="themeSetting" class="setting-select" aria-label="Mode warna"><option value="system">Ikuti perangkat</option><option value="light">Terang</option><option value="dark">Gelap</option></select></div>
+            <div class="setting-row"><div><strong>Ukuran teks</strong><p>Sesuaikan ukuran tulisan.</p></div><select id="fontSizeSetting" class="setting-select" aria-label="Ukuran teks"><option value="xsmall">Sangat kecil</option><option value="small">Kecil</option><option value="normal">Standar</option><option value="large">Besar</option><option value="xlarge">Sangat besar</option></select></div>
+          </section>
+          <section class="settings-group glass"><div class="settings-group-title"><span class="settings-group-icon"><i class="ph ph-trash ic " aria-hidden="true"></i></span><div><h2>Bersihkan data</h2><p>Hapus riwayat pencarian atau daftar favorit yang tersimpan di perangkat ini.</p></div></div>
+            <div class="setting-row"><div><strong>Riwayat pencarian</strong><p>Hapus daftar pencarian sebelumnya.</p></div><button id="clearHistorySetting" class="setting-action setting-danger" type="button">Hapus riwayat</button></div>
+            <div class="setting-row"><div><strong>Favorit</strong><p>Hapus semua relasi yang tersimpan.</p></div><button id="clearFavoritesSetting" class="setting-action setting-danger" type="button">Hapus favorit</button></div>
+            <div class="setting-row"><div><strong>Sesi akun</strong><p>Keluar dari akun K-Pedia.</p></div><button id="logoutButton" class="setting-action setting-danger" type="button">Logout</button></div>
+          </section>
+        </div>
+      </section>
+
+
+      <!-- ===== UPDATE INFO KOORDINASI (rancangan, menunggu data) ===== -->
+      <section class="page" id="page-koordinasi">
+        <div class="page-heading"><div><span class="eyebrow">Segera hadir</span><h1>Update Info Koordinasi</h1><p>Temukan hasil koordinasi antar unit dan layanan dengan cepat.</p></div></div>
+        <div class="wait-banner"><i class="ph ph-hourglass-medium ic " aria-hidden="true"></i><div><strong>Data belum tersedia</strong><p>Pencarian dinonaktifkan sampai sumber data hasil koordinasi terhubung. Rancangan filter di bawah sudah disiapkan.</p></div></div>
+        <div class="block glass">
+          <div class="filter-grid">
+            <label class="fld fld-wide"><span>Kata kunci</span><div class="field-box is-off"><i class="ph ph-magnifying-glass ic " aria-hidden="true"></i><input type="search" placeholder="Cari judul atau isi koordinasi" disabled aria-disabled="true"></div></label>
+            <label class="fld"><span>Unit atau layanan</span><select class="setting-select" disabled aria-disabled="true"><option>Semua unit</option></select></label>
+            <label class="fld"><span>Wilayah</span><select class="setting-select" disabled aria-disabled="true"><option>Semua wilayah</option></select></label>
+            <label class="fld"><span>Diperbarui dari</span><input class="date-input" type="date" disabled aria-disabled="true"></label>
+            <label class="fld"><span>Diperbarui sampai</span><input class="date-input" type="date" disabled aria-disabled="true"></label>
+          </div>
+          <button class="btn primary" type="button" disabled aria-disabled="true"><i class="ph ph-magnifying-glass ic " aria-hidden="true"></i> Cari koordinasi</button>
+        </div>
+        <div class="empty-state"><i class="ph ph-megaphone ic empty-ic" aria-hidden="true"></i><h3>Belum ada hasil koordinasi</h3><p>Hasil pencarian akan tampil di sini setelah data tersedia. Tidak ada contoh data yang ditampilkan agar tidak menyesatkan.</p></div>
+        <div class="schema-note"><b>Kolom data yang disiapkan:</b> judul, isi, unit/layanan, wilayah, tanggal pembaruan, sumber. Rancangan lengkap ada di <code>docs/ARSITEKTUR-DATA-ADMIN.md</code>.</div>
+      </section>
+
+      <!-- ===== TOKA (rancangan, menunggu data) ===== -->
+      <section class="page" id="page-toka">
+        <div class="page-heading"><div><span class="eyebrow">Segera hadir</span><h1>TOKA</h1><p>Direktori kontak layanan berdasarkan stasiun, unit, wilayah, dan jenis layanan.</p></div></div>
+        <div class="wait-banner"><i class="ph ph-hourglass-medium ic " aria-hidden="true"></i><div><strong>Data kontak belum tersedia</strong><p>Pencarian dinonaktifkan. K-Pedia tidak menampilkan kontak contoh agar tidak ada nomor yang salah dipakai.</p></div></div>
+        <div class="block glass">
+          <div class="filter-grid">
+            <label class="fld fld-wide"><span>Nama stasiun atau unit</span><div class="field-box is-off"><i class="ph ph-magnifying-glass ic " aria-hidden="true"></i><input type="search" placeholder="Cari stasiun, unit, atau layanan" disabled aria-disabled="true"></div></label>
+            <label class="fld"><span>Unit</span><select class="setting-select" disabled aria-disabled="true"><option>Semua unit</option></select></label>
+            <label class="fld"><span>Wilayah</span><select class="setting-select" disabled aria-disabled="true"><option>Semua wilayah</option></select></label>
+            <label class="fld"><span>Jenis layanan</span><select class="setting-select" disabled aria-disabled="true"><option>Semua layanan</option></select></label>
+          </div>
+          <button class="btn primary" type="button" disabled aria-disabled="true"><i class="ph ph-magnifying-glass ic " aria-hidden="true"></i> Cari kontak</button>
+        </div>
+        <div class="empty-state"><i class="ph ph-address-book ic empty-ic" aria-hidden="true"></i><h3>Direktori masih kosong</h3><p>Kartu kontak (nama unit, jenis layanan, nomor resmi) akan tampil di sini setelah data resmi diimpor oleh administrator.</p></div>
+        <div class="schema-note"><b>Kolom data yang disiapkan:</b> nama stasiun, unit, wilayah, jenis layanan, kontak resmi, jam layanan, tanggal verifikasi.</div>
+      </section>
+
+      <!-- ===== JADWAL KRL (rancangan, menunggu data) ===== -->
+      <section class="page" id="page-krl">
+        <div class="page-heading"><div><span class="eyebrow">Segera hadir</span><h1>Jadwal KRL</h1><p>Cari perjalanan KRL Jabodetabek dan Yogya–Solo, termasuk yang perlu transit.</p></div></div>
+        <div class="wait-banner"><i class="ph ph-hourglass-medium ic " aria-hidden="true"></i><div><strong>Data jadwal belum tersedia</strong><p>Pencarian dinonaktifkan sampai data jadwal KRL resmi diimpor. Tidak ada jadwal contoh yang ditampilkan.</p></div></div>
+        <div class="block glass">
+          <div class="seg-mini krl-net" role="group" aria-label="Jaringan KRL"><button type="button" class="active" disabled aria-disabled="true">KRL Jabodetabek</button><button type="button" disabled aria-disabled="true">KRL Yogya–Solo</button></div>
+          <div class="filter-grid">
+            <label class="fld"><span>Stasiun asal</span><div class="field-box is-off"><i class="ph ph-map-pin ic " aria-hidden="true"></i><input type="text" placeholder="Pilih stasiun asal" disabled aria-disabled="true"></div></label>
+            <label class="fld"><span>Stasiun tujuan</span><div class="field-box is-off"><i class="ph ph-map-pin ic " aria-hidden="true"></i><input type="text" placeholder="Pilih stasiun tujuan" disabled aria-disabled="true"></div></label>
+            <label class="fld"><span>Mulai jam</span><input class="date-input" type="time" value="05:00" disabled aria-disabled="true"></label>
+            <label class="fld"><span>Sampai jam</span><input class="date-input" type="time" value="23:00" disabled aria-disabled="true"></label>
+          </div>
+          <label class="switch is-off"><input type="checkbox" disabled aria-disabled="true"><span class="switch-ui"></span><span>Tampilkan jadwal satu hari penuh</span></label>
+          <button class="btn primary" type="button" disabled aria-disabled="true"><i class="ph ph-magnifying-glass ic " aria-hidden="true"></i> Cari perjalanan</button>
+        </div>
+        <div class="block glass">
+          <div class="block-head"><span class="panel-symbol"><i class="ph ph-subway ic " aria-hidden="true"></i></span><div><h2>Cara kerja pencarian transit (rancangan)</h2><p>Mesin pencari sudah dirancang mendukung perjalanan dengan pindah kereta, misalnya Depok → Manggarai → Jatinegara.</p></div></div>
+          <ol class="steps">
+            <li>Cari jadwal Depok–Manggarai.</li>
+            <li>Tampilkan waktu tiba di Manggarai.</li>
+            <li>Cari jadwal lanjutan Manggarai–Jatinegara yang berangkat setelah waktu tiba ditambah waktu transit minimum.</li>
+            <li>Periksa kelayakan waktu transit.</li>
+            <li>Tampilkan waktu keberangkatan awal dan kedatangan akhir.</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- ===== KALKULATOR ===== -->
+      <section class="page" id="page-kalkulator">
+        <div class="page-heading"><div><h1>Kalkulator</h1><p>Hitung cepat dan tambah atau kurang tanggal.</p></div></div>
+        <div class="kp-seg glass" role="tablist" aria-label="Jenis kalkulator"><button type="button" role="tab" class="active" data-calc-tab="math" aria-selected="true">Hitung</button><button type="button" role="tab" data-calc-tab="date" aria-selected="false">Tanggal</button></div>
+        <div id="calcMath" class="calc-wrap"></div>
+        <div id="calcDate" class="calc-wrap" hidden></div>
+      </section>
+
+      <footer class="site-footer">
+        <div class="foot-grid">
+          <div class="foot-about"><div class="foot-brand"><img src="assets/logo.png" alt=""><b>K-Pedia</b></div><p>Ruang kerja digital pendukung Customer Service perkeretaapian. Informasi cepat, mudah, dan akurat. Bukan aplikasi resmi KAI dan bukan layanan pemesanan tiket.</p></div>
+          <nav class="foot-col" aria-label="Bantuan"><h3>Bantuan</h3><button type="button" data-page="guide">Panduan penggunaan</button><button type="button" data-page="guide">Pusat bantuan</button><button type="button" data-page="help">Laporkan masalah</button></nav>
+          <nav class="foot-col" aria-label="Tentang"><h3>Tentang</h3><button type="button" data-doc="about">Tentang K-Pedia</button><button type="button" data-doc="privacy">Kebijakan privasi</button><button type="button" data-doc="terms">Ketentuan penggunaan</button></nav>
+          <nav class="foot-col" aria-label="Sumber resmi"><h3>Sumber resmi</h3><a href="https://www.kai.id" target="_blank" rel="noopener noreferrer">kai.id <i class="ph ph-arrow-square-out ic ic-sm" aria-hidden="true"></i></a><a href="https://access.kai.id" target="_blank" rel="noopener noreferrer">Access by KAI <i class="ph ph-arrow-square-out ic ic-sm" aria-hidden="true"></i></a></nav>
+        </div>
+        <div class="foot-bottom"><span class="foot-status"><span class="presence-dot" id="dbDot" role="img" aria-label="Status data"></span><span id="footerDataStatus">Menyiapkan database</span></span><span>K-Pedia <span id="appVersion">v8.0.0</span></span><span id="dbStatus" hidden></span><span id="dbStatusDetail" hidden></span></div>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<!-- Dokumen (tentang, privasi, ketentuan) -->
+<div id="docModal" class="doc-modal" hidden role="dialog" aria-modal="true" aria-labelledby="docTitle"><div class="doc-scrim" data-close-doc></div><div class="doc-card glass-strong"><button class="icon-btn doc-close" type="button" data-close-doc aria-label="Tutup"><i class="ph ph-x ic " aria-hidden="true"></i></button><h2 id="docTitle"></h2><div id="docBody" class="doc-body"></div></div></div>
+
+<!-- Detail stasiun -->
+<div id="stationSheet" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="sheet-backdrop" data-close-sheet></div>
+  <div class="sheet-panel glass-strong"><div class="sheet-grab" aria-hidden="true"></div><button class="sheet-close" type="button" data-close-sheet aria-label="Tutup"><i class="ph ph-x ic " aria-hidden="true"></i></button><div id="sheetBody" class="sheet-body"></div></div>
+</div>
+
+<div id="themeTransition" class="theme-transition-orb" hidden aria-hidden="true"></div><div id="toastRegion" class="toast-region" aria-live="polite"></div>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script><script src="kp-icons.js?v=8.0.0"></script><script src="data.js?v=8.0.0"></script><script src="content.js?v=8.0.0"></script><script src="stations-info.js?v=8.0.0"></script><script src="wiki-data.js?v=8.0.0"></script><script src="search-engine.js?v=8.0.0"></script><script src="dialogs.js?v=8.0.0"></script><script src="announcements.js?v=8.0.0"></script><script src="app.js?v=8.0.0"></script><script src="kp-time.js?v=8.0.0"></script><script src="kp-weather.js?v=8.0.0"></script><script src="kp-calc.js?v=8.0.0"></script><script src="krl-planner.js?v=8.0.0"></script><script src="kp-tools.js?v=8.0.0"></script><script src="kp-raka3d.js?v=8.0.0"></script><script src="kp-motion.js?v=8.0.0"></script><script src="kp-auth.js?v=8.0.0"></script><script src="raka.js?v=8.0.0"></script>
+</body>
+</html>
