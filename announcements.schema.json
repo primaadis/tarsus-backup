@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Informasi penting K-Pedia",
+  "type": "object",
+  "required": [
+    "items"
+  ],
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "category",
+          "title"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "category": {
+            "enum": [
+              "pengumuman",
+              "gangguan",
+              "layanan",
+              "promo",
+              "pembaruan"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "desc": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "effective": {
+            "type": "string",
+            "format": "date"
+          },
+          "image": {
+            "type": "string"
+          },
+          "link": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "linkLabel": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "important": {
+            "type": "boolean"
+          },
+          "notify": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}
