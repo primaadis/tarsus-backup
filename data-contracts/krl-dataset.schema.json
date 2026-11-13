@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Dataset jadwal KRL (dipakai krl-planner.js)",
+  "type": "object",
+  "required": [
+    "network",
+    "trips"
+  ],
+  "properties": {
+    "network": {
+      "enum": [
+        "jabodetabek",
+        "yogya-solo"
+      ]
+    },
+    "minTransitMinutes": {
+      "type": "integer",
+      "default": 3
+    },
+    "maxTransitMinutes": {
+      "type": "integer",
+      "default": 60
+    },
+    "effectiveFrom": {
+      "type": "string",
+      "format": "date"
+    },
+    "trips": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "stops"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "line": {
+            "type": "string"
+          },
+          "stops": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "station"
+              ],
+              "properties": {
+                "station": {
+                  "type": "string"
+                },
+                "arr": {
+                  "type": "string",
+                  "pattern": "^\\d{1,2}:\\d{2}$"
+                },
+                "dep": {
+                  "type": "string",
+                  "pattern": "^\\d{1,2}:\\d{2}$"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TOKA — direktori kontak layanan",
+  "type": "object",
+  "required": [
+    "items"
+  ],
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "station",
+          "unit",
+          "serviceType",
+          "contact",
+          "verified"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "station": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "serviceType": {
+            "type": "string"
+          },
+          "contact": {
+            "type": "string",
+            "description": "Kontak RESMI yang sudah diverifikasi"
+          },
+          "hours": {
+            "type": "string"
+          },
+          "verified": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      }
+    }
+  }
+}
